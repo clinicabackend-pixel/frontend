@@ -10,7 +10,8 @@ import {
     Mail,
     User,
     Upload,
-    Plus
+    Plus,
+    Trash2
 } from 'lucide-react';
 
 export default function UsuariosPage() {
@@ -42,6 +43,19 @@ export default function UsuariosPage() {
             setUsuarios([]);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDelete = async (username: string) => {
+        if (window.confirm(`¿Estás seguro de que deseas desactivar al usuario ${username}?`)) {
+            try {
+                await usuarioService.deleteUsuario(username);
+                // Refresh list
+                await fetchUsuarios();
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                alert('Hubo un error al intentar desactivar el usuario.');
+            }
         }
     };
 
@@ -176,7 +190,15 @@ export default function UsuariosPage() {
                                             {getStatusBadge(user.estatus)}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            {/* Future: Add Edit/View buttons */}
+                                            <div className="flex justify-end gap-2">
+                                                <button
+                                                    onClick={() => handleDelete(user.username)}
+                                                    className="text-red-600 hover:text-red-900 transition-colors"
+                                                    title="Desactivar usuario"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}

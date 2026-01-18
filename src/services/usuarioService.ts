@@ -30,6 +30,10 @@ const usuarioService = {
         // Checking backend controller list: UsuarioController exist.
         const response = await api.post<Usuario>('/usuarios', usuario);
         return response.data;
+    },
+
+    deleteUsuario: async (username: string): Promise<void> => {
+        await api.delete(`/usuarios/${username}`);
     }
 };
 
