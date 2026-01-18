@@ -1,5 +1,7 @@
 import api from './api';
 import type { SolicitanteRequest, SolicitanteResponse } from '../types';
+import type { EncuestaResponse } from '../types/encuesta_response';
+import type { CasoSummary } from '../types/caso';
 
 // La interfaz Solicitante ahora coincide directamente con SolicitanteRequest
 export type Solicitante = SolicitanteRequest;
@@ -41,6 +43,11 @@ const solicitanteService = {
     },
 
     getEncuesta: async (cedula: string) => {
+        const response = await api.get<EncuestaResponse>(`/solicitantes/${cedula}/encuesta-resumen`);
+        return response.data;
+    },
+
+    getEncuestaEdicion: async (cedula: string) => {
         const response = await api.get<import('../types/encuesta').DatosEncuestaResponse>(`/solicitantes/${cedula}/encuesta`);
         return response.data;
     },
@@ -51,12 +58,12 @@ const solicitanteService = {
     },
 
     getCasosTitular: async (cedula: string) => {
-        const response = await api.get<any[]>(`/solicitantes/${cedula}/casos-titular`);
+        const response = await api.get<CasoSummary[]>(`/solicitantes/${cedula}/casos-titular`);
         return response.data;
     },
 
     getCasosBeneficiario: async (cedula: string) => {
-        const response = await api.get<any[]>(`/solicitantes/${cedula}/casos-beneficiario`);
+        const response = await api.get<CasoSummary[]>(`/solicitantes/${cedula}/casos-beneficiario`);
         return response.data;
     },
 };

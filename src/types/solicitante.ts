@@ -35,4 +35,7 @@ export interface SolicitanteResponse {
     idCondicionActividad?: number;
     idNivel?: number;
     apellido?: string; // Adding as optional if backend sends it, otherwise update backend DTO
+    nombreParroquia?: string;
+    nombreMunicipio?: string;
+    nombreEstado?: string;
 }

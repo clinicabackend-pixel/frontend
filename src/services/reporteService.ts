@@ -1,22 +1,83 @@
 import api from './api';
 
+const downloadBlob = (data: Blob, filename: string) => {
+  const url = window.URL.createObjectURL(new Blob([data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', filename);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+};
+
+export interface DashboardStats {
+  totalCasos: number;
+  casosActivos: number;
+  casosCerrados: number;
+  totalSolicitantes: number;
+  distribucionMateria: Record<string, number>;
+  porcentajeVulnerabilidad: number;
+}
+
 export const reporteService = {
+  getDashboardStats: async (): Promise<DashboardStats> => {
+    try {
+      const response = await api.get<DashboardStats>('/reportes/stats');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+      throw error;
+    }
+  },
+
   downloadReporteGeneral: async () => {
     try {
       const response = await api.get('/reportes/general', {
-        responseType: 'blob', // Important for handling binary data
+        responseType: 'blob',
       });
-      
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'reporte_general.xlsx');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      downloadBlob(response.data, 'reporte_general.xlsx');
     } catch (error) {
       console.error('Error downloading general report:', error);
+      throw error;
+    }
+  },
+
+  downloadFichaSolicitante: async (cedula: string) => {
+    try {
+      const response = await api.get(`/reportes/solicitante/${cedula}`, {
+        responseType: 'blob'
+      });
+      downloadBlob(response.data, `ficha_solicitante_${cedula}.xlsx`);
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  downloadFichaPdf: async (cedula: string) => {
+    try {
+      const response = await api.get(`/reportes/ficha/${cedula}/pdf`, {
+        responseType: 'blob'
+      });
+      downloadBlob(response.data, `ficha_solicitante_${cedula}.pdf`);
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      throw error;
+    }
+  },
+
+  downloadHistorialCasos: async (inicio: string, fin: string, usuario?: string, cedula?: string) => {
+    try {
+      const params: any = { inicio, fin };
+      if (cedula) params.cedula = cedula;
+      if (usuario) params.usuario = usuario;
+
+      const response = await api.get('/reportes/historial-casos', {
+        params,
+        responseType: 'blob'
+      });
+      downloadBlob(response.data, `historial_casos_${cedula || 'general'}.xlsx`);
+    } catch (error) {
       throw error;
     }
   },
@@ -26,17 +87,44 @@ export const reporteService = {
       const response = await api.get(`/reportes/caso/${id}`, {
         responseType: 'blob',
       });
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `reporte_caso_${id}.xlsx`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      downloadBlob(response.data, `reporte_caso_${id}.xlsx`);
     } catch (error) {
       console.error('Error downloading case report:', error);
+      throw error;
+    }
+  },
+
+  downloadReporteCasoPdf: async (id: string) => {
+    try {
+      const response = await api.get(`/reportes/caso/${id}/pdf`, {
+        responseType: 'blob',
+      });
+      downloadBlob(response.data, `reporte_caso_${id}.pdf`);
+    } catch (error) {
+      console.error('Error downloading case PDF:', error);
+      throw error;
+    }
+  },
+
+  downloadReportePorEstatus: async (estatus: string) => {
+    try {
+      const response = await api.get(`/reportes/por-estatus/${estatus}`, {
+        responseType: 'blob'
+      });
+      downloadBlob(response.data, `casos_${estatus}.xlsx`);
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  downloadResumenSemestral: async (semestre: string, tipoCaso: number) => {
+    try {
+      const response = await api.get('/reportes/resumen', {
+        params: { semestre, tipoCaso },
+        responseType: 'blob'
+      });
+      downloadBlob(response.data, `resumen_${semestre}.xlsx`);
+    } catch (error) {
       throw error;
     }
   }

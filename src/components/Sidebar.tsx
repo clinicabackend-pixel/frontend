@@ -21,6 +21,7 @@ const menuItems: MenuItem[] = [
   { label: 'Registro de Casos', path: '/registro-caso' },
   { label: 'Solicitantes y Beneficiarios', path: '/solicitantes' },
   { label: 'Gestión de Usuarios', path: '/usuarios' },
+  { label: 'Reportes e Indicadores', path: '/reportes' },
 ];
 
 function Sidebar({ isOpen, onClose }: SidebarProps) {
@@ -72,7 +73,7 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
               <button
                 key={index}
                 onClick={() => handleNavigate(item.path)}
-                className="w-full text-left text-xl px-6 py-3 text-white bg-red-800/50 hover:bg-red-700/70 rounded-lg transition-all duration-200 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                className="w-full text-left text-lg px-6 py-3 text-white bg-red-800/50 hover:bg-red-700/70 rounded-lg transition-all duration-200 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
               >
                 {item.label}
               </button>
@@ -83,7 +84,7 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
           <div className="mt-auto pb-4">
             <button
               onClick={handleLogout}
-              className="w-full text-left text-xl px-6 py-3 text-white bg-red-950 hover:bg-black/50 rounded-lg transition-all duration-200 font-medium shadow-md hover:shadow-lg border border-red-800/50 flex items-center gap-3"
+              className="w-full text-left text-lg px-6 py-3 text-white bg-red-950 hover:bg-black/50 rounded-lg transition-all duration-200 font-medium shadow-md hover:shadow-lg border border-red-800/50 flex items-center gap-3"
             >
               <FontAwesomeIcon icon={faRightFromBracket} className="text-xl" />
               Cerrar Sesión

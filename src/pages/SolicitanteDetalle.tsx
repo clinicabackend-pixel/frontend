@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faUser, faBriefcase, faAddressCard, faPhone, faEnvelope, faEdit, faFileAlt } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faUser, faBriefcase, faAddressCard, faPhone, faEnvelope, faEdit, faFileAlt, faMapMarkerAlt, faFilePdf } from '@fortawesome/free-solid-svg-icons';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import Button from '../components/common/Button';
 import solicitanteService from '../services/solicitanteService';
+import { reporteService } from '../services/reporteService';
 import type { SolicitanteResponse } from '../types/solicitante';
+import type { CasoSummary } from '../types/caso';
+import type { EncuestaResponse } from '../types/encuesta_response';
 import SolicitanteForm from '../components/forms/SolicitanteForm';
 
 export default function SolicitanteDetalle() {
@@ -19,9 +22,10 @@ export default function SolicitanteDetalle() {
     const [isEditing, setIsEditing] = useState(false);
 
     // New state for Encuesta and Cases
-    const [encuesta, setEncuesta] = useState<any | null>(null);
-    const [casosTitular, setCasosTitular] = useState<any[]>([]);
-    const [casosBeneficiario, setCasosBeneficiario] = useState<any[]>([]);
+    // New state for Encuesta and Cases
+    const [encuesta, setEncuesta] = useState<EncuestaResponse | null>(null);
+    const [casosTitular, setCasosTitular] = useState<CasoSummary[]>([]);
+    const [casosBeneficiario, setCasosBeneficiario] = useState<CasoSummary[]>([]);
 
     useEffect(() => {
         if (id) {
@@ -139,6 +143,13 @@ export default function SolicitanteDetalle() {
                                     >
                                         Editar Informaci&oacute;n
                                     </Button>
+                                    <Button
+                                        onClick={() => solicitante && reporteService.downloadFichaPdf(solicitante.cedula)}
+                                        className="bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-xs ml-2"
+                                        icon={faFilePdf}
+                                    >
+                                        Ficha PDF
+                                    </Button>
                                 </div>
                             </div>
 
@@ -195,6 +206,15 @@ export default function SolicitanteDetalle() {
                                                 <dd className="font-medium text-gray-900">{solicitante.telfCasa || 'N/A'}</dd>
                                             </div>
                                         </div>
+                                        <div className="flex items-start gap-3">
+                                            <FontAwesomeIcon icon={faMapMarkerAlt} className="text-gray-400 mt-1" />
+                                            <div>
+                                                <dt className="text-gray-500">Direcci&oacute;n</dt>
+                                                <dd className="font-medium text-gray-900">
+                                                    {solicitante.nombreEstado || 'Estado (?)'}, {solicitante.nombreMunicipio || 'Municipio (?)'}, {solicitante.nombreParroquia || 'Parroquia (?)'}
+                                                </dd>
+                                            </div>
+                                        </div>
                                     </dl>
                                 </section>
 
@@ -236,28 +256,78 @@ export default function SolicitanteDetalle() {
                                             <dl className="grid grid-cols-1 gap-y-2 text-sm">
                                                 <div className="flex justify-between border-b border-gray-50 pb-1">
                                                     <dt className="text-gray-500">Cant. Personas</dt>
-                                                    <dd className="font-medium text-gray-900">{encuesta.familia?.cantPersonas || 'N/A'}</dd>
+                                                    <dd className="font-medium text-gray-900">{encuesta.familia?.cantPersonas}</dd>
+                                                </div>
+                                                <div className="flex justify-between border-b border-gray-50 pb-1">
+                                                    <dt className="text-gray-500">Cant. Ni&ntilde;os</dt>
+                                                    <dd className="font-medium text-gray-900">{encuesta.familia?.cantNinos}</dd>
+                                                </div>
+                                                <div className="flex justify-between border-b border-gray-50 pb-1">
+                                                    <dt className="text-gray-500">Cant. Estudiando</dt>
+                                                    <dd className="font-medium text-gray-900">{encuesta.familia?.cantEstudiando}</dd>
+                                                </div>
+                                                <div className="flex justify-between border-b border-gray-50 pb-1">
+                                                    <dt className="text-gray-500">Cant. Trabaja</dt>
+                                                    <dd className="font-medium text-gray-900">{encuesta.familia?.cantTrabaja}</dd>
+                                                </div>
+                                                <div className="flex justify-between border-b border-gray-50 pb-1">
+                                                    <dt className="text-gray-500">Cant. Sin Trabajo</dt>
+                                                    <dd className="font-medium text-gray-900">{encuesta.familia?.cantSinTrabajo}</dd>
                                                 </div>
                                                 <div className="flex justify-between border-b border-gray-50 pb-1">
                                                     <dt className="text-gray-500">Ingreso Mensual</dt>
-                                                    <dd className="font-medium text-gray-900">{encuesta.familia?.ingresoMes || 'N/A'}</dd>
+                                                    <dd className="font-medium text-gray-900">{encuesta.familia?.ingresoMes}</dd>
                                                 </div>
                                                 <div className="flex justify-between border-b border-gray-50 pb-1">
                                                     <dt className="text-gray-500">Es Jefe de Familia</dt>
                                                     <dd className="font-medium text-gray-900">{encuesta.familia?.jefeFamilia ? 'S\u00ED' : 'No'}</dd>
                                                 </div>
+                                                {encuesta.familia?.tiempoEstudio && (
+                                                    <div className="flex justify-between border-b border-gray-50 pb-1">
+                                                        <dt className="text-gray-500">Tiempo Estudio</dt>
+                                                        <dd className="font-medium text-gray-900">{encuesta.familia?.tiempoEstudio}</dd>
+                                                    </div>
+                                                )}
                                             </dl>
                                         </section>
                                         <section>
                                             <h4 className="font-semibold text-gray-700 mb-2">Vivienda</h4>
                                             <dl className="grid grid-cols-1 gap-y-2 text-sm">
                                                 <div className="flex justify-between border-b border-gray-50 pb-1">
+                                                    <dt className="text-gray-500">Tipo</dt>
+                                                    <dd className="font-medium text-gray-900">{encuesta.vivienda?.tipoVivienda || 'N/A'}</dd>
+                                                </div>
+                                                <div className="flex justify-between border-b border-gray-50 pb-1">
                                                     <dt className="text-gray-500">Habitaciones</dt>
-                                                    <dd className="font-medium text-gray-900">{encuesta.vivienda?.cantHabitaciones || 'N/A'}</dd>
+                                                    <dd className="font-medium text-gray-900">{encuesta.vivienda?.cantHabitaciones}</dd>
                                                 </div>
                                                 <div className="flex justify-between border-b border-gray-50 pb-1">
                                                     <dt className="text-gray-500">Ba&ntilde;os</dt>
-                                                    <dd className="font-medium text-gray-900">{encuesta.vivienda?.cantBanos || 'N/A'}</dd>
+                                                    <dd className="font-medium text-gray-900">{encuesta.vivienda?.cantBanos}</dd>
+                                                </div>
+                                                <div className="flex justify-between border-b border-gray-50 pb-1">
+                                                    <dt className="text-gray-500">Material Piso</dt>
+                                                    <dd className="font-medium text-gray-900 max-w-[150px] truncate" title={encuesta.vivienda?.materialPiso}>{encuesta.vivienda?.materialPiso || 'N/A'}</dd>
+                                                </div>
+                                                <div className="flex justify-between border-b border-gray-50 pb-1">
+                                                    <dt className="text-gray-500">Material Paredes</dt>
+                                                    <dd className="font-medium text-gray-900 max-w-[150px] truncate" title={encuesta.vivienda?.materialParedes}>{encuesta.vivienda?.materialParedes || 'N/A'}</dd>
+                                                </div>
+                                                <div className="flex justify-between border-b border-gray-50 pb-1">
+                                                    <dt className="text-gray-500">Material Techo</dt>
+                                                    <dd className="font-medium text-gray-900 max-w-[150px] truncate" title={encuesta.vivienda?.materialTecho}>{encuesta.vivienda?.materialTecho || 'N/A'}</dd>
+                                                </div>
+                                                <div className="flex justify-between border-b border-gray-50 pb-1">
+                                                    <dt className="text-gray-500">Serv. Agua</dt>
+                                                    <dd className="font-medium text-gray-900 text-xs max-w-[150px] truncate" title={encuesta.vivienda?.servicioAgua}>{encuesta.vivienda?.servicioAgua || 'N/A'}</dd>
+                                                </div>
+                                                <div className="flex justify-between border-b border-gray-50 pb-1">
+                                                    <dt className="text-gray-500">Serv. Aseo</dt>
+                                                    <dd className="font-medium text-gray-900 text-xs max-w-[150px] truncate" title={encuesta.vivienda?.aseoUrbano}>{encuesta.vivienda?.aseoUrbano || 'N/A'}</dd>
+                                                </div>
+                                                <div className="flex justify-between border-b border-gray-50 pb-1">
+                                                    <dt className="text-gray-500">Excretas</dt>
+                                                    <dd className="font-medium text-gray-900 text-xs max-w-[150px] truncate" title={encuesta.vivienda?.eliminacionExcretas}>{encuesta.vivienda?.eliminacionExcretas || 'N/A'}</dd>
                                                 </div>
                                             </dl>
                                         </section>
@@ -287,6 +357,7 @@ export default function SolicitanteDetalle() {
                                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Caso #</th>
                                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
                                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">S&iacute;ntesis</th>
+                                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">&Aacute;mbito</th>
                                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estatus</th>
                                                     </tr>
                                                 </thead>
@@ -296,6 +367,7 @@ export default function SolicitanteDetalle() {
                                                             <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-red-900">{caso.numCaso}</td>
                                                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{caso.fechaRecepcion}</td>
                                                             <td className="px-4 py-3 text-sm text-gray-500 max-w-xs truncate">{caso.sintesis}</td>
+                                                            <td className="px-4 py-3 text-sm text-gray-500 max-w-xs truncate" title={caso.legalHierarchy}>{caso.legalHierarchy || 'N/A'}</td>
                                                             <td className="px-4 py-3 whitespace-nowrap">
                                                                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${caso.estatus === 'ABIERTO' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                                                                     {caso.estatus}
@@ -324,6 +396,7 @@ export default function SolicitanteDetalle() {
                                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Caso #</th>
                                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
                                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">S&iacute;ntesis</th>
+                                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">&Aacute;mbito</th>
                                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estatus</th>
                                                     </tr>
                                                 </thead>
@@ -333,6 +406,7 @@ export default function SolicitanteDetalle() {
                                                             <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-red-900">{caso.numCaso}</td>
                                                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{caso.fechaRecepcion}</td>
                                                             <td className="px-4 py-3 text-sm text-gray-500 max-w-xs truncate">{caso.sintesis}</td>
+                                                            <td className="px-4 py-3 text-sm text-gray-500 max-w-xs truncate" title={caso.legalHierarchy}>{caso.legalHierarchy || 'N/A'}</td>
                                                             <td className="px-4 py-3 whitespace-nowrap">
                                                                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${caso.estatus === 'ABIERTO' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                                                                     {caso.estatus}

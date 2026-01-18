@@ -68,7 +68,7 @@ export default function EncuestaForm({ cedula, onSuccess, onCancel }: EncuestaFo
                 setCondicionesActividad(condActData);
 
                 // 2. Load Existing Survey Data
-                const surveyData = await solicitanteService.getEncuesta(cedula);
+                const surveyData = await solicitanteService.getEncuestaEdicion(cedula);
 
                 if (surveyData.familia) setFamilia(surveyData.familia);
                 if (surveyData.vivienda) setVivienda(surveyData.vivienda);

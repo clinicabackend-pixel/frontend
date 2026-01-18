@@ -9,12 +9,12 @@ export default defineConfig({
     allowedHosts: ['.trycloudflare.com'],
     proxy: {
       '/auth': {
-        target: 'https://proyecto-db-backend.onrender.com',
+        target: 'https://backend-8ao1.onrender.com',
         changeOrigin: true,
         secure: false,
       },
       '/api': {
-        target: 'https://proyecto-db-backend.onrender.com',
+        target: 'https://backend-8ao1.onrender.com',
         changeOrigin: true,
         secure: false,
       },

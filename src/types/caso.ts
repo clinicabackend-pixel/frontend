@@ -137,6 +137,7 @@ export interface CasoSummary {
   cedula: string;
   nombreSolicitante: string;
   comAmbLegal: number;
+  legalHierarchy?: string;
 }
 
 // Interfaz simplificada para listas

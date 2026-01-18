@@ -49,11 +49,35 @@ function CasosPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const buildAmbitoMap = (ambitos: AmbitoLegal[], map: Record<number, string> = {}) => {
+  const buildHierarchyMap = (
+    ambitos: AmbitoLegal[],
+    map: Record<number, string> = {},
+    parentPath: string = ''
+  ) => {
     ambitos.forEach(ambito => {
-      map[ambito.id] = ambito.descripcion;
+      // Logic for "Sin Categoría/Subcategoría": 
+      // If the description acts as a placeholder (starts with "Sin "), we might want to skip it in the path, 
+      // BUT normally we just want the path. 
+      // The backend code used strict checks. 
+      // Let's implement a clean "Parent > Child" logic. 
+      // If parentPath exists, append " > ".
+
+      // Optional: Filter out "Sin ..." if you want cleaner UI, matching SmartAmbitoSelector style
+      const label = ambito.descripcion.startsWith("Sin ") ? "" : ambito.descripcion;
+
+      let currentPath = parentPath;
+      if (label) {
+        currentPath = parentPath ? `${parentPath} > ${label}` : label;
+      }
+
+      // Store the full path for this ID
+      // If current label was empty (e.g. "Sin Categoría"), we might typically NOT show it as a leaf, 
+      // but if this ID is referenced, we must show SOMETHING.
+      // If "Sin Categoria" is the leaf, we probably want to show the parent path at least.
+      map[ambito.id] = currentPath || ambito.descripcion; // Fallback to raw desc if path is empty
+
       if (ambito.children && ambito.children.length > 0) {
-        buildAmbitoMap(ambito.children, map);
+        buildHierarchyMap(ambito.children, map, currentPath);
       }
     });
     return map;
@@ -67,7 +91,7 @@ function CasosPage() {
           catalogoService.getAmbitosLegales(),
           catalogoService.getSemestres()
         ]);
-        setAmbitosLegales(buildAmbitoMap(ambitosData));
+        setAmbitosLegales(buildHierarchyMap(ambitosData));
         setSemestres(semestresData);
       } catch (error) {
         console.error('Error cargando catálogos:', error);
