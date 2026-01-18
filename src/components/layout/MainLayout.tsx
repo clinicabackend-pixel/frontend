@@ -20,16 +20,22 @@ function MainLayout({ title, children, className = '' }: MainLayoutProps) {
         setIsSidebarOpen(false);
     };
 
+
     return (
-        <div className="w-screen h-screen overflow-hidden flex flex-col">
-            <Header title={title} onMenuClick={handleMenuClick} />
+        <div className="flex w-screen h-screen overflow-hidden bg-gray-50">
+            {/* Sidebar is now a direct child of the flex container (on desktop) */}
             <Sidebar isOpen={isSidebarOpen} onClose={handleCloseSidebar} />
 
-            <main
-                className={`flex-1 overflow-y-auto bg-gray-50 px-6 py-4 md:px-8 md:py-6 lg:px-14 lg:py-8 ${className}`}
-            >
-                {children}
-            </main>
+            {/* Content Wrapper */}
+            <div className="flex-1 flex flex-col w-full min-w-0 transition-all duration-300">
+                <Header title={title} onMenuClick={handleMenuClick} />
+
+                <main
+                    className={`flex-1 overflow-y-auto px-4 py-4 md:px-8 md:py-6 lg:px-10 lg:py-8 ${className}`}
+                >
+                    {children}
+                </main>
+            </div>
         </div>
     );
 }
