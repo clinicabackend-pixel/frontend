@@ -9,11 +9,13 @@ import RegistroCaso from '../pages/RegistroCaso';
 import SolicitanteDetalle from '../pages/SolicitanteDetalle';
 import UsuariosPage from '../pages/Usuarios';
 import Reportes from '../pages/Reportes';
+import SetupPassword from '../pages/auth/SetupPassword';
 
 export default function AppRoutes() {
     return (
         <Routes>
             <Route path="/" element={<Login />} />
+            <Route path="/setup-password" element={<SetupPassword />} />
 
             <Route element={<ProtectedRoute />}>
                 <Route path="/home" element={<Home />} />
