@@ -1,8 +1,9 @@
-import LogoDiagonal from '../assets/LogoDiagonal.png';
 import LogoDerecho from '../assets/LogoDerecho.png';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -41,59 +42,119 @@ function Login() {
   };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden">
-      {/* Imagen de fondo */}
-      <img
-        className="absolute inset-0 w-full h-full object-contain opacity-10"
-        src={LogoDiagonal}
-        alt="Logo Derecho"
-      />
+    <div className="flex w-screen h-screen overflow-hidden bg-white">
+      {/* LEFT SIDE: Authentication Form (40%) */}
+      <div className="w-full lg:w-[40%] flex flex-col justify-center items-center px-8 md:px-16 lg:px-20 bg-white shadow-xl z-10">
 
-      {/* Contenedor para elementos del Login */}
-      <div className="relative z-10 w-full h-full flex flex-col items-center justify-center gap-3 md:gap-4 lg:gap-6 px-4">
-        {/* Logo responsive */}
-        <img
-          className="w-2/3 md:w-1/2 lg:w-1/2 2xl:w-2/3 max-w-3xl"
-          src={LogoDerecho}
-          alt="Logo Derecho"
-        />
+        {/* Header Section */}
+        <div className="w-full max-w-md mb-10 text-center">
+          {/* Logo */}
+          <div className="flex justify-center mb-6">
+            <img
+              className="w-32 md:w-40 object-contain"
+              src={LogoDerecho}
+              alt="Logo Clínica Jurídica"
+            />
+          </div>
+          <h1 className="text-3xl md:text-4xl font-serif font-bold text-red-900 mb-2">
+            Clínica Jurídica
+          </h1>
+          <p className="text-gray-500 text-sm md:text-base">
+            Acceso Institucional
+          </p>
+        </div>
 
-        {/* Título responsive */}
-        <h1 className="text-xl md:text-2xl lg:text-3xl font-bold">Clínica Jurídica</h1>
-
-        {/* Error message */}
+        {/* Error Alert */}
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-            <span className="block sm:inline">{error}</span>
+          <div className="w-full max-w-md mb-6 bg-red-50 border-l-4 border-red-900 p-4 rounded-r-md">
+            <div className="flex">
+              <div className="ml-3">
+                <p className="text-sm text-red-700 font-medium">{error}</p>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Form responsive */}
-        <form onSubmit={handleLogin} className="flex flex-col items-center gap-3 w-full">
-          <input
-            type="text"
-            placeholder="Usuario"
-            className="w-11/12 md:w-2/3 lg:w-1/2 xl:w-1/3 max-w-md h-11 md:h-12 lg:h-14 rounded-full border-2 bg-red-900 text-white px-4 md:px-6 placeholder-white text-sm md:text-xl focus:outline-none focus:ring-0 focus:border-red-700"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
+        {/* Form */}
+        <form onSubmit={handleLogin} className="w-full max-w-md space-y-6">
 
-          <input
-            type="password"
-            placeholder="Contraseña"
-            className="w-11/12 md:w-2/3 lg:w-1/2 xl:w-1/3 max-w-md h-11 md:h-12 lg:h-14 rounded-full border-2 bg-red-900 text-white px-4 md:px-6 placeholder-white text-sm md:text-xl focus:outline-none focus:ring-0 focus:border-red-700"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          {/* Username Input */}
+          <div className="relative">
+            <label className="block text-sm font-medium text-gray-700 mb-1 ml-1">Usuario</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-red-900/50">
+                <FontAwesomeIcon icon={faEnvelope} />
+              </div>
+              <input
+                type="text"
+                placeholder="Ingrese su usuario"
+                className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-900/20 focus:border-red-900 transition-all text-gray-800 placeholder-gray-400"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+          </div>
 
+          {/* Password Input */}
+          <div className="relative">
+            <label className="block text-sm font-medium text-gray-700 mb-1 ml-1">Contraseña</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-red-900/50">
+                <FontAwesomeIcon icon={faLock} />
+              </div>
+              <input
+                type="password"
+                placeholder="Ingrese su contraseña"
+                className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-900/20 focus:border-red-900 transition-all text-gray-800 placeholder-gray-400"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Submit Button */}
           <button
             type="submit"
-            className="w-40 md:w-48 lg:w-56 h-10 md:h-11 lg:h-12 rounded-full bg-gray-700 hover:bg-gray-600 text-white text-sm md:text-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={loading}
+            className="w-full py-3 px-4 bg-red-900 hover:bg-red-800 text-white font-medium rounded-lg shadow-md hover:shadow-lg transform transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-900 disabled:opacity-70 disabled:cursor-not-allowed mt-4"
           >
-            {loading ? 'Cargando...' : 'Iniciar sesión'}
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Validando...
+              </span>
+            ) : 'Iniciar Sesión'}
           </button>
         </form>
+
+        <div className="mt-8 text-center">
+          <p className="text-xs text-gray-400">
+            &copy; 2026 Clínica Jurídica. Todos los derechos reservados.
+          </p>
+        </div>
+      </div>
+
+      {/* RIGHT SIDE: Background Image (60%) */}
+      <div className="hidden lg:block lg:w-[60%] relative">
+        <img
+          className="absolute inset-0 w-full h-full object-cover"
+          src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&q=80"
+          alt="Office Background"
+        />
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-linear-to-br from-red-900/90 to-black/80 flex flex-col justify-end p-16">
+          <div className="max-w-xl text-white">
+            <h2 className="text-4xl font-serif font-bold mb-4 leading-tight">
+              Experiencia y Compromiso Social
+            </h2>
+            <p className="text-lg text-gray-200 font-light">
+              Plataforma de gestión integral para la atención de casos y servicios legales comunitarios.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
