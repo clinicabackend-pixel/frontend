@@ -1,11 +1,23 @@
 import LogoDerecho from '../assets/LogoDerecho.png';
+import LogoFondNegro from '../assets/LogoFondNegro.png';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Moon, Sun } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
+import { useTheme } from '../context/ThemeContext';
 
 function Login() {
+  const { theme, setTheme } = useTheme();
+  const [isDark, setIsDark] = useState(() => {
+    if (theme === 'dark') return true;
+    if (theme === 'light') return false;
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -18,6 +30,23 @@ function Login() {
       navigate('/home', { replace: true });
     }
   }, [isAuthenticated, navigate]);
+
+  // Actualizar isDark cuando cambia el theme
+  useEffect(() => {
+    if (theme === 'dark') {
+      setIsDark(true);
+    } else if (theme === 'light') {
+      setIsDark(false);
+    } else {
+      if (typeof window !== 'undefined') {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        setIsDark(mediaQuery.matches);
+        const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
+        mediaQuery.addEventListener('change', handler);
+        return () => mediaQuery.removeEventListener('change', handler);
+      }
+    }
+  }, [theme]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,34 +71,53 @@ function Login() {
   };
 
   return (
-    <div className="flex w-screen h-screen overflow-hidden bg-white">
+    <div className={`relative flex w-screen h-screen overflow-hidden ${isDark ? 'bg-red-900' : 'bg-white'}`}>
+      {/* Theme Toggle - Bottom Right Corner */}
+      <div className="absolute bottom-6 right-6 z-20">
+        <button
+          onClick={() => {
+            const newTheme = isDark ? 'light' : 'dark';
+            setTheme(newTheme);
+          }}
+          className="h-12 w-12 rounded-md border border-white/30 bg-transparent hover:bg-white/10 text-white transition-colors flex items-center justify-center"
+          title={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+          aria-label="Toggle theme"
+          type="button"
+        >
+          {isDark ? (
+            <Sun className="h-6 w-6" />
+          ) : (
+            <Moon className="h-6 w-6" />
+          )}
+        </button>
+      </div>
       {/* LEFT SIDE: Authentication Form (40%) */}
-      <div className="w-full lg:w-[40%] flex flex-col justify-center items-center px-8 md:px-16 lg:px-20 bg-white shadow-xl z-10">
+      <div className={`w-full lg:w-[40%] flex flex-col justify-center items-center px-8 md:px-16 lg:px-20 ${isDark ? 'bg-red-900' : 'bg-white'} shadow-xl z-10`}>
 
         {/* Header Section */}
         <div className="w-full max-w-md mb-10 text-center">
           {/* Logo */}
           <div className="flex justify-center mb-6">
             <img
-              className="w-32 md:w-40 object-contain"
-              src={LogoDerecho}
+              className="w-56 md:w-72 lg:w-80 object-contain"
+              src={isDark ? LogoFondNegro : LogoDerecho}
               alt="Logo Clínica Jurídica"
             />
           </div>
-          <h1 className="text-3xl md:text-4xl font-serif font-bold text-red-900 mb-2">
+          <h1 className={`text-3xl md:text-4xl lg:text-5xl font-serif font-bold mb-2 ${isDark ? 'text-white' : 'text-red-900'}`}>
             Clínica Jurídica
           </h1>
-          <p className="text-gray-500 text-sm md:text-base">
+          <p className={`text-base md:text-lg lg:text-xl ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
             Acceso Institucional
           </p>
         </div>
 
         {/* Error Alert */}
         {error && (
-          <div className="w-full max-w-md mb-6 bg-red-50 border-l-4 border-red-900 p-4 rounded-r-md">
+          <div className={`w-full max-w-md mb-6 px-4 py-3 rounded border ${isDark ? 'bg-red-900/50 border-red-700 text-red-200' : 'bg-red-50 border-red-400 text-red-700'} border-l-4 ${isDark ? 'border-red-700' : 'border-red-900'}`}>
             <div className="flex">
               <div className="ml-3">
-                <p className="text-sm text-red-700 font-medium">{error}</p>
+                <p className={`text-base md:text-lg font-medium ${isDark ? 'text-red-200' : 'text-red-700'}`}>{error}</p>
               </div>
             </div>
           </div>
@@ -80,15 +128,19 @@ function Login() {
 
           {/* Username Input */}
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1 ml-1">Usuario</label>
+            <label className={`block text-base md:text-lg font-medium mb-2 ml-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Usuario</label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-red-900/50">
-                <FontAwesomeIcon icon={faEnvelope} />
+              <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none ${isDark ? 'text-white/50' : 'text-red-900/50'}`}>
+                <FontAwesomeIcon icon={faEnvelope} className="text-lg" />
               </div>
               <input
                 type="text"
                 placeholder="Ingrese su usuario"
-                className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-900/20 focus:border-red-900 transition-all text-gray-800 placeholder-gray-400"
+                className={`w-full pl-12 pr-5 py-4 text-lg rounded-lg border-2 text-white placeholder-white focus:outline-none focus:ring-0 transition-all ${
+                  isDark 
+                    ? 'bg-red-900/80 border-red-700 focus:border-red-600' 
+                    : 'bg-red-900 border-red-800 focus:border-red-700'
+                }`}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
@@ -97,15 +149,19 @@ function Login() {
 
           {/* Password Input */}
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1 ml-1">Contraseña</label>
+            <label className={`block text-base md:text-lg font-medium mb-2 ml-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Contraseña</label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-red-900/50">
-                <FontAwesomeIcon icon={faLock} />
+              <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none ${isDark ? 'text-white/50' : 'text-red-900/50'}`}>
+                <FontAwesomeIcon icon={faLock} className="text-lg" />
               </div>
               <input
                 type="password"
                 placeholder="Ingrese su contraseña"
-                className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-900/20 focus:border-red-900 transition-all text-gray-800 placeholder-gray-400"
+                className={`w-full pl-12 pr-5 py-4 text-lg rounded-lg border-2 text-white placeholder-white focus:outline-none focus:ring-0 transition-all ${
+                  isDark 
+                    ? 'bg-red-900/80 border-red-700 focus:border-red-600' 
+                    : 'bg-red-900 border-red-800 focus:border-red-700'
+                }`}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -116,7 +172,11 @@ function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 bg-red-900 hover:bg-red-800 text-white font-medium rounded-lg shadow-md hover:shadow-lg transform transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-900 disabled:opacity-70 disabled:cursor-not-allowed mt-4"
+            className={`w-full py-4 px-4 text-lg md:text-xl text-white font-medium rounded-lg shadow-md hover:shadow-lg transform transition-all duration-200 focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed mt-4 ${
+              isDark 
+                ? 'bg-gray-700 hover:bg-gray-600' 
+                : 'bg-gray-700 hover:bg-gray-600'
+            }`}
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">

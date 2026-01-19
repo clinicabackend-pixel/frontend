@@ -4,6 +4,7 @@ export default {
         "./index.html",
         "./src/**/*.{js,ts,jsx,tsx}",
     ],
+    darkMode: 'class', // Habilitar dark mode usando clases
     theme: {
         extend: {
             zIndex: {

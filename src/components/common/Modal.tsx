@@ -39,18 +39,18 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
                 role="dialog"
                 aria-modal="true"
             >
-                <div className="flex items-center justify-between p-4 border-b border-red-800 bg-linear-to-r from-red-900 to-red-950">
-                    <h3 className="text-xl font-bold text-white shadow-sm">{title}</h3>
+                <div className="flex items-center justify-between p-4 bg-red-900">
+                    <h3 className="text-xl font-bold text-white">{title}</h3>
                     <button
                         onClick={onClose}
-                        className="p-1 rounded-full hover:bg-red-800/50 transition-colors duration-200 text-white/80 hover:text-white"
+                        className="p-1 text-white hover:text-gray-200 transition-colors duration-200"
                         aria-label="Cerrar modal"
                     >
                         <X className="w-6 h-6" />
                     </button>
                 </div>
 
-                <div className="overflow-y-auto">
+                <div className="overflow-y-auto bg-white p-6">
                     {children}
                 </div>
             </div>

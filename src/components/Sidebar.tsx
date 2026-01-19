@@ -13,6 +13,7 @@ import {
   faScaleBalanced
 } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { useState } from 'react';
 
 interface SidebarProps {
@@ -23,6 +24,8 @@ interface SidebarProps {
 function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [isCollapsed, setIsCollapsed] = useState(() => {
     const saved = localStorage.getItem('sidebarCollapsed');
     return saved === 'true';
@@ -42,9 +45,13 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-3 px-3 py-3 font-medium rounded-lg transition-all duration-300 group relative ${isActive
-      ? 'bg-red-50 text-red-900'
-      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-    } ${isCollapsed ? 'justify-center text-xl' : 'text-sm'}`;
+      ? isDark 
+        ? 'bg-red-800/50 text-white' 
+        : 'bg-red-50 text-red-900'
+      : isDark
+        ? 'text-white hover:bg-red-800/50'
+        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+    } ${isCollapsed ? 'justify-center text-2xl' : 'text-base'}`;
 
   // Helper to render the tooltip when collapsed
   const Tooltip = ({ text }: { text: string }) => {
@@ -71,7 +78,9 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transform transition-all duration-300 ease-in-out shadow-sm group
+        className={`fixed md:static inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out shadow-sm group
+          ${isDark ? 'bg-red-900 border-red-800' : 'bg-white border-gray-200'}
+          border-r
           ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
           ${isCollapsed ? 'w-20' : 'w-64'}
         `}
@@ -79,26 +88,26 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="flex flex-col h-full relative">
 
           {/* Header / Logo */}
-          <div className={`h-16 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between px-6'} border-b border-gray-100 transition-all duration-300`}>
+          <div className={`h-16 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between px-6'} ${isDark ? 'border-red-800' : 'border-gray-100'} border-b transition-all duration-300`}>
 
             {/* Desktop Toggle (Collapsed: Icon is the button) */}
             {isCollapsed ? (
               <button
                 onClick={toggleSidebar}
-                className="hidden md:flex text-2xl text-red-900 hover:scale-110 transition-transform duration-200 focus:outline-none"
+                className={`hidden md:flex text-2xl hover:scale-110 transition-transform duration-200 focus:outline-none ${isDark ? 'text-white' : 'text-red-900'}`}
                 title="Expandir"
               >
                 <FontAwesomeIcon icon={faScaleBalanced} />
               </button>
             ) : (
               <div className="flex items-center justify-between w-full">
-                <h1 className="text-xl font-serif font-bold text-red-900 tracking-wide truncate">
+                <h1 className={`text-xl font-serif font-bold tracking-wide truncate ${isDark ? 'text-white' : 'text-red-900'}`}>
                   Clínica Jurídica
                 </h1>
                 {/* Desktop Toggle (Expanded: Icon on right) */}
                 <button
                   onClick={toggleSidebar}
-                  className="hidden md:flex text-red-900 hover:scale-110 transition-transform duration-200 focus:outline-none ml-2"
+                  className={`hidden md:flex hover:scale-110 transition-transform duration-200 focus:outline-none ml-2 ${isDark ? 'text-white' : 'text-red-900'}`}
                   title="Contraer"
                 >
                   <FontAwesomeIcon icon={faScaleBalanced} />
@@ -112,7 +121,7 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
 
             <button
               onClick={onClose}
-              className="md:hidden text-gray-400 hover:text-gray-600 focus:outline-none ml-auto"
+              className={`md:hidden focus:outline-none ml-auto ${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}`}
             >
               <FontAwesomeIcon icon={faXmark} className="text-xl" />
             </button>
@@ -124,7 +133,7 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
             {/* Group: PRINCIPAL */}
             <div>
               {!isCollapsed && (
-                <p className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 transition-opacity duration-300">
+                <p className={`px-4 text-sm font-semibold uppercase tracking-wider mb-2 transition-opacity duration-300 ${isDark ? 'text-gray-300' : 'text-gray-400'}`}>
                   Principal
                 </p>
               )}
@@ -133,7 +142,7 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
               <ul className="space-y-1">
                 <li>
                   <NavLink to="/home" className={navLinkClasses} onClick={() => isOpen && onClose()}>
-                    <FontAwesomeIcon icon={faChartPie} className={`${isCollapsed ? '' : 'w-5 text-center'}`} />
+                    <FontAwesomeIcon icon={faChartPie} className={`${isCollapsed ? 'text-2xl' : 'text-xl'}`} />
                     {!isCollapsed && <span className="truncate">Dashboard</span>}
                     <Tooltip text="Dashboard" />
                   </NavLink>
@@ -144,35 +153,35 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
             {/* Group: OPERACIONES */}
             <div>
               {!isCollapsed && (
-                <p className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 transition-opacity duration-300">
+                <p className={`px-4 text-sm font-semibold uppercase tracking-wider mb-2 transition-opacity duration-300 ${isDark ? 'text-gray-300' : 'text-gray-400'}`}>
                   Operaciones
                 </p>
               )}
               <ul className="space-y-1">
                 <li>
                   <NavLink to="/solicitantes" className={navLinkClasses} onClick={() => isOpen && onClose()}>
-                    <FontAwesomeIcon icon={faUsers} className={`${isCollapsed ? '' : 'w-5 text-center'}`} />
+                    <FontAwesomeIcon icon={faUsers} className={`${isCollapsed ? 'text-2xl' : 'text-xl'}`} />
                     {!isCollapsed && <span className="truncate">Solicitantes</span>}
                     <Tooltip text="Solicitantes" />
                   </NavLink>
                 </li>
                 <li>
                   <NavLink to="/casos" className={navLinkClasses} onClick={() => isOpen && onClose()}>
-                    <FontAwesomeIcon icon={faBriefcase} className={`${isCollapsed ? '' : 'w-5 text-center'}`} />
+                    <FontAwesomeIcon icon={faBriefcase} className={`${isCollapsed ? 'text-2xl' : 'text-xl'}`} />
                     {!isCollapsed && <span className="truncate">Casos</span>}
                     <Tooltip text="Casos" />
                   </NavLink>
                 </li>
                 <li>
                   <NavLink to="/expedientes" className={navLinkClasses} onClick={() => isOpen && onClose()}>
-                    <FontAwesomeIcon icon={faFolderOpen} className={`${isCollapsed ? '' : 'w-5 text-center'}`} />
+                    <FontAwesomeIcon icon={faFolderOpen} className={`${isCollapsed ? 'text-2xl' : 'text-xl'}`} />
                     {!isCollapsed && <span className="truncate">Expedientes</span>}
                     <Tooltip text="Expedientes" />
                   </NavLink>
                 </li>
                 <li>
                   <NavLink to="/calendario" className={navLinkClasses} onClick={() => isOpen && onClose()}>
-                    <FontAwesomeIcon icon={faCalendarAlt} className={`${isCollapsed ? '' : 'w-5 text-center'}`} />
+                    <FontAwesomeIcon icon={faCalendarAlt} className={`${isCollapsed ? 'text-2xl' : 'text-xl'}`} />
                     {!isCollapsed && <span className="truncate">Agenda</span>}
                     <Tooltip text="Agenda" />
                   </NavLink>
@@ -183,21 +192,21 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
             {/* Group: SISTEMA */}
             <div>
               {!isCollapsed && (
-                <p className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 transition-opacity duration-300">
+                <p className={`px-4 text-sm font-semibold uppercase tracking-wider mb-2 transition-opacity duration-300 ${isDark ? 'text-gray-300' : 'text-gray-400'}`}>
                   Sistema
                 </p>
               )}
               <ul className="space-y-1">
                 <li>
                   <NavLink to="/reportes" className={navLinkClasses} onClick={() => isOpen && onClose()}>
-                    <FontAwesomeIcon icon={faFileLines} className={`${isCollapsed ? '' : 'w-5 text-center'}`} />
+                    <FontAwesomeIcon icon={faFileLines} className={`${isCollapsed ? 'text-2xl' : 'text-xl'}`} />
                     {!isCollapsed && <span className="truncate">Reportes</span>}
                     <Tooltip text="Reportes" />
                   </NavLink>
                 </li>
                 <li>
                   <NavLink to="/usuarios" className={navLinkClasses} onClick={() => isOpen && onClose()}>
-                    <FontAwesomeIcon icon={faUserGear} className={`${isCollapsed ? '' : 'w-5 text-center'}`} />
+                    <FontAwesomeIcon icon={faUserGear} className={`${isCollapsed ? 'text-2xl' : 'text-xl'}`} />
                     {!isCollapsed && <span className="truncate">Usuarios</span>}
                     <Tooltip text="Usuarios" />
                   </NavLink>
@@ -207,12 +216,16 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
           </nav>
 
           {/* Footer / Logout */}
-          <div className="p-4 border-t border-gray-100">
+          <div className={`p-4 border-t ${isDark ? 'border-red-800' : 'border-gray-100'}`}>
             <button
               onClick={handleLogout}
-              className={`flex items-center gap-3 w-full px-3 py-3 font-medium text-gray-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors group relative ${isCollapsed ? 'justify-center' : 'text-sm'}`}
+              className={`flex items-center gap-3 w-full px-3 py-3 font-medium rounded-lg transition-colors group relative ${isCollapsed ? 'justify-center text-2xl' : 'text-base'} ${
+                isDark
+                  ? 'text-white hover:bg-red-800/50'
+                  : 'text-gray-600 hover:text-red-700 hover:bg-red-50'
+              }`}
             >
-              <FontAwesomeIcon icon={faRightFromBracket} className={isCollapsed ? 'text-xl' : ''} />
+              <FontAwesomeIcon icon={faRightFromBracket} className={isCollapsed ? 'text-2xl' : 'text-xl'} />
               {!isCollapsed && <span className="truncate">Cerrar Sesión</span>}
               <Tooltip text="Cerrar Sesión" />
             </button>
