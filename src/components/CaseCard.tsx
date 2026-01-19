@@ -1,5 +1,4 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Keep for other usages if any
-import { faCalendarAlt, faIdCard } from '@fortawesome/free-solid-svg-icons'; // Keep if used in valid code blocks I might have missed, or just standard imports
+// Imports removed as they were unused
 import { useTheme } from '../context/ThemeContext';
 import { useEffect, useState } from 'react';
 
