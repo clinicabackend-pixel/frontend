@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faArrowLeft,
-  faFileExcel,
+  faFilePdf,
   faPencil,
   faPlus,
   faFolderOpen,
@@ -282,12 +282,13 @@ export default function CasoDetalle() {
           </Button>
           <div className="flex gap-2 items-center">
             <Button
-              onClick={() => caso.numCaso && reporteService.downloadReporteCaso(caso.numCaso)}
+              onClick={() => caso.numCaso && reporteService.downloadReporteCasoPdf(caso.numCaso)}
               variant="secondary"
               size="sm"
-              icon={faFileExcel}
+              icon={faFilePdf}
+              className="text-red-700 hover:text-red-900 border-red-200 hover:border-red-300"
             >
-              Exportar
+              Exportar PDF
             </Button>
             <span
               className={`px-4 py-1.5 rounded-full text-sm font-semibold border ${caso.estatus === 'ABIERTO'

@@ -1,4 +1,6 @@
-export interface FamiliaDTO {
+// src/types/encuesta.ts
+
+export interface EncuestaFamiliaDto {
     cantPersonas: number;
     cantEstudiando: number;
     ingresoMes: number;
@@ -10,7 +12,7 @@ export interface FamiliaDTO {
     tiempoEstudio: string;
 }
 
-export interface ViviendaDTO {
+export interface EncuestaViviendaDto {
     cantHabitaciones: number;
     cantBanos: number;
 }
@@ -21,11 +23,12 @@ export interface CaracteristicaRequest {
 }
 
 export interface DatosEncuestaRequest {
-    familia: FamiliaDTO;
-    vivienda: ViviendaDTO;
+    familia: EncuestaFamiliaDto;
+    vivienda: EncuestaViviendaDto;
     caracteristicas: CaracteristicaRequest[];
     idCondicion?: number;
     idCondicionActividad?: number;
 }
 
+// Response is same as Request for this case
 export type DatosEncuestaResponse = DatosEncuestaRequest;

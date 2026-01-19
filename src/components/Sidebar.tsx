@@ -9,8 +9,8 @@ import {
   faCalendarAlt,
   faFileLines,
   faUserGear,
-  faFolderOpen,
-  faScaleBalanced
+  faScaleBalanced,
+  faTags
 } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
@@ -164,13 +164,6 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
                   </NavLink>
                 </li>
                 <li>
-                  <NavLink to="/expedientes" className={navLinkClasses} onClick={() => isOpen && onClose()}>
-                    <FontAwesomeIcon icon={faFolderOpen} className={`${isCollapsed ? '' : 'w-5 text-center'}`} />
-                    {!isCollapsed && <span className="truncate">Expedientes</span>}
-                    <Tooltip text="Expedientes" />
-                  </NavLink>
-                </li>
-                <li>
                   <NavLink to="/calendario" className={navLinkClasses} onClick={() => isOpen && onClose()}>
                     <FontAwesomeIcon icon={faCalendarAlt} className={`${isCollapsed ? '' : 'w-5 text-center'}`} />
                     {!isCollapsed && <span className="truncate">Agenda</span>}
@@ -188,6 +181,13 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </p>
               )}
               <ul className="space-y-1">
+                <li>
+                  <NavLink to="/catalogos" className={navLinkClasses} onClick={() => isOpen && onClose()}>
+                    <FontAwesomeIcon icon={faTags} className={`${isCollapsed ? '' : 'w-5 text-center'}`} />
+                    {!isCollapsed && <span className="truncate">Catálogos</span>}
+                    <Tooltip text="Catálogos" />
+                  </NavLink>
+                </li>
                 <li>
                   <NavLink to="/reportes" className={navLinkClasses} onClick={() => isOpen && onClose()}>
                     <FontAwesomeIcon icon={faFileLines} className={`${isCollapsed ? '' : 'w-5 text-center'}`} />

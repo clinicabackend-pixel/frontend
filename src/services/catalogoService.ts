@@ -63,12 +63,64 @@ const catalogoService = {
     },
 
     getCondicionesLaborales: async () => {
-        const response = await api.get<import('../types').CondicionLaboralResponse[]>('/catalogos/condiciones-laborales');
+        const response = await api.get<import('../types/catalogo').CondicionLaboralResponse[]>('/catalogos/condiciones-laborales');
         return response.data;
     },
 
     getCondicionesActividad: async () => {
         const response = await api.get<import('../types').CondicionActividadResponse[]>('/catalogos/condiciones-actividad');
+        return response.data;
+    },
+
+    getNivelesEducativos: async () => {
+        const response = await api.get<import('../types/catalogo').NivelEducativoResponse[]>('/catalogos/niveles-educativos');
+        return response.data;
+    },
+
+    // --- CREATE METHODS ---
+    createNivelEducativo: async (nombre: string) => {
+        const response = await api.post('/catalogos/niveles-educativos', { nombre });
+        return response.data;
+    },
+
+    createCondicionLaboral: async (nombre: string) => {
+        const response = await api.post('/catalogos/condiciones-laborales', { nombre });
+        return response.data;
+    },
+
+    createCondicionActividad: async (nombre: string) => {
+        const response = await api.post('/catalogos/condiciones-actividad', { nombre });
+        return response.data;
+    },
+
+    createTipoVivienda: async (nombre: string) => {
+        const response = await api.post('/catalogos/viviendas/tipos', { nombre });
+        return response.data;
+    },
+
+    createVivienda: async (idTipo: number, descripcion: string) => {
+        const response = await api.post('/catalogos/viviendas', { idTipo, descripcion });
+        return response.data;
+    },
+
+    // --- UPDATE STATUS METHODS ---
+    updateNivelEducativoStatus: async (id: number, estatus: 'ACTIVO' | 'INACTIVO') => {
+        const response = await api.patch(`/catalogos/niveles-educativos/${id}/estatus`, null, { params: { estatus } });
+        return response.data;
+    },
+
+    updateCondicionLaboralStatus: async (id: number, estatus: 'ACTIVO' | 'INACTIVO') => {
+        const response = await api.patch(`/catalogos/condiciones-laborales/${id}/estatus`, null, { params: { estatus } });
+        return response.data;
+    },
+
+    updateCondicionActividadStatus: async (id: number, estatus: 'ACTIVO' | 'INACTIVO') => {
+        const response = await api.patch(`/catalogos/condiciones-actividad/${id}/estatus`, null, { params: { estatus } });
+        return response.data;
+    },
+
+    updateCategoriaViviendaStatus: async (idTipo: number, idCat: number, estatus: 'ACTIVO' | 'INACTIVO') => {
+        const response = await api.patch(`/catalogos/viviendas/${idTipo}/${idCat}/estatus`, null, { params: { estatus } });
         return response.data;
     },
 };

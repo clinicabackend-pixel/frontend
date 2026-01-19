@@ -10,6 +10,8 @@ import type { SolicitanteResponse } from '../types/solicitante';
 import type { CasoSummary } from '../types/caso';
 import type { EncuestaResponse } from '../types/encuesta_response';
 import SolicitanteForm from '../components/forms/SolicitanteForm';
+import EncuestaForm from '../components/forms/EncuestaForm';
+import Modal from '../components/common/Modal';
 
 export function SolicitanteDetalle() {
     const { id } = useParams<{ id: string }>();
@@ -18,6 +20,7 @@ export function SolicitanteDetalle() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(false);
+    const [showEncuestaModal, setShowEncuestaModal] = useState(false);
 
     // New state for Encuesta and Cases
     // New state for Encuesta and Cases
@@ -121,8 +124,8 @@ export function SolicitanteDetalle() {
                     <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
                         {/* Header Section */}
                         <div className="bg-linear-to-r from-red-900 to-red-800 p-8 text-white relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-4 opacity-10">
-                                <FontAwesomeIcon icon={faUser} size="6x" />
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-10 pointer-events-none">
+                                <FontAwesomeIcon icon={faUser} size="10x" />
                             </div>
                             <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                                 <div>
@@ -168,6 +171,10 @@ export function SolicitanteDetalle() {
                                     <div>
                                         <dt className="text-gray-500">Nacionalidad</dt>
                                         <dd className="font-medium text-gray-900">{solicitante.nacionalidad}</dd>
+                                    </div>
+                                    <div>
+                                        <dt className="text-gray-500">Nivel Educativo</dt>
+                                        <dd className="font-medium text-gray-900">{solicitante.nombreNivel || 'N/A'}</dd>
                                     </div>
                                     <div>
                                         <dt className="text-gray-500">Estado Civil</dt>
@@ -241,10 +248,21 @@ export function SolicitanteDetalle() {
 
                         {/* Encuesta Socioeconómica */}
                         <div className="border-t border-gray-100 p-8">
-                            <h3 className="flex items-center gap-2 text-xl font-bold text-gray-800 mb-6">
-                                <FontAwesomeIcon icon={faFileAlt} className="text-red-900" />
-                                Encuesta Socioecon&oacute;mica
-                            </h3>
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="flex items-center gap-2 text-xl font-bold text-gray-800">
+                                    <FontAwesomeIcon icon={faFileAlt} className="text-red-900" />
+                                    Encuesta Socioecon&oacute;mica
+                                </h3>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setShowEncuestaModal(true)}
+                                    icon={faEdit}
+                                >
+                                    {encuesta ? 'Modificar Encuesta' : 'Registrar Encuesta'}
+                                </Button>
+                            </div>
+
                             {encuesta ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <section>
@@ -332,6 +350,25 @@ export function SolicitanteDetalle() {
                                 <p className="text-gray-500 italic">No hay encuesta registrada para este solicitante.</p>
                             )}
                         </div>
+
+                        {/* Modal Encuesta */}
+                        {showEncuestaModal && solicitante && (
+                            <Modal
+                                isOpen={showEncuestaModal}
+                                onClose={() => setShowEncuestaModal(false)}
+                                title={`Encuesta Socioeconómica - ${solicitante.nombre}`}
+                            >
+                                <EncuestaForm
+                                    cedula={solicitante.cedula}
+                                    onSuccess={() => {
+                                        alert("Encuesta guardada con éxito");
+                                        setShowEncuestaModal(false);
+                                        loadSolicitante(solicitante.cedula);
+                                    }}
+                                    onCancel={() => setShowEncuestaModal(false)}
+                                />
+                            </Modal>
+                        )}
 
                         {/* Listado de Casos */}
                         <div className="bg-gray-50 p-8 border-t border-gray-200">

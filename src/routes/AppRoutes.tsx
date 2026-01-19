@@ -10,6 +10,7 @@ import SolicitanteDetalle from '../pages/SolicitanteDetalle';
 import UsuariosPage from '../pages/Usuarios';
 import Reportes from '../pages/Reportes';
 import SetupPassword from '../pages/auth/SetupPassword';
+import Catalogos from '../pages/Catalogos';
 
 export default function AppRoutes() {
     return (
@@ -26,6 +27,7 @@ export default function AppRoutes() {
                 <Route path="/registro-caso" element={<RegistroCaso />} />
                 <Route path="/usuarios" element={<UsuariosPage />} />
                 <Route path="/reportes" element={<Reportes />} />
+                <Route path="/catalogos" element={<Catalogos />} />
             </Route>
         </Routes>
     );

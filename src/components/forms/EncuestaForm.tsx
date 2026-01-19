@@ -8,7 +8,7 @@ import CustomSelect from '../common/CustomSelect';
 import CustomInput from '../common/CustomInput';
 import CustomCheckbox from '../common/CustomCheckbox';
 import Button from '../common/Button';
-import type { DatosEncuestaRequest, FamiliaDTO, ViviendaDTO } from '../../types/encuesta';
+import type { DatosEncuestaRequest, EncuestaFamiliaDto, EncuestaViviendaDto } from '../../types/encuesta';
 import type { TipoViviendaResponse, CondicionLaboralResponse, CondicionActividadResponse } from '../../types';
 
 interface EncuestaFormProps {
@@ -31,7 +31,7 @@ export default function EncuestaForm({ cedula, onSuccess, onCancel }: EncuestaFo
     const [idCondicion, setIdCondicion] = useState<number | undefined>(undefined);
     const [idCondicionActividad, setIdCondicionActividad] = useState<number | undefined>(undefined);
 
-    const [familia, setFamilia] = useState<FamiliaDTO>({
+    const [familia, setFamilia] = useState<EncuestaFamiliaDto>({
         cantPersonas: 0,
         cantEstudiando: 0,
         ingresoMes: 0,
@@ -43,7 +43,7 @@ export default function EncuestaForm({ cedula, onSuccess, onCancel }: EncuestaFo
         tiempoEstudio: ''
     });
 
-    const [vivienda, setVivienda] = useState<ViviendaDTO>({
+    const [vivienda, setVivienda] = useState<EncuestaViviendaDto>({
         cantHabitaciones: 0,
         cantBanos: 0
     });
@@ -166,7 +166,7 @@ export default function EncuestaForm({ cedula, onSuccess, onCancel }: EncuestaFo
                             <CustomSelect
                                 label="Condición Laboral"
                                 value={idCondicion || ''}
-                                options={condicionesLaborales.map(c => ({ value: c.id, label: c.condicion }))}
+                                options={condicionesLaborales.map(c => ({ value: c.id, label: c.nombre }))}
                                 onChange={(val) => {
                                     setIdCondicion(Number(val));
                                     // Reset condicion actividad if not 'Sin trabajo'? Usually safer to keep user intent or clear it.
@@ -182,8 +182,8 @@ export default function EncuestaForm({ cedula, onSuccess, onCancel }: EncuestaFo
                             const selectedCond = condicionesLaborales.find(c => c.id === idCondicion);
                             // Check for "Sin trabajo" case-insensitive or by ID if known. ID is safer but text is more robust to DB reseeds if IDs change.
                             // Assuming typical naming.
-                            const isSinTrabajo = selectedCond?.condicion.toLowerCase().includes('sin trabajo')
-                                || selectedCond?.condicion.toLowerCase().includes('desempleado');
+                            const isSinTrabajo = selectedCond?.nombre.toLowerCase().includes('sin trabajo')
+                                || selectedCond?.nombre.toLowerCase().includes('desempleado');
 
                             if (isSinTrabajo) {
                                 return (
@@ -214,7 +214,7 @@ export default function EncuestaForm({ cedula, onSuccess, onCancel }: EncuestaFo
                             label="Cant. Personas"
                             type="number"
                             name="cantPersonas"
-                            value={familia.cantPersonas}
+                            value={familia.cantPersonas ?? ''}
                             onChange={(e: any) => handleFamiliaChange(e)}
                             disabled={!isEditing}
                         />
@@ -224,7 +224,7 @@ export default function EncuestaForm({ cedula, onSuccess, onCancel }: EncuestaFo
                             label="Cant. Niños"
                             type="number"
                             name="cantNinos"
-                            value={familia.cantNinos}
+                            value={familia.cantNinos ?? ''}
                             onChange={(e: any) => handleFamiliaChange(e)}
                             disabled={!isEditing}
                         />
@@ -234,7 +234,7 @@ export default function EncuestaForm({ cedula, onSuccess, onCancel }: EncuestaFo
                             label="Ingreso Mensual"
                             type="number"
                             name="ingresoMes"
-                            value={familia.ingresoMes}
+                            value={familia.ingresoMes ?? ''}
                             onChange={(e: any) => handleFamiliaChange(e)}
                             disabled={!isEditing}
                             step={0.01}
@@ -245,7 +245,7 @@ export default function EncuestaForm({ cedula, onSuccess, onCancel }: EncuestaFo
                             label="Cant. Estudiando"
                             type="number"
                             name="cantEstudiando"
-                            value={familia.cantEstudiando}
+                            value={familia.cantEstudiando ?? ''}
                             onChange={(e: any) => handleFamiliaChange(e)}
                             disabled={!isEditing}
                         />
@@ -255,7 +255,7 @@ export default function EncuestaForm({ cedula, onSuccess, onCancel }: EncuestaFo
                             label="Cant. Trabaja"
                             type="number"
                             name="cantTrabaja"
-                            value={familia.cantTrabaja}
+                            value={familia.cantTrabaja ?? ''}
                             onChange={(e: any) => handleFamiliaChange(e)}
                             disabled={!isEditing}
                         />
@@ -265,7 +265,7 @@ export default function EncuestaForm({ cedula, onSuccess, onCancel }: EncuestaFo
                             label="Cant. Sin Trabajo"
                             type="number"
                             name="cantSinTrabajo"
-                            value={familia.cantSinTrabajo}
+                            value={familia.cantSinTrabajo ?? ''}
                             onChange={(e: any) => handleFamiliaChange(e)}
                             disabled={!isEditing}
                         />
@@ -291,7 +291,7 @@ export default function EncuestaForm({ cedula, onSuccess, onCancel }: EncuestaFo
                             label="Cant. Habitaciones"
                             type="number"
                             name="cantHabitaciones"
-                            value={vivienda.cantHabitaciones}
+                            value={vivienda.cantHabitaciones ?? ''}
                             onChange={(e: any) => handleViviendaChange(e)}
                             disabled={!isEditing}
                         />
@@ -301,7 +301,7 @@ export default function EncuestaForm({ cedula, onSuccess, onCancel }: EncuestaFo
                             label="Cant. Baños"
                             type="number"
                             name="cantBanos"
-                            value={vivienda.cantBanos}
+                            value={vivienda.cantBanos ?? ''}
                             onChange={(e: any) => handleViviendaChange(e)}
                             disabled={!isEditing}
                         />

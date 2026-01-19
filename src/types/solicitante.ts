@@ -12,6 +12,7 @@ export interface SolicitanteRequest {
     telfCelular: string;
     email: string;
     idParroquia: number;
+    idNivel?: number;
 }
 
 export interface SolicitanteResponse {
@@ -38,4 +39,5 @@ export interface SolicitanteResponse {
     nombreParroquia?: string;
     nombreMunicipio?: string;
     nombreEstado?: string;
+    nombreNivel?: string;
 }

@@ -1,3 +1,6 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendarAlt, faIdCard } from '@fortawesome/free-solid-svg-icons';
+
 interface CaseCardProps {
   numCaso: string;
   materia: string;
@@ -18,15 +21,15 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
       case 'EN PROGRESO':
       case 'ACTIVO':
       case 'ABIERTO':
-        return 'bg-green-600';
+        return 'bg-green-100 text-green-800 border-green-200';
       case 'CERRADO':
-        return 'bg-red-800';
+        return 'bg-gray-100 text-gray-800 border-gray-200';
       case 'PENDIENTE':
-        return 'bg-yellow-500';
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'REVISIÓN':
-        return 'bg-blue-600';
+        return 'bg-blue-100 text-blue-800 border-blue-200';
       default:
-        return 'bg-gray-500';
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
@@ -35,73 +38,80 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
       if (!fechaStr) return '';
       const [year, month, day] = fechaStr.split('-');
       const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-      return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+      return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
     } catch {
       return fechaStr;
     }
   };
 
+  // Parse chips from "Category > Subcategory" string
+  const chips = materia.split('>').map(s => s.trim()).filter(Boolean);
+
   return (
     <div
       onClick={onClick}
-      // Height fixed to mimic the reference image ratio
-      className="group cursor-pointer bg-white relative shadow-md hover:shadow-xl transition-all duration-300 h-[340px] w-full flex flex-col rounded-sm overflow-hidden"
+      className="group bg-white rounded-lg border border-gray-200 border-l-4 border-l-red-900 shadow-sm hover:shadow-md transition-all duration-200 p-5 flex flex-col h-full relative"
     >
-      {/* 1. Left Vertical Red Bar */}
-      <div className="absolute left-0 top-0 bottom-0 w-3 bg-red-900 group-hover:w-4 transition-all duration-300"></div>
 
-      {/* Main Content Container */}
-      <div className="pl-8 pr-6 pt-5 pb-4 flex flex-col h-full w-full">
 
-        {/* 2. Top Right: Case Number */}
-        {/* Requirement: Larger, Black, Red on Hover, Scale on Hover */}
-        <div className="flex justify-end mb-1">
-          <span className="text-gray-900 font-bold text-lg tracking-wide group-hover:text-red-900 group-hover:scale-110 origin-right transition-all duration-300">
+
+      {/* Status Pill (Moved to top right in visual hierarchy, but positioned via flex in header or absolute? 
+            Req says "Coloca la Etiqueta de Estado ... en la esquina superior derecha".
+            The menu is usually extreme top right. I'll put status next to name or just below, 
+            OR absolute top right and move menu? 
+            Let's put Status absolute top right, and Menu below it? Or Menu top right, Status top left?
+            Req: "Coloca la Etiqueta de Estado (ej. 'Abierto' en verde) en la esquina superior derecha de la tarjeta"
+            Req: "Acciones: Añade un icono de menú ... en la esquina inferior o superior derecha"
+            I'll put Status top-right, and Menu bottom-right to avoid clutter/conflict.
+        */}
+
+      {/* Re-structuring based on strict reqs: 
+          Header: Name Left, Status Right.
+          Subtitle: Case ID below Name.
+      */}
+      <div className="flex justify-between items-start w-full mb-1">
+        <div className="flex-1 pr-2">
+          <h3 className="text-lg font-bold text-gray-900 leading-tight mb-0.5 line-clamp-1">
+            {nombre}
+          </h3>
+          <span className="text-xs text-gray-500 font-mono block">
             {numCaso}
           </span>
         </div>
+        <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getStatusColor(estatus)} whitespace-nowrap`}>
+          {estatus}
+        </span>
+      </div>
 
-        {/* 3. Title: Name */}
-        <div className="h-[64px] mb-1 flex items-center">
-          <h2 className="text-2xl font-black text-gray-900 leading-tight line-clamp-2 w-full">
-            {nombre}
-          </h2>
-        </div>
+      {/* Body: Chips */}
+      <div className="flex flex-wrap gap-2 mt-3 mb-3">
+        {chips.map((chip, idx) => (
+          <span key={idx} className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-md font-medium">
+            {chip}
+          </span>
+        ))}
+      </div>
 
-        {/* Requirements: Materia (Ambito Legal) below name */}
-        <div className="h-[32px] mb-3 flex items-center">
-          <p className="text-xs font-bold text-red-900 uppercase tracking-widest line-clamp-2">
-            {materia}
-          </p>
-        </div>
+      {/* Body: Description Excerpt */}
+      <div className="flex-1 mb-4">
+        <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed">
+          {sintesis || <span className="italic text-gray-400">Sin descripción disponible.</span>}
+        </p>
+      </div>
 
-        {/* 4. Body: Synthesis */}
-        {/* Requirement: Center text, truncation */}
-        <div className="flex-1 overflow-hidden relative flex items-center justify-center px-2">
-          <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 text-center">
-            {sintesis || <span className="italic opacity-50">Sin síntesis disponible.</span>}
-          </p>
-        </div>
-
-        {/* 5. Bottom Section: Badge and Metadata */}
-        <div className="mt-2 shrink-0">
-
-          {/* Badge */}
-          <div className="mb-3">
-            <span className={`${getStatusColor(estatus)} text-white px-6 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider inline-block shadow-sm`}>
-              {estatus}
-            </span>
+      {/* Footer: Cedula & Date */}
+      <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto text-xs text-gray-500">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5" title="Cédula">
+            <FontAwesomeIcon icon={faIdCard} className="text-red-900" />
+            <span className="text-gray-600">{cedula}</span>
           </div>
-
-          {/* Metadata */}
-          <div className="text-xs text-gray-400 font-medium flex justify-between items-end border-t border-gray-100 pt-2">
-            <div>
-              <p className="mb-0.5">Cédula: {cedula}</p>
-              <p>Fecha: {formatFecha(fecha)}</p>
-            </div>
+          <div className="flex items-center gap-1.5" title="Fecha de Recepción">
+            <FontAwesomeIcon icon={faCalendarAlt} className="text-red-900" />
+            <span className="text-gray-600">{formatFecha(fecha)}</span>
           </div>
-
         </div>
+
 
       </div>
     </div>

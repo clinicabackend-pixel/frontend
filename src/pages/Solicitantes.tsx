@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 import MainLayout from '../components/layout/MainLayout';
@@ -19,8 +19,9 @@ import type { SolicitanteResponse } from '../types/solicitante';
 import Loader from '../components/common/Loader';
 
 function Solicitantes() {
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const [showForm, setShowForm] = useState(false);
+    const [showForm, setShowForm] = useState(searchParams.get('mode') === 'create');
 
     // Edit Modal State
     const [showEditForm, setShowEditForm] = useState(false);

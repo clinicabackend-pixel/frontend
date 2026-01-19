@@ -37,7 +37,7 @@ function Home() {
           </p>
         </div>
         <button
-          onClick={() => navigate('/casos?mode=create')} // Adjust logic to open create modal
+          onClick={() => navigate('/registro-caso')} // Navigate to RegistroCaso page
           className="bg-red-900 hover:bg-red-800 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2 font-medium"
         >
           <FontAwesomeIcon icon={faPlus} />
@@ -86,11 +86,11 @@ function Home() {
               </div>
               <span className="font-medium text-sm">Registrar Solicitante</span>
             </button>
-            <button onClick={() => navigate('/expedientes')} className="w-full flex items-center gap-3 p-3 text-left rounded-lg hover:bg-red-50 text-gray-700 hover:text-red-900 transition-colors group">
+            <button onClick={() => navigate('/casos')} className="w-full flex items-center gap-3 p-3 text-left rounded-lg hover:bg-red-50 text-gray-700 hover:text-red-900 transition-colors group">
               <div className="w-8 h-8 rounded-full bg-gray-100 group-hover:bg-red-100 flex items-center justify-center text-gray-500 group-hover:text-red-900 transition-colors">
                 <FontAwesomeIcon icon={faSearch} className="text-sm" />
               </div>
-              <span className="font-medium text-sm">Buscar Expediente</span>
+              <span className="font-medium text-sm">Buscar Caso</span>
             </button>
             <button onClick={() => navigate('/calendario')} className="w-full flex items-center gap-3 p-3 text-left rounded-lg hover:bg-red-50 text-gray-700 hover:text-red-900 transition-colors group">
               <div className="w-8 h-8 rounded-full bg-gray-100 group-hover:bg-red-100 flex items-center justify-center text-gray-500 group-hover:text-red-900 transition-colors">

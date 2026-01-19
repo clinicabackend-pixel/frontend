@@ -37,12 +37,14 @@ export interface AmbitoLegal {
 export interface CategoriaViviendaResponse {
     id: number;
     descripcion: string;
+    estatus?: 'ACTIVO' | 'INACTIVO';
 }
 
 export interface TipoViviendaResponse {
     id: number;
     nombre: string;
     categorias: CategoriaViviendaResponse[];
+    estatus?: 'ACTIVO' | 'INACTIVO';
 }
 
 export interface Semestre {
@@ -52,13 +54,20 @@ export interface Semestre {
 
 export interface CondicionLaboralResponse {
     id: number;
-    condicion: string;
+    nombre: string;
+    estatus?: 'ACTIVO' | 'INACTIVO';
 }
-
 
 export interface CondicionActividadResponse {
     id: number;
     nombre: string;
+    estatus?: 'ACTIVO' | 'INACTIVO';
+}
+
+export interface NivelEducativoResponse {
+    id: number;
+    nombre: string;
+    estatus?: 'ACTIVO' | 'INACTIVO';
 }
 
 export interface Tribunal {

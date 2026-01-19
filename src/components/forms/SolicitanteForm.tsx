@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { faEdit, faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '../common/Button';
-import type { SolicitanteRequest, Estado, Municipio, Parroquia, EstadoCivil } from '../../types'; // Importando todo desde el index
+import type { SolicitanteRequest, Estado, Municipio, Parroquia, EstadoCivil, NivelEducativoResponse } from '../../types'; // Importando todo desde el index
 import solicitanteService from '../../services/solicitanteService';
 import catalogoService from '../../services/catalogoService';
 import CustomSelect from '../common/CustomSelect';
@@ -62,6 +62,7 @@ export default function SolicitanteForm({
     const [municipios, setMunicipios] = useState<Municipio[]>([]);
     const [parroquias, setParroquias] = useState<Parroquia[]>([]);
     const [estadosCiviles, setEstadosCiviles] = useState<EstadoCivil[]>([]);
+    const [nivelesEducativos, setNivelesEducativos] = useState<NivelEducativoResponse[]>([]);
 
     const [selectedEstado, setSelectedEstado] = useState<number>(0);
     const [selectedMunicipio, setSelectedMunicipio] = useState<number>(0);
@@ -78,18 +79,21 @@ export default function SolicitanteForm({
                     estadosData,
                     municipiosData,
                     parroquiasData,
-                    estadosCivilesData
+                    estadosCivilesData,
+                    nivelesEducativosData
                 ] = await Promise.all([
                     catalogoService.getEstados(),
                     catalogoService.getAllMunicipios(),
                     catalogoService.getAllParroquias(),
-                    catalogoService.getEstadosCiviles()
+                    catalogoService.getEstadosCiviles(),
+                    catalogoService.getNivelesEducativos()
                 ]);
 
                 setEstados(estadosData);
                 setMunicipios(municipiosData);
                 setParroquias(parroquiasData);
                 setEstadosCiviles(estadosCivilesData);
+                setNivelesEducativos(nivelesEducativosData);
             } catch (error) {
                 console.error("Error al cargar catálogos", error);
             }
@@ -385,6 +389,21 @@ export default function SolicitanteForm({
 
 
 
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    {/* Nivel Educativo */}
+                    <div>
+                        <CustomSelect
+                            label="Nivel Educativo (Opcional)"
+                            value={formData.idNivel || ''}
+                            options={nivelesEducativos
+                                .filter(n => n.estatus === 'ACTIVO')
+                                .map(n => ({ value: n.id, label: n.nombre }))}
+                            onChange={(val) => setFormData(prev => ({ ...prev, idNivel: Number(val) }))}
+                            disabled={!isEditing}
+                        />
+                    </div>
                 </div>
             </section>
 
