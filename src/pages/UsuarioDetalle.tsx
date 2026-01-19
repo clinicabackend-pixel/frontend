@@ -143,30 +143,30 @@ export default function UsuarioDetalle() {
                     <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                         {/* Avatar */}
                         <div className={`w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold ${isDark ? 'bg-red-950/50 text-red-300' : 'bg-red-100 text-red-900'}`}>
-                            {usuario.nombre.charAt(0).toUpperCase()}
+                            {(usuario.nombre && usuario.nombre.length > 0) ? usuario.nombre.charAt(0).toUpperCase() : 'U'}
                         </div>
 
                         {/* User Info */}
                         <div className="flex-1">
                             <h1 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                                {usuario.nombre}
+                                {usuario.nombre || 'Sin nombre'}
                             </h1>
                             <div className="flex flex-wrap items-center gap-4">
                                 <div className={`flex items-center gap-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                                     <FontAwesomeIcon icon={faIdCard} className="text-sm" />
-                                    <span className="text-sm">@{usuario.username}</span>
+                                    <span className="text-sm">@{usuario.username || 'N/A'}</span>
                                 </div>
                                 <div className={`flex items-center gap-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                                     <FontAwesomeIcon icon={faIdCard} className="text-sm" />
-                                    <span className="text-sm">CI: {usuario.idUsuario}</span>
+                                    <span className="text-sm">CI: {usuario.idUsuario || 'N/A'}</span>
                                 </div>
                             </div>
                         </div>
 
                         {/* Status and Role Badges */}
                         <div className="flex flex-col gap-2 items-end">
-                            {getStatusBadge(usuario.estatus)}
-                            {getRoleBadge(usuario.tipoUsuario)}
+                            {getStatusBadge(usuario.estatus || 'INACTIVO')}
+                            {getRoleBadge(usuario.tipoUsuario || 'ESTUDIANTE')}
                         </div>
                     </div>
                 </div>
@@ -189,7 +189,7 @@ export default function UsuarioDetalle() {
                                         Correo Electrónico
                                     </p>
                                     <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                                        {usuario.email}
+                                        {usuario.email || 'Sin email'}
                                     </p>
                                 </div>
                             </div>

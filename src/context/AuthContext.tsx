@@ -23,6 +23,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 try {
                     const user = await authService.getCurrentUser();
                     setUser(user);
+                    // Guardar username en localStorage para compatibilidad con otros componentes
+                    if (user?.username) {
+                        localStorage.setItem('username', user.username);
+                    }
                     setIsAuthenticated(true);
                 } catch (error) {
                     console.error('Session validation failed:', error);
@@ -42,6 +46,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             localStorage.setItem('token', jwt);
             const user = await authService.getCurrentUser();
             setUser(user);
+            // Guardar username en localStorage para compatibilidad con otros componentes
+            if (user?.username) {
+                localStorage.setItem('username', user.username);
+            }
             setIsAuthenticated(true);
         } catch (error) {
             console.error('Login failed:', error);

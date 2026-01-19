@@ -16,9 +16,11 @@ import { reporteService } from '../services/reporteService';
 import type { CasoSummary } from '../types/caso';
 import type { AmbitoLegal, Semestre } from '../types/catalogo';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 
 function CasosPage() {
   const { theme } = useTheme();
+  const { user } = useAuth();
   const isDark = theme === 'dark';
   const [casos, setCasos] = useState<CasoSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,6 +39,14 @@ function CasosPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>('ABIERTO');
   const [selectedSemestre, setSelectedSemestre] = useState<string>('');
   const [onlyMyCases, setOnlyMyCases] = useState<boolean>(true);
+
+  // Ajustar onlyMyCases cuando el usuario se carga
+  useEffect(() => {
+    const esCoordinadorOAdmin = user?.tipo === 'COORDINADOR' || user?.tipo === 'ADMINISTRADOR';
+    if (esCoordinadorOAdmin) {
+      setOnlyMyCases(false); // COORDINADOR/ADMINISTRADOR ven todos los casos por defecto
+    }
+  }, [user]);
 
   const casosPerPage = 12;
   const navigate = useNavigate();
@@ -83,12 +93,27 @@ function CasosPage() {
     const fetchCasos = async () => {
       setLoading(true);
       try {
-        const userFilter = onlyMyCases ? username : undefined;
+        // Si el usuario es COORDINADOR o ADMINISTRADOR, siempre mostrar todos los casos
+        // (ignorar el filtro onlyMyCases para estos roles)
+        const esCoordinadorOAdmin = user?.tipo === 'COORDINADOR' || user?.tipo === 'ADMINISTRADOR';
+        const userFilter = (onlyMyCases && !esCoordinadorOAdmin) ? username : undefined;
         // Si el estatus es 'TODOS', mandamos undefined al service
         const statusFilter = selectedStatus === 'TODOS' ? undefined : selectedStatus;
         const terminoFilter = selectedSemestre === '' ? undefined : selectedSemestre;
 
+        console.log('Casos: Cargando casos con filtros:', {
+          statusFilter,
+          userFilter,
+          terminoFilter,
+          onlyMyCases,
+          username,
+          esCoordinadorOAdmin,
+          userTipo: user?.tipo
+        });
+
         const data = await casoService.getAll(statusFilter, userFilter, terminoFilter);
+        console.log('Casos: Total casos obtenidos:', data.length);
+        console.log('Casos: Primeros 3 casos:', data.slice(0, 3));
         setCasos(data);
         setCurrentPage(1); // Reset page only when API data changes
       } catch (error) {
@@ -99,7 +124,7 @@ function CasosPage() {
     };
 
     fetchCasos();
-  }, [selectedStatus, selectedSemestre, onlyMyCases, username]);
+  }, [selectedStatus, selectedSemestre, onlyMyCases, username, user]);
 
   // Filtrado local por Buscador (Texto)
   const casosFiltrados = casos.filter((caso) => {

@@ -8,6 +8,7 @@ import ImportModal from '../components/users/ImportModal';
 import UserFormModal from '../components/users/UserFormModal';
 import type { Usuario } from '../types/usuario';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import {
     Mail,
     User,
@@ -15,12 +16,14 @@ import {
     Plus,
     MoreVertical,
     Trash2,
+    CheckCircle,
     X
 } from 'lucide-react';
 
 export default function UsuariosPage() {
     const navigate = useNavigate();
     const { theme } = useTheme();
+    const { user: currentUser } = useAuth();
     const [isDark, setIsDark] = useState(() => {
         if (theme === 'dark') return true;
         if (theme === 'light') return false;
@@ -45,6 +48,11 @@ export default function UsuariosPage() {
     useEffect(() => {
         fetchUsuarios();
     }, []);
+
+    // Resetear página cuando cambia el texto de búsqueda
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchText]);
 
     // Cerrar menú al hacer clic fuera
     useEffect(() => {
@@ -84,7 +92,16 @@ export default function UsuariosPage() {
         try {
             const data = await usuarioService.getAll();
             if (Array.isArray(data)) {
-                setUsuarios(data);
+                // Ordenar de manera estable: primero por nombre, luego por username como desempate
+                // Esto asegura que la posición no cambie cuando se actualiza el estatus
+                const usuariosOrdenados = [...data].sort((a, b) => {
+                    // Primero por nombre
+                    const nombreCompare = (a.nombre || '').localeCompare(b.nombre || '', 'es', { sensitivity: 'base' });
+                    if (nombreCompare !== 0) return nombreCompare;
+                    // Si el nombre es igual, ordenar por username
+                    return (a.username || '').localeCompare(b.username || '', 'es', { sensitivity: 'base' });
+                });
+                setUsuarios(usuariosOrdenados);
             } else {
                 console.error('Error: usuarioService.getAll() did not return an array', data);
                 setUsuarios([]);
@@ -103,10 +120,10 @@ export default function UsuariosPage() {
         if (!searchText) return true;
         const search = searchText.toLowerCase();
         return (
-            user.nombre.toLowerCase().includes(search) ||
-            user.idUsuario.toLowerCase().includes(search) || // Was cedula
-            user.username.toLowerCase().includes(search) ||
-            user.email.toLowerCase().includes(search)
+            (user.nombre || '').toLowerCase().includes(search) ||
+            (user.idUsuario || '').toLowerCase().includes(search) || // Was cedula
+            (user.username || '').toLowerCase().includes(search) ||
+            (user.email || '').toLowerCase().includes(search)
         );
     });
 
@@ -126,17 +143,29 @@ export default function UsuariosPage() {
         setOpenMenuId(null);
     };
 
-    const handleConfirmDelete = async () => {
+    const handleConfirmToggleStatus = async () => {
         if (!userToDelete) return;
         
         try {
-            await usuarioService.deleteUsuario(userToDelete.username);
+            const nuevoEstatus = userToDelete.estatus === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
+            // Actualizar solo el estatus, manteniendo todos los demás campos intactos
+            await usuarioService.updateUsuario(userToDelete.username, { 
+                estatus: nuevoEstatus,
+                nombre: userToDelete.nombre,
+                email: userToDelete.email,
+                idUsuario: userToDelete.idUsuario,
+                tipoUsuario: userToDelete.tipoUsuario,
+                username: userToDelete.username,
+                sexo: userToDelete.sexo
+            });
+            // Recargar la lista de usuarios
             await fetchUsuarios();
             setDeleteModalOpen(false);
             setUserToDelete(null);
         } catch (error) {
-            console.error('Error desactivando usuario:', error);
-            alert('Error al desactivar el usuario. Por favor, intente nuevamente.');
+            console.error('Error cambiando estatus del usuario:', error);
+            const accion = userToDelete.estatus === 'ACTIVO' ? 'desactivar' : 'activar';
+            alert(`Error al ${accion} el usuario. Por favor, intente nuevamente.`);
         }
     };
 
@@ -252,25 +281,25 @@ export default function UsuariosPage() {
                                                     <User size={20} />
                                                 </div>
                                                 <div className="ml-4">
-                                                    <div className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{user.nombre}</div>
-                                                    <div className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>@{user.username}</div>
+                                                    <div className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{user.nombre || 'Sin nombre'}</div>
+                                                    <div className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>@{user.username || 'N/A'}</div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className={`text-sm flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                                                <Mail size={14} className={isDark ? 'text-gray-400' : 'text-gray-400'} /> {user.email}
+                                                <Mail size={14} className={isDark ? 'text-gray-400' : 'text-gray-400'} /> {user.email || 'Sin email'}
                                             </div>
-                                            <div className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>CI: {user.idUsuario}</div>
+                                            <div className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>CI: {user.idUsuario || 'N/A'}</div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            {getRoleBadge(user.tipoUsuario)}
+                                            {getRoleBadge(user.tipoUsuario || 'ESTUDIANTE')}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            {getStatusBadge(user.estatus)}
+                                            {getStatusBadge(user.estatus || 'INACTIVO')}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <div className="relative" ref={(el) => (menuRefs.current[user.username] = el)}>
+                                            <div className="relative" ref={(el) => { menuRefs.current[user.username] = el; }}>
                                                 <button
                                                     onClick={(e) => toggleMenu(user.username, e)}
                                                     className={`p-2 rounded-md transition-colors ${
@@ -283,7 +312,7 @@ export default function UsuariosPage() {
                                                     <MoreVertical size={20} />
                                                 </button>
                                                 
-                                                {openMenuId === user.username && (
+                                                {openMenuId === user.username && (currentUser?.tipo === 'COORDINADOR' || currentUser?.tipo === 'ADMINISTRADOR') && (
                                                     <div className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg z-10 ${
                                                         isDark ? 'bg-[#630000] border border-red-800/50' : 'bg-white border border-gray-200'
                                                     }`}>
@@ -291,13 +320,26 @@ export default function UsuariosPage() {
                                                             <button
                                                                 onClick={(e) => handleDeleteClick(user, e)}
                                                                 className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors ${
-                                                                    isDark
-                                                                        ? 'text-red-300 hover:bg-red-950/50 hover:text-red-200'
-                                                                        : 'text-red-600 hover:bg-red-50 hover:text-red-900'
+                                                                    user.estatus === 'ACTIVO'
+                                                                        ? (isDark
+                                                                            ? 'text-red-300 hover:bg-red-950/50 hover:text-red-200'
+                                                                            : 'text-red-600 hover:bg-red-50 hover:text-red-900')
+                                                                        : (isDark
+                                                                            ? 'text-green-300 hover:bg-green-950/50 hover:text-green-200'
+                                                                            : 'text-green-600 hover:bg-green-50 hover:text-green-900')
                                                                 }`}
                                                             >
-                                                                <Trash2 size={16} />
-                                                                Desactivar Usuario
+                                                                {user.estatus === 'ACTIVO' ? (
+                                                                    <>
+                                                                        <Trash2 size={16} />
+                                                                        Desactivar Usuario
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <CheckCircle size={16} />
+                                                                        Activar Usuario
+                                                                    </>
+                                                                )}
                                                             </button>
                                                         </div>
                                                     </div>
@@ -341,12 +383,16 @@ export default function UsuariosPage() {
                 onSuccess={fetchUsuarios}
             />
 
-            {/* Modal de Confirmación de Desactivación */}
+            {/* Modal de Confirmación de Activación/Desactivación */}
             {deleteModalOpen && userToDelete && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
                     <div className="bg-white backdrop-blur-md rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-slide-up-modal">
-                        <div className="flex items-center justify-between p-4 bg-red-900">
-                            <h3 className="text-xl font-bold text-white">Confirmar Desactivación</h3>
+                        <div className={`flex items-center justify-between p-4 ${
+                            userToDelete.estatus === 'ACTIVO' ? 'bg-red-900' : 'bg-green-900'
+                        }`}>
+                            <h3 className="text-xl font-bold text-white">
+                                {userToDelete.estatus === 'ACTIVO' ? 'Confirmar Desactivación' : 'Confirmar Activación'}
+                            </h3>
                             <button
                                 onClick={() => {
                                     setDeleteModalOpen(false);
@@ -361,10 +407,12 @@ export default function UsuariosPage() {
 
                         <div className="overflow-y-auto bg-white p-6">
                             <p className="text-gray-700 mb-4">
-                                ¿Está seguro de que desea desactivar al usuario <strong>{userToDelete.nombre}</strong> ({userToDelete.username})?
+                                ¿Está seguro de que desea {userToDelete.estatus === 'ACTIVO' ? 'desactivar' : 'activar'} al usuario <strong>{userToDelete.nombre}</strong> ({userToDelete.username})?
                             </p>
                             <p className="text-sm text-gray-500 mb-6">
-                                El usuario será desactivado y no podrá acceder al sistema. Esta acción puede revertirse editando el usuario.
+                                {userToDelete.estatus === 'ACTIVO' 
+                                    ? 'El usuario será desactivado y no podrá acceder al sistema. Esta acción puede revertirse activando el usuario nuevamente.'
+                                    : 'El usuario será activado y podrá acceder al sistema nuevamente.'}
                             </p>
 
                             <div className="flex justify-end gap-3">
@@ -378,10 +426,14 @@ export default function UsuariosPage() {
                                     Cancelar
                                 </button>
                                 <button
-                                    onClick={handleConfirmDelete}
-                                    className="px-4 py-2 text-sm font-medium text-white rounded-md transition-colors bg-red-600 hover:bg-red-700"
+                                    onClick={handleConfirmToggleStatus}
+                                    className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors ${
+                                        userToDelete.estatus === 'ACTIVO' 
+                                            ? 'bg-red-600 hover:bg-red-700'
+                                            : 'bg-green-600 hover:bg-green-700'
+                                    }`}
                                 >
-                                    Desactivar
+                                    {userToDelete.estatus === 'ACTIVO' ? 'Desactivar' : 'Activar'}
                                 </button>
                             </div>
                         </div>

@@ -26,8 +26,18 @@ export const authService = {
     },
 
     getCurrentUser: async (): Promise<User> => {
-        const response = await api.get<User>('/auth/me');
-        return response.data;
+        const response = await api.get<any>('/auth/me');
+        // El backend devuelve 'idUsuario' pero el frontend espera 'cedula'
+        // Mapear idUsuario -> cedula
+        return {
+            cedula: response.data.idUsuario || response.data.cedula || '',
+            nombre: response.data.nombre || '',
+            sexo: response.data.sexo || '',
+            email: response.data.email || '',
+            username: response.data.username || '',
+            status: response.data.estatus || response.data.status || '',
+            tipo: response.data.tipoUsuario || response.data.tipo || ''
+        };
     },
 
     logout: (): void => {
