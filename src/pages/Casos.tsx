@@ -1,32 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilter, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faFileExcel, faFilter, faPlus } from '@fortawesome/free-solid-svg-icons';
 import MainLayout from '../components/layout/MainLayout';
 import CaseCard from '../components/CaseCard';
 import CasoRow from '../components/CasoRow';
 import Button from '../components/common/Button';
-import CustomSelect from '../components/common/CustomSelect'; // Importar CustomSelect
+import CustomSelect from '../components/common/CustomSelect';
 import Pagination from '../components/common/Pagination';
 import SearchBar from '../components/common/SearchBar';
 import ViewToggle from '../components/common/ViewToggle';
 import casoService from '../services/casoService';
 import catalogoService from '../services/catalogoService';
-
+import { reporteService } from '../services/reporteService';
 import type { CasoSummary } from '../types/caso';
 import type { AmbitoLegal, Semestre } from '../types/catalogo';
 import { useTheme } from '../context/ThemeContext';
 
 function CasosPage() {
   const { theme } = useTheme();
-  const [isDark, setIsDark] = useState(() => {
-    if (theme === 'dark') return true;
-    if (theme === 'light') return false;
-    if (typeof window !== 'undefined') {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches;
-    }
-    return false;
-  });
+  const isDark = theme === 'dark';
   const [casos, setCasos] = useState<CasoSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -44,7 +37,6 @@ function CasosPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>('ABIERTO');
   const [selectedSemestre, setSelectedSemestre] = useState<string>('');
   const [onlyMyCases, setOnlyMyCases] = useState<boolean>(true);
-
 
   const casosPerPage = 12;
   const navigate = useNavigate();
@@ -75,7 +67,7 @@ function CasosPage() {
       try {
         const [ambitosData, semestresData] = await Promise.all([
           catalogoService.getAmbitosLegales(),
-          catalogoService.getSemestres()
+          catalogoService.getSemestres(),
         ]);
         setAmbitosLegales(buildAmbitoMap(ambitosData));
         setSemestres(semestresData);
@@ -167,63 +159,36 @@ function CasosPage() {
     ...semestres.map((s) => ({ value: s.termino, label: s.nombre })),
   ];
 
-  // Actualizar isDark cuando cambia el theme
-  useEffect(() => {
-    if (theme === 'dark') {
-      setIsDark(true);
-    } else if (theme === 'light') {
-      setIsDark(false);
-    } else {
-      if (typeof window !== 'undefined') {
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        setIsDark(mediaQuery.matches);
-        const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
-        mediaQuery.addEventListener('change', handler);
-        return () => mediaQuery.removeEventListener('change', handler);
-      }
-    }
-  }, [theme]);
-
   return (
     <MainLayout title="GESTIÓN DE CASOS">
       <div className="w-full mx-auto">
-
         {/* Controles de Filtros y Búsqueda */}
-        <div className="bg-white p-4 border-b border-gray-200 mb-6">
-          <div className="flex flex-col xl:flex-row gap-4 justify-between items-center">
-
-            {/* IZQUIERDA: Buscador */}
-            <div className="w-full xl:w-1/3 min-w-[300px]">
-              <SearchBar
-                value={searchText}
-                onChange={setSearchText}
-                placeholder="Buscar por nombre, cédula o ID..."
-              />
+        <div className={`${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'} p-3 rounded-lg shadow-sm mb-6 border`}>
+          <div className="flex flex-col lg:flex-row gap-3 justify-between items-stretch lg:items-center">
+            {/* Buscador de Texto */}
+            <div className="w-full lg:w-64 xl:w-80">
+              <SearchBar value={searchText} onChange={setSearchText} placeholder="Buscar..." />
             </div>
 
-            {/* CENTRO: Filtros (Agrupados) */}
-            <div className="flex flex-wrap gap-2 items-center flex-1 justify-start xl:justify-start w-full">
-
+            {/* Filtros Dropdowns y Toggles */}
+            <div className="flex flex-wrap gap-2 items-center justify-end">
               {/* View Toggle */}
-              <div className="hidden md:block mr-2">
-                <ViewToggle
-                  viewMode={viewMode}
-                  onToggle={setViewMode}
-                />
+              <div className="hidden lg:flex">
+                <ViewToggle viewMode={viewMode} onToggle={setViewMode} />
               </div>
 
-              {/* Ordenamiento */}
-              <div className="w-40 md:w-48">
+              {/* Ordenamiento - CustomSelect */}
+              <div className="w-36 xl:w-40">
                 <CustomSelect
                   value={sortOption}
                   options={sortOptions}
                   onChange={setSortOption}
-                  placeholder="Ordenar por"
+                  placeholder="Ordenar"
                 />
               </div>
 
-              {/* Semestre */}
-              <div className="w-32 md:w-70">
+              {/* Filtro Semestre - CustomSelect */}
+              <div className="w-36 xl:w-40">
                 <CustomSelect
                   value={selectedSemestre}
                   options={semesterOptions}
@@ -232,8 +197,8 @@ function CasosPage() {
                 />
               </div>
 
-              {/* Estatus */}
-              <div className="w-32 md:w-40">
+              {/* Filtro Estatus - CustomSelect */}
+              <div className="w-36 xl:w-40">
                 <CustomSelect
                   value={selectedStatus}
                   options={statusOptions}
@@ -242,40 +207,46 @@ function CasosPage() {
                 />
               </div>
 
-              {/* Toggle Mis Casos (Opcional/Legacy Filter) */}
-              <Button // Keeping this as a small filter toggle if needed, or removing if strictly adhering to "Search, Filters, Action". 
-                // User didn't strictly say DELETE "Mis Casos", but grouped filters. I'll keep it as a filter button.
-                variant={onlyMyCases ? 'secondary' : 'outline'}
+              {/* Toggle Mis Casos */}
+              <Button
+                variant={onlyMyCases ? 'primary' : 'outline'}
                 onClick={() => setOnlyMyCases(!onlyMyCases)}
-                className="gap-2 px-3"
-                title="Mis Casos"
+                className="gap-1.5 px-3"
+                icon={faFilter}
               >
-                <FontAwesomeIcon icon={faFilter} className={onlyMyCases ? "text-red-800" : "text-gray-400"} />
-                <span className="hidden sm:inline">Mis Casos</span>
+                <span className="hidden xl:inline">{onlyMyCases ? 'Mis Casos' : 'Todos'}</span>
+                <span className="xl:hidden">{onlyMyCases ? 'Míos' : 'Todo'}</span>
               </Button>
-            </div>
 
-            {/* DERECHA: Acción Principal */}
-            <div className="w-full xl:w-auto flex justify-end">
+              {/* Botón Registrar Caso */}
               <Button
                 variant="primary"
                 onClick={() => navigate('/registro-caso')}
-                className="bg-red-900 hover:bg-red-800 text-white font-medium px-6 py-2.5 rounded-md shadow-sm flex items-center gap-2 whitespace-nowrap w-full md:w-auto justify-center"
+                className="gap-1.5 px-3"
+                icon={faPlus}
               >
-                <FontAwesomeIcon icon={faPlus} />
-                Registrar Caso
+                <span className="hidden md:inline">Registrar</span>
               </Button>
-            </div>
 
+              {/* Botón Exportar Reporte General */}
+              <button
+                onClick={() => reporteService.downloadReporteGeneral()}
+                className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors flex items-center gap-1.5 whitespace-nowrap"
+                title="Descargar Reporte General de Casos"
+              >
+                <FontAwesomeIcon icon={faFileExcel} />
+                <span className="hidden xl:inline">Reporte</span>
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Resumen de Resultados */}
         {!loading && (
-          <div className={`mb-4 text-sm ${isDark ? 'text-white' : 'text-gray-600'}`}>
+          <div className={`mb-4 text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
             Mostrando {casosActuales.length} de {casosOrdenados.length} casos encontrados
             {(selectedStatus !== 'TODOS' || selectedSemestre || onlyMyCases || searchText) && (
-              <span className={`ml-2 italic ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>(filtros activos)</span>
+              <span className={`ml-2 italic ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>(filtros activos)</span>
             )}
           </div>
         )}
@@ -283,15 +254,15 @@ function CasosPage() {
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="flex flex-col items-center">
-              <div className={`animate-spin rounded-full h-12 w-12 border-b-2 mb-4 ${isDark ? 'border-red-700' : 'border-red-900'}`}></div>
-              <p className={isDark ? 'text-white' : 'text-gray-600'}>Cargando casos...</p>
+              <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${isDark ? 'border-red-700' : 'border-red-900'} mb-4`}></div>
+              <p className={isDark ? 'text-white' : 'text-black'}>Cargando casos...</p>
             </div>
           </div>
         ) : (
           <>
             {casosOrdenados.length === 0 ? (
-              <div className={`text-center py-16 rounded-lg border border-dashed ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-300'}`}>
-                <p className={`text-lg ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+              <div className={`text-center py-16 ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-300'} rounded-lg border border-dashed`}>
+                <p className={`${isDark ? 'text-gray-300' : 'text-gray-500'} text-lg`}>
                   No se encontraron casos con los criterios seleccionados.
                 </p>
                 <Button
@@ -311,7 +282,7 @@ function CasosPage() {
             ) : (
               <>
                 {viewMode === 'list' ? (
-                  <div className={`shadow overflow-hidden sm:rounded-lg border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
+                  <div className={`${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'} shadow overflow-hidden sm:rounded-lg border`}>
                     <table className="min-w-full divide-y divide-border">
                       <thead className={isDark ? 'bg-red-950/30' : 'bg-gray-50'}>
                         <tr>
@@ -350,7 +321,7 @@ function CasosPage() {
                           </th>
                         </tr>
                       </thead>
-                      <tbody className={`divide-y divide-border ${isDark ? 'bg-[#630000]' : 'bg-white'}`}>
+                      <tbody className={`${isDark ? 'bg-[#630000]' : 'bg-white'} divide-y divide-border`}>
                         {casosActuales.map((caso) => (
                           <CasoRow
                             key={caso.numCaso}

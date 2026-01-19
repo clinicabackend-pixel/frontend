@@ -1,59 +1,36 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Search, Plus, Pencil } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faArrowLeft,
-  faFilePdf,
-  faPencil,
-  faPlus,
-  faFolderOpen,
-  faScaleBalanced,
-  faGavel,
-  faUser,
-  faUsers,
-  faHistory,
-  faCalendarAlt
-} from '@fortawesome/free-solid-svg-icons';
+import { faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import MainLayout from '../components/layout/MainLayout';
 import casoService from '../services/casoService';
 import solicitanteService from '../services/solicitanteService';
 import catalogoService from '../services/catalogoService';
 import { reporteService } from '../services/reporteService';
+import Modal from '../components/common/Modal';
+import CustomSelect from '../components/common/CustomSelect';
 import Button from '../components/common/Button';
 import AddAccionModal from '../components/modals/AddAccionModal';
 import AddEncuentroModal from '../components/modals/AddEncuentroModal';
-import Modal from '../components/common/Modal';
+import SolicitanteForm from '../components/forms/SolicitanteForm';
+import { useTheme } from '../context/ThemeContext';
 import { getFullAmbitoPath } from '../utils/ambitoUtils';
 import type {
   CasoDetalleResponse,
   CasoResponse,
   BeneficiarioResponse,
   CasoUpdateRequest,
-  AccionCreateRequest
+  AccionCreateRequest,
 } from '../types/caso';
 import type { Tribunal } from '../types/catalogo';
 import type { SolicitanteResponse } from '../types/solicitante';
-import Loader from '../components/common/Loader';
 
-// Interface for Timeline Events
-interface TimelineEvent {
-  id: string;
-  type: 'accion' | 'encuentro' | 'inicio';
-  fecha: Date;
-  titulo: string;
-  descripcion?: string;
-  observacion?: string;
-  idAccion?: number;
-  fechaEjecucion?: string;
-  username?: string;
-  idEncuentro?: number;
-  fechaAtencion?: string;
-  fechaProxima?: string;
-}
-
-export default function CasoDetalle() {
+function CasoDetalle() {
   const { numCaso } = useParams<{ numCaso: string }>();
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -73,28 +50,44 @@ export default function CasoDetalle() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddBeneficiarioModalOpen, setIsAddBeneficiarioModalOpen] = useState(false);
 
-  // Beneficiario Add State
+  // Estado para el modal de eventos de la línea de tiempo
+  const [selectedEvento, setSelectedEvento] = useState<any>(null);
+  const [isEventoModalOpen, setIsEventoModalOpen] = useState(false);
+
+  // Beneficiario Add State (Inline)
   const [cedulaSearch, setCedulaSearch] = useState('');
-  const [foundPerson, setFoundPerson] = useState<SolicitanteResponse | null>(null);
+  const [foundPerson, setFoundPerson] = useState<any>(null);
   const [newBenParentesco, setNewBenParentesco] = useState('');
   const [newBenTipo, setNewBenTipo] = useState('');
+  const [showSolicitanteForm, setShowSolicitanteForm] = useState(false);
   const [searchError, setSearchError] = useState('');
 
-  // Accion/Encuentro State
+  // Accion State
   const [isAddAccionModalOpen, setIsAddAccionModalOpen] = useState(false);
+
+  // Encuentro State
   const [isAddEncuentroModalOpen, setIsAddEncuentroModalOpen] = useState(false);
 
   // Edit Form State
   const [editFormData, setEditFormData] = useState<CasoUpdateRequest>({});
 
-
-
+  // Cerrar modal de evento con Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isEventoModalOpen) {
+        setIsEventoModalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isEventoModalOpen]);
 
   useEffect(() => {
     const fetchData = async () => {
       if (!numCaso) return;
       setLoading(true);
       try {
+        // 1. Fetch Case Details and Catalogs
         const [detalle, listaTribunales] = await Promise.all([
           casoService.getById(numCaso),
           catalogoService.getTribunales().catch(() => []),
@@ -103,6 +96,7 @@ export default function CasoDetalle() {
         setCasoDetalle(detalle);
         setTribunales(listaTribunales);
 
+        // 2. Fetch Solicitante Name
         if (detalle.caso.cedula) {
           try {
             const sol = await solicitanteService.getByCedula(detalle.caso.cedula);
@@ -115,9 +109,9 @@ export default function CasoDetalle() {
           }
         }
 
+        // 3. Resolve Materia Name using Tree Search (Full Path)
         const materiaPath = await getFullAmbitoPath(detalle.caso.comAmbLegal);
         setMateriaNombre(materiaPath);
-        setError(null);
       } catch (err) {
         console.error('Error cargando caso:', err);
         setError('No se pudo cargar el caso. Verifique que exista.');
@@ -129,6 +123,7 @@ export default function CasoDetalle() {
     fetchData();
   }, [numCaso]);
 
+  // Helper to calculate age if needed
   const calculateAge = (birthDateString?: string) => {
     if (!birthDateString) return 'N/A';
     const today = new Date();
@@ -168,6 +163,72 @@ export default function CasoDetalle() {
     }
   };
 
+  /* --- Funciones de Editar Beneficiario --- */
+  const [editingBeneficiario, setEditingBeneficiario] = useState<SolicitanteResponse | null>(null);
+  const [editingRelacion, setEditingRelacion] = useState({ parentesco: '', tipoBeneficiario: '' });
+  const [isEditBeneficiarioModalOpen, setIsEditBeneficiarioModalOpen] = useState(false);
+
+  const handleEditBeneficiario = async (cedula: string) => {
+    try {
+      setLoading(true);
+      const [solicitanteData, casoData] = await Promise.all([
+        solicitanteService.getByCedula(cedula),
+        Promise.resolve(casoDetalle?.beneficiarios?.find((b) => b.cedula === cedula)),
+      ]);
+
+      setEditingBeneficiario(solicitanteData);
+      if (casoData) {
+        setEditingRelacion({
+          parentesco: casoData.parentesco,
+          tipoBeneficiario: casoData.tipoBeneficiario,
+        });
+      }
+      setIsEditBeneficiarioModalOpen(true);
+    } catch (e) {
+      console.error('Error cargando beneficiario', e);
+      alert('No se pudo cargar la información del beneficiario');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditBeneficiarioSuccess = () => {
+    setIsEditBeneficiarioModalOpen(false);
+    setEditingBeneficiario(null);
+    const refresh = async () => {
+      if (!numCaso) return;
+      const updatedCaso = await casoService.getById(numCaso);
+      setCasoDetalle(updatedCaso);
+    };
+    refresh();
+  };
+
+  /* --- Funciones de Beneficiario Inline --- */
+
+  const handleAddBeneficiarioInternal = async (newBen: any) => {
+    if (!numCaso || !casoDetalle) return;
+    await casoService.addBeneficiario(numCaso, newBen);
+
+    const addedBen: BeneficiarioResponse = {
+      cedula: newBen.cedula,
+      nombre: newBen.nombre || '',
+      parentesco: newBen.parentesco,
+      tipoBeneficiario: newBen.tipoBeneficiario,
+      numCaso: numCaso,
+    };
+
+    const newBeneficiarios = casoDetalle.beneficiarios
+      ? [...casoDetalle.beneficiarios, addedBen]
+      : [addedBen];
+    setCasoDetalle({ ...casoDetalle, beneficiarios: newBeneficiarios });
+
+    // Reset modal state
+    setFoundPerson(null);
+    setCedulaSearch('');
+    setNewBenParentesco('');
+    setNewBenTipo('');
+    setIsAddBeneficiarioModalOpen(false);
+  };
 
   const handleSearchPerson = async () => {
     setSearchError('');
@@ -179,7 +240,7 @@ export default function CasoDetalle() {
       if (persona) {
         setFoundPerson(persona);
       } else {
-        setSearchError('Persona no encontrada.');
+        setSearchError('Persona no encontrada. Puede registrarla.');
       }
     } catch (e) {
       setSearchError('Persona no encontrada o error al buscar.');
@@ -187,7 +248,7 @@ export default function CasoDetalle() {
   };
 
   const handleAddBeneficiarioClick = async () => {
-    if (!numCaso || !casoDetalle || !foundPerson || !newBenParentesco || !newBenTipo) return;
+    if (!foundPerson || !newBenParentesco || !newBenTipo) return;
 
     const newBen = {
       cedula: foundPerson.cedula,
@@ -195,36 +256,15 @@ export default function CasoDetalle() {
       parentesco: newBenParentesco,
       tipoBeneficiario: newBenTipo,
     };
-
-    try {
-      await casoService.addBeneficiario(numCaso, newBen);
-
-      const addedBen: BeneficiarioResponse = {
-        cedula: newBen.cedula,
-        nombre: newBen.nombre || '',
-        parentesco: newBen.parentesco,
-        tipoBeneficiario: newBen.tipoBeneficiario,
-        numCaso: numCaso,
-      };
-
-      const newBeneficiarios = casoDetalle.beneficiarios
-        ? [...casoDetalle.beneficiarios, addedBen]
-        : [addedBen];
-      setCasoDetalle({ ...casoDetalle, beneficiarios: newBeneficiarios });
-
-      // Reset state
-      setFoundPerson(null);
-      setCedulaSearch('');
-      setNewBenParentesco('');
-      setNewBenTipo('');
-      setIsAddBeneficiarioModalOpen(false);
-    } catch (error) {
-      console.error("Error adding beneficiario:", error);
-      alert("Error al agregar beneficiario");
-    }
+    await handleAddBeneficiarioInternal(newBen);
   };
 
-
+  const handleNewPersonSuccess = (newPerson: any) => {
+    setShowSolicitanteForm(false);
+    setFoundPerson(newPerson);
+    setCedulaSearch(newPerson.cedula);
+    setSearchError('');
+  };
 
   const handleAddAccion = async (data: AccionCreateRequest) => {
     if (!numCaso || !casoDetalle) return;
@@ -232,7 +272,6 @@ export default function CasoDetalle() {
       await casoService.createAccion(numCaso, data);
       const updated = await casoService.getById(numCaso);
       setCasoDetalle(updated);
-      setIsAddAccionModalOpen(false);
     } catch (err) {
       console.error('Error adding accion', err);
       alert('Error al registrar la acción');
@@ -245,481 +284,1305 @@ export default function CasoDetalle() {
       await casoService.createEncuentro(numCaso, data);
       const updated = await casoService.getById(numCaso);
       setCasoDetalle(updated);
-      setIsAddEncuentroModalOpen(false);
     } catch (err) {
       console.error('Error adding encuentro', err);
       alert('Error al registrar el encuentro');
     }
   };
 
-  if (loading) return <Loader text="Cargando caso..." />;
-
-  if (error || !casoDetalle) {
+  if (loading) {
     return (
-      <MainLayout title="Error">
-        <div className="flex flex-col items-center justify-center h-96">
-          <p className="text-red-600 text-xl font-semibold mb-4">{error || 'Caso no encontrado'}</p>
-          <Button onClick={() => navigate('/casos')} variant="primary">Volver a casos</Button>
+      <MainLayout title="Cargando...">
+        <div className="flex h-screen w-screen items-center justify-center">
+          <div className="flex flex-col items-center">
+            <div className={`animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 ${isDark ? 'border-red-700' : 'border-red-900'} mb-4`}></div>
+            <p className={isDark ? 'text-white' : 'text-black'}>Cargando información del caso...</p>
+          </div>
         </div>
       </MainLayout>
     );
   }
 
-  const { caso, beneficiarios, acciones, encuentros, documentos, /* pruebas */ } = casoDetalle;
+  if (error || !casoDetalle) {
+    return (
+      <MainLayout title="Error">
+        <div className="flex flex-1 items-center justify-center">
+          <div className={`text-center p-8 rounded-lg shadow-md border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
+            <p className={`text-red-600 text-xl font-semibold mb-4 ${isDark ? 'text-red-300' : 'text-red-600'}`}>
+              {error || 'Caso no encontrado'}
+            </p>
+            <button
+              onClick={() => navigate('/casos')}
+              className={`px-6 py-2 rounded hover:bg-red-800 transition-colors ${isDark ? 'bg-red-800 text-white' : 'bg-red-900 text-white'}`}
+            >
+              Volver a la lista
+            </button>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  const { caso, beneficiarios, acciones, encuentros, documentos } = casoDetalle;
 
   return (
     <MainLayout title={`Caso ${caso.numCaso}`}>
-      <div className="max-w-7xl mx-auto w-full pb-20 animate-fade-in-up">
-        {/* Top Actions */}
-        <div className="flex justify-between items-center mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/casos')}
-            className="text-gray-600 hover:text-red-900 pl-0"
-            icon={faArrowLeft}
-          >
-            Volver
-          </Button>
-          <div className="flex gap-2 items-center">
-            <Button
-              onClick={() => caso.numCaso && reporteService.downloadReporteCasoPdf(caso.numCaso)}
-              variant="secondary"
-              size="sm"
-              icon={faFilePdf}
-              className="text-red-700 hover:text-red-900 border-red-200 hover:border-red-300"
+      <main className={`flex-1 overflow-y-auto py-6 px-8 md:px-10 lg:px-16 xl:px-20 pb-20 w-full ${isDark ? 'bg-red-900' : ''}`}>
+        <div className="w-full space-y-6">
+          {/* Top Bar with Back & Actions */}
+          <div className="flex justify-between items-center">
+            <button
+              onClick={() => navigate('/casos')}
+              className={`flex items-center hover:text-red-900 transition-colors font-medium ${
+                isDark ? 'text-gray-300' : 'text-gray-600'
+              }`}
             >
-              Exportar PDF
-            </Button>
-            <span
-              className={`px-4 py-1.5 rounded-full text-sm font-semibold border ${caso.estatus === 'ABIERTO'
-                ? 'bg-green-100 text-green-800 border-green-200'
-                : 'bg-gray-100 text-gray-800 border-gray-200'
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+              Volver
+            </button>
+            <div className="flex gap-2 items-center">
+              {/* Botón Exportar Reporte Caso */}
+              <button
+                onClick={() => caso.numCaso && reporteService.downloadReporteCaso(caso.numCaso)}
+                className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors flex items-center gap-2 text-sm"
+                title="Descargar Reporte del Caso"
+              >
+                <FontAwesomeIcon icon={faFileExcel} />
+                <span className="hidden sm:inline">Exportar</span>
+              </button>
+
+              <span
+                className={`px-4 py-1 rounded-full text-sm font-semibold border ${
+                  caso.estatus === 'ABIERTO'
+                    ? isDark
+                      ? 'bg-green-900/50 text-green-300 border-green-700'
+                      : 'bg-green-100 text-green-800 border-green-200'
+                    : isDark
+                      ? 'bg-gray-800 text-gray-300 border-gray-700'
+                      : 'bg-gray-100 text-gray-800 border-gray-200'
                 }`}
-            >
-              {caso.estatus}
-            </span>
-          </div>
-        </div>
-
-        {/* Header Summary Card */}
-        <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-8">
-          <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                <FontAwesomeIcon icon={faFolderOpen} className="text-red-900 opacity-70" />
-                {nombreSolicitante}
-              </h1>
-              <p className="text-sm text-gray-500 mt-1 ml-8">
-                Solicitante - C.I: {caso.cedula}
-              </p>
-            </div>
-            <div className="text-right">
-              <div className="flex items-center justify-end gap-2 text-red-900 font-semibold text-lg">
-                <FontAwesomeIcon icon={faScaleBalanced} />
-                {materiaNombre}
-              </div>
-              <div className="text-xs text-gray-500 uppercase tracking-wide">Materia</div>
-            </div>
-          </div>
-
-          {/* Solicitante Details */}
-          {solicitante && (
-            <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-100 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <span className="block text-xs text-gray-500">Teléfono</span>
-                <span className="font-medium text-sm text-gray-900">{solicitante.telfCelular || solicitante.telfCasa || 'N/A'}</span>
-              </div>
-              <div>
-                <span className="block text-xs text-gray-500">Correo</span>
-                <span className="font-medium text-sm text-gray-900 truncate" title={solicitante.email}>{solicitante.email || 'N/A'}</span>
-              </div>
-              <div>
-                <span className="block text-xs text-gray-500">Edad / Civil</span>
-                <span className="font-medium text-sm text-gray-900">{calculateAge(solicitante.fechaNacimiento)} años, {solicitante.estadoCivil}</span>
-              </div>
-              <div>
-                <span className="block text-xs text-gray-500">Dirección</span>
-                <span className="font-medium text-sm text-gray-900 truncate" title={`${solicitante.nombreParroquia || solicitante.idParroquia}, ${solicitante.nombreMunicipio || solicitante.idMunicipio}`}>{solicitante.nombreParroquia || solicitante.idParroquia}</span>
-              </div>
-            </div>
-          )}
-
-          <div className="mt-6 pt-6 border-t border-gray-100 grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div>
-              <span className="block text-xs text-gray-500 uppercase tracking-wide mb-1">Fecha Recepción</span>
-              <span className="text-sm font-medium text-gray-900">{new Date(caso.fechaRecepcion).toLocaleDateString()}</span>
-            </div>
-            <div>
-              <span className="block text-xs text-gray-500 uppercase tracking-wide mb-1">Trámite</span>
-              <span className="text-sm font-medium text-gray-900">{caso.tramite}</span>
-            </div>
-            <div>
-              <span className="block text-xs text-gray-500 uppercase tracking-wide mb-1">Asignado a</span>
-              <span className="text-sm font-medium text-gray-900 flex items-center gap-2">
-                <FontAwesomeIcon icon={faUser} className="text-gray-400" />
-                {caso.username || 'Sin asignar'}
+              >
+                {caso.estatus}
               </span>
             </div>
-            <div>
-              <span className="block text-xs text-gray-500 uppercase tracking-wide mb-1">Tribunal</span>
-              <div className="text-sm font-medium text-gray-900 flex flex-col">
-                {caso.nombreTribunal ? (
-                  <>
-                    <span>{caso.nombreTribunal}</span>
-                    <span className="text-xs text-gray-500 font-normal">{caso.codCasoTribunal}</span>
-                  </>
+          </div>
+
+          {/* Header Card */}
+          <div
+            className={`rounded-xl shadow-sm border p-6 ${
+              isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'
+            }`}
+          >
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+              <div>
+                <h1
+                  className={`text-2xl font-bold mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}
+                >
+                  {nombreSolicitante}
+                </h1>
+                <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                  Solicitante (CI: {caso.cedula})
+                </p>
+              </div>
+              <div className="text-right">
+                <div
+                  className={`text-lg font-semibold text-right ${
+                    isDark ? 'text-red-400' : 'text-red-900'
+                  }`}
+                >
+                  {materiaNombre}
+                </div>
+                <div className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                  Materia
+                </div>
+              </div>
+            </div>
+
+            {/* Información del Solicitante Expandida */}
+            {solicitante && (
+              <div
+                className={`rounded-lg p-4 mb-6 border ${
+                  isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-100'
+                }`}
+              >
+                <h3
+                  className={`text-xs font-bold uppercase tracking-wider mb-3 ${
+                    isDark ? 'text-gray-300' : 'text-gray-400'
+                  }`}
+                >
+                  Datos del Solicitante
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div>
+                    <span className={`block text-xs ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                      Teléfono
+                    </span>
+                    <span
+                      className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}
+                    >
+                      {solicitante.telfCelular || solicitante.telfCasa || 'N/A'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className={`block text-xs ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                      Correo
+                    </span>
+                    <span
+                      className={`text-sm font-medium truncate ${isDark ? 'text-white' : 'text-gray-900'}`}
+                      title={solicitante.email}
+                    >
+                      {solicitante.email || 'N/A'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className={`block text-xs ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                      Edad / Estado Civil
+                    </span>
+                    <span
+                      className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}
+                    >
+                      {calculateAge(solicitante.fechaNacimiento)} años, {solicitante.estadoCivil}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div
+              className={`grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t ${
+                isDark ? 'border-red-800/50' : 'border-gray-100'
+              }`}
+            >
+              <div>
+                <span
+                  className={`block text-xs uppercase tracking-wide ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                >
+                  Fecha Recepción
+                </span>
+                <span className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  {new Date(caso.fechaRecepcion).toLocaleDateString()}
+                </span>
+              </div>
+              <div>
+                <span
+                  className={`block text-xs uppercase tracking-wide ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                >
+                  Trámite
+                </span>
+                <span className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  {caso.tramite}
+                </span>
+              </div>
+              <div>
+                <span
+                  className={`block text-xs uppercase tracking-wide ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                >
+                  Asignado a
+                </span>
+                <span className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  {caso.username || 'Sin asignar'}
+                </span>
+              </div>
+              <div>
+                <span
+                  className={`block text-xs uppercase tracking-wide ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                >
+                  Término
+                </span>
+                <span className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  {caso.termino}
+                </span>
+              </div>
+            </div>
+
+            {(caso.nombreTribunal || caso.codCasoTribunal) && (
+              <div
+                className={`mt-4 pt-4 border-t ${isDark ? 'border-red-800/50' : 'border-gray-100'}`}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <span
+                      className={`block text-xs uppercase tracking-wide ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                    >
+                      Tribunal
+                    </span>
+                    <span
+                      className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}
+                    >
+                      {caso.nombreTribunal || 'No asignado'}
+                    </span>
+                  </div>
+                  <div>
+                    <span
+                      className={`block text-xs uppercase tracking-wide ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                    >
+                      N° Expediente / Causa
+                    </span>
+                    <span
+                      className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}
+                    >
+                      {caso.codCasoTribunal || 'No registrado'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Tabs */}
+          <div className={`border-b ${isDark ? 'border-red-800/50' : 'border-gray-200'}`}>
+            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+              {[
+                { id: 'general', label: 'General' },
+                { id: 'beneficiarios', label: 'Beneficiarios' },
+                { id: 'historial', label: 'Historial' },
+                { id: 'pruebas', label: 'Pruebas' },
+                ...(caso.codCasoTribunal ? [{ id: 'documentos', label: 'Documentos' }] : []),
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`
+                                py-4 px-1 border-b-2 font-medium text-sm capitalize transition-colors
+                                ${
+                                  activeTab === tab.id
+                                    ? isDark
+                                      ? 'border-red-600 text-red-400'
+                                      : 'border-red-900 text-red-900'
+                                    : isDark
+                                      ? 'border-transparent text-gray-300 hover:text-white hover:border-red-700'
+                                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                }
+                            `}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          {/* Content Area */}
+          <div
+            className={`rounded-xl shadow-sm border min-h-[400px] ${
+              isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'
+            }`}
+          >
+            {/* GENERAL TAB */}
+            {activeTab === 'general' && (
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3
+                    className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}
+                  >
+                    Síntesis del Caso
+                  </h3>
+                  <button
+                    onClick={openEditModal}
+                    className={`px-3 py-1 text-sm font-medium border rounded-md transition-colors ${
+                      isDark
+                        ? 'text-red-400 border-red-600 hover:bg-red-950'
+                        : 'text-red-900 border-red-900 hover:bg-red-50'
+                    }`}
+                  >
+                    Editar Informacion
+                  </button>
+                </div>
+                <p
+                  className={`whitespace-pre-line leading-relaxed p-4 rounded-lg border ${
+                    isDark
+                      ? 'text-white bg-red-950/30 border-red-800/50'
+                      : 'text-gray-700 bg-gray-50 border-gray-100'
+                  }`}
+                >
+                  {caso.sintesis || 'No hay síntesis registrada.'}
+                </p>
+
+                <div className="mt-6">
+                  <h3
+                    className={`text-lg font-semibold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}
+                  >
+                    Información de Tribunal
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div
+                      className={`p-3 rounded border ${
+                        isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-100'
+                      }`}
+                    >
+                      <div className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                        Tribunal
+                      </div>
+                      <div className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                        {caso.nombreTribunal || 'N/A'}
+                      </div>
+                    </div>
+                    <div
+                      className={`p-3 rounded border ${
+                        isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-100'
+                      }`}
+                    >
+                      <div className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                        Causa / Expediente
+                      </div>
+                      <div className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                        {caso.codCasoTribunal || 'N/A'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* BENEFICIARIES TAB */}
+            {activeTab === 'beneficiarios' && (
+              <div className="p-6">
+                <div className="mb-4 flex justify-between items-center">
+                  <h3
+                    className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}
+                  >
+                    Beneficiarios ({beneficiarios?.length || 0})
+                  </h3>
+                  <Button
+                    onClick={() => setIsAddBeneficiarioModalOpen(true)}
+                    variant="primary"
+                    size="sm"
+                  >
+                    <Plus size={16} className="mr-2" /> Agregar
+                  </Button>
+                </div>
+                {!beneficiarios || beneficiarios.length === 0 ? (
+                  <p className={`italic ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                    No hay beneficiarios registrados.
+                  </p>
                 ) : (
-                  <span className="text-gray-400 italic">No asignado</span>
+                  <div className="overflow-x-auto">
+                    <table
+                      className={`min-w-full divide-y ${
+                        isDark ? 'divide-red-800/50' : 'divide-gray-200'
+                      }`}
+                    >
+                      <thead className={isDark ? 'bg-red-950/30' : 'bg-gray-50'}>
+                        <tr>
+                          <th
+                            className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                              isDark ? 'text-gray-300' : 'text-gray-500'
+                            }`}
+                          >
+                            Cédula
+                          </th>
+                          <th
+                            className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                              isDark ? 'text-gray-300' : 'text-gray-500'
+                            }`}
+                          >
+                            Parentesco
+                          </th>
+                          <th
+                            className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                              isDark ? 'text-gray-300' : 'text-gray-500'
+                            }`}
+                          >
+                            Tipo
+                          </th>
+                          <th
+                            className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${
+                              isDark ? 'text-gray-300' : 'text-gray-500'
+                            }`}
+                          >
+                            Acciones
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody
+                        className={
+                          isDark
+                            ? 'divide-y divide-red-800/50'
+                            : 'bg-white divide-y divide-gray-200'
+                        }
+                      >
+                        {beneficiarios.map((ben) => (
+                          <tr key={ben.cedula}>
+                            <td
+                              className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}
+                            >
+                              {ben.cedula}
+                            </td>
+                            <td
+                              className={`px-6 py-4 whitespace-nowrap text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                            >
+                              {ben.parentesco}
+                            </td>
+                            <td
+                              className={`px-6 py-4 whitespace-nowrap text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                            >
+                              {ben.tipoBeneficiario}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                              <button
+                                onClick={() => handleEditBeneficiario(ben.cedula)}
+                                className={`transition-colors ${
+                                  isDark
+                                    ? 'text-gray-400 hover:text-red-400'
+                                    : 'text-gray-400 hover:text-red-900'
+                                }`}
+                                title="Editar información del beneficiario"
+                              >
+                                <Pencil size={18} />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
               </div>
-            </div>
-          </div>
-        </div>
+            )}
 
-        {/* Tabs Navigation */}
-        <div className="border-b border-gray-200 mb-6">
-          <nav className="-mb-px flex space-x-8">
-            {[
-              { id: 'general', label: 'General' },
-              { id: 'beneficiarios', label: 'Beneficiarios' },
-              { id: 'historial', label: 'Historial' },
-              { id: 'documentos', label: 'Documentos' },
-              // { id: 'pruebas', label: 'Pruebas' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`
-                      py-4 px-1 border-b-2 font-medium text-sm transition-colors
-                      ${activeTab === tab.id
-                    ? 'border-red-900 text-red-900'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
-                    `}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-        </div>
-
-        {/* Tab Content */}
-        <div className="min-h-[300px]">
-          {/* GENERAL */}
-          {activeTab === 'general' && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-bold text-gray-900">Síntesis del Caso</h3>
-                <Button variant="outline" size="sm" onClick={openEditModal} icon={faPencil}>
-                  Editar
-                </Button>
-              </div>
-              <p className="text-gray-700 whitespace-pre-line leading-relaxed bg-gray-50 p-6 rounded-lg border border-gray-100">
-                {caso.sintesis || 'No hay síntesis registrada.'}
-              </p>
-            </div>
-          )}
-
-          {/* BENEFICIARIOS */}
-          {activeTab === 'beneficiarios' && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                  <FontAwesomeIcon icon={faUsers} className="text-gray-400" />
-                  Beneficiarios ({beneficiarios?.length || 0})
-                </h3>
-                <Button variant="primary" size="sm" onClick={() => setIsAddBeneficiarioModalOpen(true)} icon={faPlus}>
-                  Agregar Beneficiario
-                </Button>
-              </div>
-
-              {!beneficiarios || beneficiarios.length === 0 ? (
-                <div className="text-center py-10 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                  <p className="text-gray-500">No hay beneficiarios registrados en este caso.</p>
+            {/* HISTORIAL TAB */}
+            {activeTab === 'historial' && (
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                    Línea de Tiempo del Caso
+                  </h3>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => setIsAddEncuentroModalOpen(true)}
+                      variant="secondary"
+                      size="sm"
+                    >
+                      <Plus size={16} className="mr-2" /> Registrar Cita
+                    </Button>
+                    <Button
+                      onClick={() => setIsAddAccionModalOpen(true)}
+                      variant="primary"
+                      size="sm"
+                    >
+                      <Plus size={16} className="mr-2" /> Registrar Acción
+                    </Button>
+                  </div>
                 </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {beneficiarios.map(ben => (
-                    <div key={ben.cedula} className="border border-gray-200 rounded-lg p-4 flex justify-between items-center hover:shadow-sm transition-shadow">
-                      <div>
-                        <p className="font-semibold text-gray-900">{ben.nombre}</p>
-                        <p className="text-sm text-gray-500">C.I: {ben.cedula}</p>
-                        <div className="flex gap-2 mt-2">
-                          <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-100">
-                            {ben.parentesco}
-                          </span>
-                          <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full border border-gray-200">
-                            {ben.tipoBeneficiario}
-                          </span>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => {
-                          alert("Funcionalidad de edición en desarrollo");
-                        }}
-                        className="text-gray-400 hover:text-red-900 p-2"
-                      >            <FontAwesomeIcon icon={faPencil} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
 
-          {/* HISTORIAL */}
-          {activeTab === 'historial' && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex justify-between items-center mb-8">
-                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                  <FontAwesomeIcon icon={faHistory} className="text-gray-400" />
-                  Línea de Tiempo
-                </h3>
-                <div className="flex gap-2">
-                  <Button variant="secondary" size="sm" onClick={() => setIsAddEncuentroModalOpen(true)} icon={faCalendarAlt}>
-                    Registrar Cita
-                  </Button>
-                  <Button variant="primary" size="sm" onClick={() => setIsAddAccionModalOpen(true)} icon={faGavel}>
-                    Registrar Acción
-                  </Button>
-                </div>
-              </div>
-
-              <div className="relative pl-4 sm:pl-8 space-y-8 before:absolute before:left-2 sm:before:left-4 before:top-2 before:bottom-0 before:w-0.5 before:bg-gray-200">
-                {/* Timeline Logic */}
                 {(() => {
-                  const timeline: TimelineEvent[] = [];
-                  acciones?.forEach(a => timeline.push({
-                    id: `accion-${a.idAccion}`,
-                    type: 'accion',
-                    fecha: new Date(a.fechaRegistro),
-                    titulo: a.titulo,
-                    descripcion: a.descripcion,
-                    username: a.username
-                  }));
-                  encuentros?.forEach(e => timeline.push({
-                    id: `encuentro-${e.idEncuentro}`,
-                    type: 'encuentro',
-                    fecha: new Date(e.fechaAtencion),
-                    titulo: e.orientacion,
-                    observacion: e.observacion,
-                    fechaProxima: e.fechaProxima
-                  }));
+                  // Combinar todas las actividades en un solo array
+                  const timeline: Array<{
+                    id: string;
+                    type: 'accion' | 'encuentro' | 'inicio';
+                    fecha: Date;
+                    titulo: string;
+                    descripcion?: string;
+                    observacion?: string;
+                    idAccion?: number;
+                    fechaEjecucion?: string;
+                    username?: string;
+                    idEncuentro?: number;
+                    fechaAtencion?: string;
+                    fechaProxima?: string;
+                  }> = [];
 
-                  // Initial Event
+                  // Agregar acciones
+                  if (acciones && acciones.length > 0) {
+                    acciones.forEach((acc) => {
+                      timeline.push({
+                        id: `accion-${acc.idAccion}`,
+                        type: 'accion',
+                        fecha: new Date(acc.fechaRegistro),
+                        titulo: acc.titulo,
+                        descripcion: acc.descripcion,
+                        idAccion: acc.idAccion,
+                        fechaEjecucion: acc.fechaEjecucion,
+                        username: acc.username,
+                      });
+                    });
+                  }
+
+                  // Agregar encuentros
+                  if (encuentros && encuentros.length > 0) {
+                    encuentros.forEach((enc) => {
+                      timeline.push({
+                        id: `encuentro-${enc.idEncuentro}`,
+                        type: 'encuentro',
+                        fecha: new Date(enc.fechaAtencion),
+                        titulo: enc.orientacion,
+                        observacion: enc.observacion,
+                        idEncuentro: enc.idEncuentro,
+                        fechaAtencion: enc.fechaAtencion,
+                        fechaProxima: enc.fechaProxima,
+                      });
+                    });
+                  }
+
+                  // Agregar evento inicial del caso
                   timeline.push({
-                    id: 'inicio',
+                    id: 'inicio-caso',
                     type: 'inicio',
                     fecha: new Date(caso.fechaRecepcion),
-                    titulo: 'Apertura del Caso',
-                    descripcion: `Caso registrado en el sistema. ${caso.username ? 'Asignado a ' + caso.username : ''}`
+                    titulo: 'Caso Registrado',
+                    descripcion: `Caso ${caso.numCaso} ingresado al sistema`,
                   });
 
-                  return timeline.sort((a, b) => b.fecha.getTime() - a.fecha.getTime()).map((event) => (
-                    <div key={event.id} className="relative pl-6 sm:pl-8">
-                      <div className={`absolute left-0 sm:left-2 -translate-x-1/2 w-4 h-4 rounded-full border-2 border-white shadow-sm
-                                        ${event.type === 'inicio' ? 'bg-green-500' :
-                          event.type === 'accion' ? 'bg-red-600' : 'bg-blue-500'}
-                                     `}></div>
+                  // Ordenar por fecha (más reciente primero)
+                  timeline.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
 
-                      <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-1 mb-2">
-                          <span className={`text-xs font-bold px-2 py-0.5 rounded w-fit uppercase
-                                                ${event.type === 'inicio' ? 'bg-green-100 text-green-800' :
-                              event.type === 'accion' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}
-                                             `}>
-                            {event.type}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {event.fecha.toLocaleDateString()} - {event.fecha.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                        </div>
-                        <h4 className="font-bold text-gray-800 mb-1">{event.titulo}</h4>
-                        {event.descripcion && <p className="text-gray-600 text-sm mb-2">{event.descripcion}</p>}
-                        {event.observacion && (
-                          <div className="bg-yellow-50 p-2 rounded text-xs text-yellow-800 border border-yellow-100">
-                            <strong>Observación:</strong> {event.observacion}
-                          </div>
-                        )}
-                        {event.fechaProxima && (
-                          <div className="mt-2 text-xs font-semibold text-blue-600 flex items-center gap-1">
-                            <FontAwesomeIcon icon={faCalendarAlt} />
-                            Próxima Cita: {new Date(event.fechaProxima).toLocaleDateString()}
-                          </div>
-                        )}
+                  // Si no hay eventos, mostrar mensaje
+                  if (timeline.length === 0) {
+                    return (
+                      <p
+                        className={`italic text-center py-12 ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                      >
+                        No hay eventos registrados en el historial.
+                      </p>
+                    );
+                  }
+
+                  return (
+                    <div className="relative w-full">
+                      {/* Línea vertical */}
+                      <div
+                        className={`absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b ${
+                          isDark
+                            ? 'from-red-700 via-red-600 to-red-800'
+                            : 'from-red-900 via-red-600 to-gray-300'
+                        }`}
+                      ></div>
+
+                      {/* Eventos de la línea de tiempo */}
+                      <div className="space-y-6 w-full">
+                        {timeline.map((evento, index) => {
+                          const isLast = index === timeline.length - 1;
+
+                          // Colores y estilos según tipo
+                          const typeStyles = {
+                            accion: {
+                              bgColor: isDark ? 'bg-red-700' : 'bg-red-900',
+                              borderColor: isDark ? 'border-green-700' : 'border-green-200',
+                              textColor: isDark ? 'text-green-400' : 'text-green-700',
+                              badgeBg: isDark ? 'bg-green-900/50' : 'bg-green-50',
+                              badgeText: isDark ? 'text-green-300' : 'text-green-700',
+                              label: 'Acción Legal',
+                            },
+                            encuentro: {
+                              bgColor: isDark ? 'bg-red-700' : 'bg-red-900',
+                              borderColor: isDark ? 'border-blue-700' : 'border-blue-200',
+                              textColor: isDark ? 'text-blue-400' : 'text-blue-700',
+                              badgeBg: isDark ? 'bg-blue-900/50' : 'bg-blue-50',
+                              badgeText: isDark ? 'text-blue-300' : 'text-blue-700',
+                              label: 'Encuentro / Cita',
+                            },
+                            inicio: {
+                              bgColor: isDark ? 'bg-red-700' : 'bg-red-900',
+                              borderColor: isDark ? 'border-red-700' : 'border-red-200',
+                              textColor: isDark ? 'text-red-400' : 'text-red-900',
+                              badgeBg: isDark ? 'bg-red-950/80' : 'bg-red-50',
+                              badgeText: isDark ? 'text-red-300' : 'text-red-900',
+                              label: 'Inicio del Caso',
+                            },
+                          };
+
+                          const style = typeStyles[evento.type];
+
+                          return (
+                            <div key={evento.id} className="relative w-full pl-20 pb-6">
+                              {/* Círculo en la línea */}
+                              <div
+                                className={`absolute top-12 w-8 h-8 left-4 rounded-full 
+                                  ${style.bgColor} border-4 ${isDark ? 'border-[#630000]' : 'border-white'} shadow-lg flex items-center 
+                                  justify-center z-10 transition-all`}
+                              ></div>
+
+                              {/* Tarjeta de contenido */}
+                              <div
+                                onClick={() => {
+                                  setSelectedEvento(evento);
+                                  setIsEventoModalOpen(true);
+                                }}
+                                className={`w-full rounded-lg shadow-md border-l-4 ${style.borderColor} p-5 hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer ${
+                                  isDark ? 'bg-red-700/50' : 'bg-white'
+                                } ${isLast ? 'opacity-80' : ''}`}
+                              >
+                                {/* Header */}
+                                <div className="flex justify-between items-start mb-3">
+                                  <span
+                                    className={`text-xs font-bold ${style.badgeBg} ${style.badgeText} px-3 py-1 rounded-full uppercase tracking-wide`}
+                                  >
+                                    {style.label}
+                                  </span>
+                                  <span
+                                    className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                                  >
+                                    {evento.fecha.toLocaleDateString('es-ES', {
+                                      day: 'numeric',
+                                      month: 'long',
+                                      year: 'numeric',
+                                    })}
+                                  </span>
+                                </div>
+
+                                {/* Título */}
+                                <div className="mb-2">
+                                  <h4 className={`font-bold text-lg ${style.textColor} inline`}>
+                                    {evento.titulo}
+                                  </h4>
+                                  {/* Badge para cita próxima programada */}
+                                  {evento.type === 'encuentro' && evento.fechaProxima && (
+                                    <span
+                                      className={`ml-3 text-xs font-semibold px-2 py-1 rounded-full border ${
+                                        isDark
+                                          ? 'text-blue-300 bg-blue-900/50 border-blue-700'
+                                          : 'text-blue-700 bg-blue-50 border-blue-200'
+                                      }`}
+                                    >
+                                      📅 Próxima:{' '}
+                                      {new Date(evento.fechaProxima).toLocaleDateString('es-ES', {
+                                        day: 'numeric',
+                                        month: 'short',
+                                      })}
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Descripción */}
+                                {evento.descripcion && (
+                                  <p
+                                    className={`text-sm leading-relaxed ${isDark ? 'text-white' : 'text-gray-700'}`}
+                                  >
+                                    {evento.descripcion}
+                                  </p>
+                                )}
+
+                                {/* Observación */}
+                                {evento.observacion && (
+                                  <div
+                                    className={`mt-3 rounded p-3 border ${
+                                      isDark
+                                        ? 'bg-red-950/30 border-red-800/50'
+                                        : 'bg-gray-50 border-gray-200'
+                                    }`}
+                                  >
+                                    <p
+                                      className={`text-xs uppercase font-semibold mb-1 ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                                    >
+                                      Observación:
+                                    </p>
+                                    <p
+                                      className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                                    >
+                                      {evento.observacion}
+                                    </p>
+                                  </div>
+                                )}
+
+                                {/* Indicador de click */}
+                                <div className="mt-4 text-right">
+                                  <span
+                                    className={`text-xs font-medium ${isDark ? 'text-gray-400' : 'text-gray-400'}`}
+                                  >
+                                    Click para ver más detalles →
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
-                  ));
+                  );
                 })()}
               </div>
-            </div>
-          )}
+            )}
 
-          {/* DOCUMENTOS */}
-          {activeTab === 'documentos' && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Documentos del Expediente</h3>
-              {!documentos || documentos.length === 0 ? (
-                <div className="text-center py-8 text-gray-500 italic">
-                  No hay documentos asociados a este caso.
+            {/* PRUEBAS TAB */}
+            {activeTab === 'pruebas' && (
+              <div className="p-6">
+                <div className="mb-4">
+                  <h3
+                    className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}
+                  >
+                    Pruebas del Caso
+                  </h3>
                 </div>
-              ) : (
-                <ul className="divide-y divide-gray-100">
-                  {documentos.map((doc, _idx) => (
-                    <li key={_idx} className="py-3 flex items-start gap-3">
-                      <div className="p-2 bg-gray-100 rounded text-gray-500">
-                        <FontAwesomeIcon icon={faFolderOpen} />
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{doc.titulo || 'Documento sin título'}</p>
-                        <p className="text-sm text-gray-500">{doc.observacion}</p>
-                        <div className="text-xs text-gray-400 mt-1">
-                          Fila: {doc.folioIni} - {doc.folioFin} | Registrado: {new Date(doc.fechaRegistro).toLocaleDateString()}
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
+                {!casoDetalle.pruebas || casoDetalle.pruebas.length === 0 ? (
+                  <p className={`italic ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                    No hay pruebas registradas.
+                  </p>
+                ) : (
+                  <ul className="space-y-4">
+                    {casoDetalle.pruebas.map((prueba) => (
+                      <li
+                        key={prueba.idPrueba}
+                        className={`p-4 border rounded-lg shadow-sm ${
+                          isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-white border-gray-200'
+                        }`}
+                      >
+                        <h4 className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                          {prueba.titulo}
+                        </h4>
+                        <p className={`text-sm mt-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                          {prueba.documento}
+                        </p>
+                        {prueba.observacion && (
+                          <p
+                            className={`text-xs italic mt-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+                          >
+                            Nota: {prueba.observacion}
+                          </p>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
 
-      {/* MODALS */}
-      {/* Edit Case Modal (Simplified) */}
+            {/* DOCUMENTS TAB */}
+            {activeTab === 'documentos' && caso.codCasoTribunal && (
+              <div className="p-6">
+                <div className="mb-4">
+                  <h3
+                    className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}
+                  >
+                    Documentos del Expediente en Tribunal
+                  </h3>
+                </div>
+                {!documentos || documentos.length === 0 ? (
+                  <p className={`italic ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                    No hay documentos cargados.
+                  </p>
+                ) : (
+                  <ul
+                    className={`divide-y border rounded-lg overflow-hidden ${
+                      isDark
+                        ? 'divide-red-800/50 border-red-800/50'
+                        : 'divide-gray-200 border-gray-200'
+                    }`}
+                  >
+                    {documentos.map((doc) => (
+                      <li
+                        key={doc.idDocumento}
+                        className={`p-4 flex items-center justify-between transition-colors ${
+                          isDark ? 'bg-red-950/30 hover:bg-red-950/50' : 'bg-white hover:bg-gray-50'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div
+                            className={`p-2 rounded-lg ${
+                              isDark ? 'bg-red-900/50 text-red-400' : 'bg-red-50 text-red-700'
+                            }`}
+                          >
+                            <svg
+                              className="w-6 h-6"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                              />
+                            </svg>
+                          </div>
+                          <div>
+                            <p
+                              className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}
+                            >
+                              {doc.titulo}
+                            </p>
+                            <div
+                              className={`flex gap-2 text-xs mt-1 ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                            >
+                              <span>
+                                Registrado: {new Date(doc.fechaRegistro).toLocaleDateString()}
+                              </span>
+                              {doc.folioIni && (
+                                <span>
+                                  Folios: {doc.folioIni} - {doc.folioFin}
+                                </span>
+                              )}
+                            </div>
+                            {doc.observacion && (
+                              <p
+                                className={`text-xs mt-1 italic ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+                              >
+                                "{doc.observacion}"
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+
+      {/* EDIT BENEFICIARIO MODAL */}
       <Modal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        title="Editar Caso"
+        isOpen={isEditBeneficiarioModalOpen}
+        onClose={() => setIsEditBeneficiarioModalOpen(false)}
+        title={`Editar Información de Beneficiario${editingBeneficiario ? `: ${editingBeneficiario.nombre}` : ''}`}
       >
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Síntesis</label>
-            <textarea
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm h-32 p-2 border"
-              value={editFormData.sintesis || ''}
-              onChange={e => setEditFormData({ ...editFormData, sintesis: e.target.value })}
-            />
-          </div>
-          {/* Simplified Tribunal Select */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Tribunal</label>
-            <select
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm h-10 border"
-              value={editFormData.idTribunal || ''}
-              onChange={e => setEditFormData({ ...editFormData, idTribunal: Number(e.target.value) })}
-            >
-              <option value="">Seleccione Tribunal</option>
-              {tribunales.map(t => (
-                <option key={t.idTribunal} value={t.idTribunal}>{t.nombreTribunal}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Código/Expediente en Tribunal</label>
-            <input
-              type="text"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm h-10 border px-3"
-              value={editFormData.codCasoTribunal || ''}
-              onChange={e => setEditFormData({ ...editFormData, codCasoTribunal: e.target.value })}
-            />
-          </div>
-          <div className="flex justify-end gap-2 pt-4">
-            <Button variant="ghost" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
-            <Button variant="primary" onClick={handleUpdate}>Guardar Cambios</Button>
+        <div className="p-0">
+          <div className="p-0">
+            {editingBeneficiario && (
+              <div className="flex flex-col gap-4">
+                {/*  Relationship Form Section - Only shown here */}
+                <div className="px-6 pt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Parentesco
+                    </label>
+                    <CustomSelect
+                      options={[
+                        { value: '', label: 'Seleccione...' },
+                        { value: 'Hijo', label: 'Hijo/a' },
+                        { value: 'Padre', label: 'Padre/Madre' },
+                        { value: 'Esposo', label: 'Esposo/a' },
+                        { value: 'Hermano', label: 'Hermano/a' },
+                        { value: 'Otro', label: 'Otro' },
+                      ]}
+                      value={editingRelacion.parentesco}
+                      onChange={(val) =>
+                        setEditingRelacion({ ...editingRelacion, parentesco: String(val) })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Tipo Beneficiario
+                    </label>
+                    <CustomSelect
+                      options={[
+                        { value: 'Directo', label: 'Directo' },
+                        { value: 'Indirecto', label: 'Indirecto' },
+                      ]}
+                      value={editingRelacion.tipoBeneficiario}
+                      onChange={(val) =>
+                        setEditingRelacion({ ...editingRelacion, tipoBeneficiario: String(val) })
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="pb-2">
+                  <SolicitanteForm
+                    initialData={editingBeneficiario as any}
+                    formMode="edit"
+                    onSuccess={async (updatedSolicitante) => {
+                      if (numCaso && updatedSolicitante.cedula) {
+                        try {
+                          await casoService.updateBeneficiario(numCaso, updatedSolicitante.cedula, {
+                            tipoBeneficiario: editingRelacion.tipoBeneficiario,
+                            parentesco: editingRelacion.parentesco,
+                          });
+                          handleEditBeneficiarioSuccess();
+                        } catch (err) {
+                          console.error('Error updating relationship', err);
+                          alert(
+                            'Datos personales guardados, pero hubo un error actualizando la relación con el caso.'
+                          );
+                        }
+                      }
+                    }}
+                    onCancel={() => setIsEditBeneficiarioModalOpen(false)}
+                    isModal={true}
+                    simplifiedMode={true}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </Modal>
 
-      {/* Add Accion Modal */}
       <AddAccionModal
         isOpen={isAddAccionModalOpen}
         onClose={() => setIsAddAccionModalOpen(false)}
         onSuccess={handleAddAccion}
+        defaultUsername={casoDetalle.caso.username}
       />
 
-      {/* Add Encuentro Modal */}
       <AddEncuentroModal
         isOpen={isAddEncuentroModalOpen}
         onClose={() => setIsAddEncuentroModalOpen(false)}
         onSuccess={handleAddEncuentro}
+        defaultUsername={casoDetalle.caso.username}
       />
 
-      {/* Add Beneficiario Modal */}
+      {/* EDIT MODAL */}
       <Modal
-        isOpen={isAddBeneficiarioModalOpen}
-        onClose={() => setIsAddBeneficiarioModalOpen(false)}
-        title="Agregar Beneficiario"
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title="Editar Información del Caso"
       >
-        <div className="space-y-4">
-          {/* Buscar por Cédula */}
-          <div className="flex gap-2">
-            <input
-              type="text"
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-900/20 focus:border-red-900"
-              placeholder="Buscar por Cédula"
-              value={cedulaSearch}
-              onChange={e => setCedulaSearch(e.target.value)}
+        <div className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Síntesis</label>
+            <textarea
+              className="w-full border rounded-lg p-2 focus:ring-red-900 focus:border-red-900"
+              rows={4}
+              value={editFormData.sintesis || ''}
+              onChange={(e) => setEditFormData({ ...editFormData, sintesis: e.target.value })}
             />
-            <button
-              type="button"
-              onClick={handleSearchPerson}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
-            >
-              Buscar
-            </button>
           </div>
-          
-          {searchError && (
-            <p className="text-red-500 text-sm">{searchError}</p>
-          )}
 
-          {foundPerson && (
-            <div className="bg-green-50 p-3 rounded border border-green-200">
-              <p className="font-bold text-green-900">{foundPerson.nombre} {foundPerson.apellido}</p>
-              <p className="text-sm text-green-700">C.I: {foundPerson.cedula}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Tribunal Asignado
+              </label>
+              <CustomSelect
+                options={[
+                  { value: '', label: 'Sin Asignar' },
+                  ...tribunales.map((t) => ({ value: t.idTribunal, label: t.nombreTribunal })),
+                ]}
+                value={editFormData.idTribunal || ''}
+                onChange={(val) =>
+                  setEditFormData({ ...editFormData, idTribunal: val ? Number(val) : undefined })
+                }
+                placeholder="Seleccione tribunal"
+              />
             </div>
-          )}
-
-          {/* Parentesco */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Parentesco</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-900/20 focus:border-red-900"
-              value={newBenParentesco}
-              onChange={e => setNewBenParentesco(e.target.value)}
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                N° Expediente / Causa
+              </label>
+              <input
+                type="text"
+                className="w-full border rounded-lg p-2 focus:ring-red-900 focus:border-red-900"
+                value={editFormData.codCasoTribunal || ''}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, codCasoTribunal: e.target.value })
+                }
+                placeholder="Ej: ABC-123456"
+              />
+            </div>
           </div>
 
-          {/* Tipo */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
-            <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-900/20 focus:border-red-900 appearance-none bg-white"
-              value={newBenTipo}
-              onChange={e => setNewBenTipo(e.target.value)}
-            >
-              <option value="">Seleccione...</option>
-              <option value="DIRECTO">Directo</option>
-              <option value="INDIRECTO">Indirecto</option>
-            </select>
-          </div>
-
-          {/* Botón Agregar */}
-          <div className="flex justify-end pt-4">
-            <button
-              type="button"
-              onClick={handleAddBeneficiarioClick}
-              disabled={!foundPerson || !newBenParentesco || !newBenTipo}
-              className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
-            >
-              Agregar
-            </button>
+          <div className="pt-4 flex justify-end gap-2">
+            <Button onClick={() => setIsEditModalOpen(false)} variant="secondary">
+              Cancelar
+            </Button>
+            <Button onClick={handleUpdate} variant="primary">
+              Guardar Cambios
+            </Button>
           </div>
         </div>
       </Modal>
 
+      <Modal
+        isOpen={isAddBeneficiarioModalOpen}
+        onClose={() => {
+          setIsAddBeneficiarioModalOpen(false);
+          setShowSolicitanteForm(false);
+          setFoundPerson(null);
+          setCedulaSearch('');
+          setSearchError('');
+        }}
+        title="Agregar Beneficiario"
+      >
+        <div className={!showSolicitanteForm ? 'p-6 space-y-4' : ''}>
+          {!showSolicitanteForm ? (
+            <>
+              {/* Search Section */}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Buscar por Cédula"
+                  className="flex-1 border p-2 rounded focus:ring-red-900 focus:border-red-900 outline-none"
+                  value={cedulaSearch}
+                  onChange={(e) => setCedulaSearch(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearchPerson()}
+                />
+                <Button onClick={handleSearchPerson} variant="primary">
+                  <Search size={18} />
+                </Button>
+              </div>
+
+              {searchError && (
+                <div className="text-red-500 text-sm flex justify-between items-center text-center p-2 bg-red-50 rounded border border-red-100">
+                  <span>{searchError}</span>
+                  <Button
+                    onClick={() => setShowSolicitanteForm(true)}
+                    variant="ghost"
+                    size="sm"
+                    className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                  >
+                    <Plus size={16} className="mr-1" /> Registrar Nuevo
+                  </Button>
+                </div>
+              )}
+
+              {/* Found Person & Form */}
+              {foundPerson && (
+                <div className="bg-green-50 p-4 rounded-lg border border-green-100 shadow-sm animate-fade-in">
+                  <p className="font-semibold text-green-900 mb-2">
+                    Persona encontrada: {foundPerson.nombre} ({foundPerson.cedula})
+                  </p>
+
+                  <div className="mt-4 grid grid-cols-1 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Parentesco con solicitante
+                      </label>
+                      <CustomSelect
+                        options={[
+                          { value: '', label: 'Seleccione...' },
+                          { value: 'Hijo', label: 'Hijo/a' },
+                          { value: 'Padre', label: 'Padre/Madre' },
+                          { value: 'Esposo', label: 'Esposo/a' },
+                          { value: 'Hermano', label: 'Hermano/a' },
+                          { value: 'Otro', label: 'Otro' },
+                        ]}
+                        value={newBenParentesco}
+                        onChange={(val) => setNewBenParentesco(String(val))}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Tipo de Beneficiario
+                      </label>
+                      <CustomSelect
+                        options={[
+                          { value: '', label: 'Seleccione...' },
+                          { value: 'Directo', label: 'Directo' },
+                          { value: 'Indirecto', label: 'Indirecto' },
+                        ]}
+                        value={newBenTipo}
+                        onChange={(val) => setNewBenTipo(String(val))}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex justify-end">
+                    <Button
+                      onClick={handleAddBeneficiarioClick}
+                      disabled={!newBenParentesco || !newBenTipo}
+                      variant="primary"
+                    >
+                      Agregar al Caso
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            /* Create New Person Form */
+            <div>
+              <div className="flex justify-between items-center mb-0 p-4 border-b bg-gray-50">
+                <h4 className="font-semibold text-gray-800">Registrar Nueva Persona</h4>
+                <button
+                  onClick={() => setShowSolicitanteForm(false)}
+                  className="text-gray-500 hover:text-gray-700 text-sm font-medium"
+                >
+                  Volver
+                </button>
+              </div>
+              <div className="p-0">
+                <SolicitanteForm
+                  onSuccess={handleNewPersonSuccess}
+                  onCancel={() => setShowSolicitanteForm(false)}
+                  isModal={true}
+                  simplifiedMode={true}
+                  formMode="create"
+                  initialData={{ cedula: cedulaSearch }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </Modal>
+
+      {/* Modal de Detalles del Evento */}
+      <Modal
+        isOpen={isEventoModalOpen}
+        onClose={() => setIsEventoModalOpen(false)}
+        title="Detalles del Evento"
+      >
+        {selectedEvento && (
+          <div className="p-6 space-y-6">
+            {/* Tipo de evento */}
+            <div className="flex items-center justify-between border-b pb-4">
+              <div>
+                <span
+                  className={`inline-block px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wide ${
+                    selectedEvento.type === 'accion'
+                      ? 'bg-green-50 text-green-700'
+                      : selectedEvento.type === 'encuentro'
+                        ? 'bg-blue-50 text-blue-700'
+                        : 'bg-red-50 text-red-900'
+                  }`}
+                >
+                  {selectedEvento.type === 'accion'
+                    ? 'Acción Legal'
+                    : selectedEvento.type === 'encuentro'
+                      ? 'Encuentro / Cita'
+                      : 'Inicio del Caso'}
+                </span>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-500 font-medium">Fecha</p>
+                <p className="text-lg font-bold text-gray-900">
+                  {selectedEvento.fecha.toLocaleDateString('es-ES', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </p>
+              </div>
+            </div>
+
+            {/* Título */}
+            <div>
+              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                Título
+              </h3>
+              <p className="text-xl font-bold text-gray-900">{selectedEvento.titulo}</p>
+            </div>
+
+            {/* Descripción */}
+            {selectedEvento.descripcion && (
+              <div>
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  Descripción
+                </h3>
+                <p className="text-base text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-lg">
+                  {selectedEvento.descripcion}
+                </p>
+              </div>
+            )}
+
+            {/* Observación */}
+            {selectedEvento.observacion && (
+              <div>
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  Observación
+                </h3>
+                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+                  <p className="text-base text-gray-700 leading-relaxed">
+                    {selectedEvento.observacion}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Información adicional según tipo */}
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+              {selectedEvento.type === 'accion' && (
+                <>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase font-semibold mb-1">ID Acción</p>
+                    <p className="text-sm font-medium text-gray-900">{selectedEvento.idAccion}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase font-semibold mb-1">
+                      Registrado por
+                    </p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {selectedEvento.username || 'N/A'}
+                    </p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-xs text-gray-500 uppercase font-semibold mb-1">
+                      Fecha de ejecución
+                    </p>
+                    {selectedEvento.fechaEjecucion ? (
+                      <p className="text-sm font-medium text-green-700 bg-green-50 px-3 py-2 rounded inline-block">
+                        Ejecutada el{' '}
+                        {new Date(selectedEvento.fechaEjecucion).toLocaleDateString('es-ES')}
+                      </p>
+                    ) : (
+                      <p className="text-sm font-medium text-orange-700 bg-orange-50 px-3 py-2 rounded inline-block">
+                        Acción No Ejecutada
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {selectedEvento.type === 'encuentro' && (
+                <>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase font-semibold mb-1">
+                      ID Encuentro
+                    </p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {selectedEvento.idEncuentro}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase font-semibold mb-1">
+                      Tipo de Encuentro
+                    </p>
+                    {selectedEvento.fechaProxima ? (
+                      <p className="text-sm font-medium text-blue-700 bg-blue-50 px-3 py-2 rounded inline-block">
+                        Cita Programada
+                      </p>
+                    ) : (
+                      <p className="text-sm font-medium text-gray-700 bg-gray-50 px-3 py-2 rounded inline-block">
+                        Encuentro Realizado
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase font-semibold mb-1">
+                      Fecha de Atención
+                    </p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {new Date(selectedEvento.fechaAtencion!).toLocaleDateString('es-ES', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </p>
+                  </div>
+                  {selectedEvento.fechaProxima && (
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase font-semibold mb-1">
+                        Próxima Cita Programada
+                      </p>
+                      <p className="text-sm font-medium text-blue-700 bg-blue-50 px-3 py-2 rounded inline-block">
+                        {' '}
+                        {new Date(selectedEvento.fechaProxima).toLocaleDateString('es-ES', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        })}
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
+
+              <div className="col-span-2">
+                <p className="text-xs text-gray-500 uppercase font-semibold mb-1">Caso N°</p>
+                <p className="text-sm font-medium text-red-900">{numCaso}</p>
+              </div>
+            </div>
+
+            {/* Botón de cerrar */}
+            <div className="flex justify-end pt-4 border-t">
+              <Button onClick={() => setIsEventoModalOpen(false)} variant="secondary">
+                Cerrar
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </MainLayout>
   );
 }
+
+export default CasoDetalle;

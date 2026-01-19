@@ -15,6 +15,7 @@ import Modal from '../components/common/Modal';
 import CustomInput from '../components/common/CustomInput';
 import catalogoService from '../services/catalogoService';
 import Loader from '../components/common/Loader';
+import { useTheme } from '../context/ThemeContext';
 import type {
     TipoViviendaResponse
 } from '../types/catalogo';
@@ -22,6 +23,8 @@ import type {
 type CatalogType = 'NIVEL_EDUCATIVO' | 'CONDICION_LABORAL' | 'CONDICION_ACTIVIDAD' | 'VIVIENDA';
 
 export function Catalogos() {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const [activeTab, setActiveTab] = useState<CatalogType>('NIVEL_EDUCATIVO');
     const [items, setItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
@@ -141,10 +144,10 @@ export function Catalogos() {
             <div className="max-w-7xl mx-auto w-full flex flex-col md:flex-row gap-6 animate-fade-in-up">
 
                 {/* Sidebar / Tabs */}
-                <div className="w-full md:w-64 bg-white rounded-lg shadow-sm border border-gray-200 h-fit">
-                    <div className="p-4 border-b border-gray-100 bg-gray-50 rounded-t-lg">
-                        <h2 className="font-semibold text-gray-700 flex items-center gap-2">
-                            <FontAwesomeIcon icon={faTags} className="text-red-900" />
+                <div className={`w-full md:w-64 rounded-lg shadow-sm border h-fit ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
+                    <div className={`p-4 border-b rounded-t-lg ${isDark ? 'border-red-800/50 bg-red-950/30' : 'border-gray-100 bg-gray-50'}`}>
+                        <h2 className={`font-semibold flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>
+                            <FontAwesomeIcon icon={faTags} className={isDark ? 'text-red-400' : 'text-red-900'} />
                             Catálogos
                         </h2>
                     </div>
@@ -155,10 +158,14 @@ export function Catalogos() {
                                 onClick={() => setActiveTab(tab.id as CatalogType)}
                                 className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors mb-1
                                     ${activeTab === tab.id
-                                        ? 'bg-red-50 text-red-900 border border-red-100 shadow-xs'
-                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                                        ? isDark
+                                            ? 'bg-red-800/50 text-white border border-red-700 shadow-xs'
+                                            : 'bg-red-50 text-red-900 border border-red-100 shadow-xs'
+                                        : isDark
+                                            ? 'text-gray-300 hover:bg-red-800/50 hover:text-white'
+                                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
                             >
-                                <FontAwesomeIcon icon={tab.icon} className={`w-5 ${activeTab === tab.id ? 'text-red-700' : 'text-gray-400'}`} />
+                                <FontAwesomeIcon icon={tab.icon} className={`w-5 ${activeTab === tab.id ? (isDark ? 'text-red-400' : 'text-red-700') : (isDark ? 'text-gray-400' : 'text-gray-400')}`} />
                                 {tab.label}
                             </button>
                         ))}
@@ -166,9 +173,9 @@ export function Catalogos() {
                 </div>
 
                 {/* Main Content Area */}
-                <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 min-h-[500px] flex flex-col">
-                    <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                        <h2 className="text-xl font-bold text-gray-800">
+                <div className={`flex-1 rounded-lg shadow-sm border min-h-[500px] flex flex-col ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
+                    <div className={`p-6 border-b flex justify-between items-center ${isDark ? 'border-red-800/50' : 'border-gray-100'}`}>
+                        <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>
                             {tabs.find(t => t.id === activeTab)?.label}
                         </h2>
                         <Button
@@ -186,17 +193,17 @@ export function Catalogos() {
 
                     <div className="p-6 flex-1">
                         {loading ? (
-                            <Loader text="Cargando catálogo..." />
+                            <Loader text="Cargando catálogo..." isDark={isDark} />
                         ) : (
                             <>
                                 {activeTab === 'VIVIENDA' ? (
                                     <div className="space-y-6">
                                         {housingData.map(type => (
-                                            <div key={type.id} className="border border-gray-200 rounded-lg overflow-hidden">
-                                                <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex justify-between items-center">
+                                            <div key={type.id} className={`border rounded-lg overflow-hidden ${isDark ? 'border-red-800/50' : 'border-gray-200'}`}>
+                                                <div className={`px-4 py-3 border-b flex justify-between items-center ${isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-200'}`}>
                                                     <div className="flex items-center gap-2">
-                                                        <FontAwesomeIcon icon={faLayerGroup} className="text-gray-400" />
-                                                        <h3 className="font-semibold text-gray-800">{type.nombre}</h3>
+                                                        <FontAwesomeIcon icon={faLayerGroup} className={isDark ? 'text-gray-400' : 'text-gray-400'} />
+                                                        <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>{type.nombre}</h3>
                                                     </div>
                                                     <Button
                                                         variant="ghost"
@@ -210,37 +217,37 @@ export function Catalogos() {
                                                         Agregar Categoría
                                                     </Button>
                                                 </div>
-                                                <ul className="divide-y divide-gray-100">
+                                                <ul className={isDark ? 'divide-y divide-red-800/50' : 'divide-y divide-gray-100'}>
                                                     {type.categorias.length > 0 ? type.categorias.map(cat => (
-                                                        <li key={cat.id} className="px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors">
-                                                            <span className="text-sm text-gray-700">{cat.descripcion}</span>
+                                                        <li key={cat.id} className={`px-4 py-3 flex justify-between items-center transition-colors ${isDark ? 'hover:bg-red-950/30' : 'hover:bg-gray-50'}`}>
+                                                            <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{cat.descripcion}</span>
                                                             <StatusToggle
                                                                 isActive={cat.estatus === 'ACTIVO'}
                                                                 onClick={() => handleToggleStatus({ ...cat, estatus: cat.estatus || 'ACTIVO' }, type.id)}
                                                             />
                                                         </li>
                                                     )) : (
-                                                        <li className="px-4 py-3 text-sm text-gray-400 italic">No hay categorías registradas.</li>
+                                                        <li className={`px-4 py-3 text-sm italic ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>No hay categorías registradas.</li>
                                                     )}
                                                 </ul>
                                             </div>
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                                        <table className="min-w-full divide-y divide-gray-200">
-                                            <thead className="bg-gray-50">
+                                    <div className={`rounded-lg border overflow-hidden ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
+                                        <table className={`min-w-full ${isDark ? 'divide-y divide-red-800/50' : 'divide-y divide-gray-200'}`}>
+                                            <thead className={isDark ? 'bg-red-950/30' : 'bg-gray-50'}>
                                                 <tr>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Estatus</th>
+                                                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>ID</th>
+                                                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Nombre</th>
+                                                    <th className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Estatus</th>
                                                 </tr>
                                             </thead>
-                                            <tbody className="bg-white divide-y divide-gray-200">
+                                            <tbody className={isDark ? 'bg-[#630000] divide-y divide-red-800/50' : 'bg-white divide-y divide-gray-200'}>
                                                 {items.length > 0 ? items.map((item) => (
-                                                    <tr key={item.id} className="hover:bg-gray-50">
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-24">#{item.id}</td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.nombre}</td>
+                                                    <tr key={item.id} className={isDark ? 'hover:bg-red-950/30' : 'hover:bg-gray-50'}>
+                                                        <td className={`px-6 py-4 whitespace-nowrap text-sm w-24 ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>#{item.id}</td>
+                                                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{item.nombre}</td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-right">
                                                             <div className="flex justify-end">
                                                                 <StatusToggle
@@ -252,7 +259,7 @@ export function Catalogos() {
                                                     </tr>
                                                 )) : (
                                                     <tr>
-                                                        <td colSpan={3} className="px-6 py-8 text-center text-sm text-gray-500 italic">
+                                                        <td colSpan={3} className={`px-6 py-8 text-center text-sm italic ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                                                             No hay registros disponibles.
                                                         </td>
                                                     </tr>
@@ -274,7 +281,7 @@ export function Catalogos() {
                 title={`Nuevo registro - ${activeTab === 'VIVIENDA' && selectedParentId ? 'Categoría' : 'Elemento'}`}
             >
                 <div className="space-y-4">
-                    <p className="text-sm text-gray-600 mb-2">
+                    <p className={`text-sm mb-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                         Ingrese el nombre para el nuevo registro en <strong>{tabs.find(t => t.id === activeTab)?.label}</strong>.
                     </p>
                     <CustomInput

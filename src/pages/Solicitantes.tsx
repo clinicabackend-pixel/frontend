@@ -252,7 +252,7 @@ function Solicitantes() {
 
                         {/* Grid/List de Resultados */}
                         {loading ? (
-                            <Loader text="Cargando solicitantes..." />
+                            <Loader text="Cargando solicitantes..." isDark={isDark} />
                         ) : (
                             <>
                                 {filteredSolicitantes.length === 0 ? (

@@ -8,6 +8,7 @@ import Solicitantes from '../pages/Solicitantes';
 import RegistroCaso from '../pages/RegistroCaso';
 import SolicitanteDetalle from '../pages/SolicitanteDetalle';
 import UsuariosPage from '../pages/Usuarios';
+import UsuarioDetalle from '../pages/UsuarioDetalle';
 import Reportes from '../pages/Reportes';
 import SetupPassword from '../pages/auth/SetupPassword';
 import Catalogos from '../pages/Catalogos';
@@ -26,6 +27,7 @@ export default function AppRoutes() {
                 <Route path="/solicitantes/:id" element={<SolicitanteDetalle />} />
                 <Route path="/registro-caso" element={<RegistroCaso />} />
                 <Route path="/usuarios" element={<UsuariosPage />} />
+                <Route path="/usuarios/:username" element={<UsuarioDetalle />} />
                 <Route path="/reportes" element={<Reportes />} />
                 <Route path="/catalogos" element={<Catalogos />} />
             </Route>

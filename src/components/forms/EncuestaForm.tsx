@@ -8,6 +8,7 @@ import CustomSelect from '../common/CustomSelect';
 import CustomInput from '../common/CustomInput';
 import CustomCheckbox from '../common/CustomCheckbox';
 import Button from '../common/Button';
+import { useTheme } from '../../context/ThemeContext';
 import type { DatosEncuestaRequest, EncuestaFamiliaDto, EncuestaViviendaDto } from '../../types/encuesta';
 import type { TipoViviendaResponse, CondicionLaboralResponse, CondicionActividadResponse } from '../../types';
 
@@ -18,6 +19,8 @@ interface EncuestaFormProps {
 }
 
 export default function EncuestaForm({ cedula, onSuccess, onCancel }: EncuestaFormProps) {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [isEditing, setIsEditing] = useState(false); // Default to read-only
@@ -140,7 +143,7 @@ export default function EncuestaForm({ cedula, onSuccess, onCancel }: EncuestaFo
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-gray-500"><FontAwesomeIcon icon={faSpinner} spin size="2x" /> Cargando encuesta...</div>;
+    if (loading) return <div className={`p-8 text-center ${isDark ? 'text-white' : 'text-black'}`}><FontAwesomeIcon icon={faSpinner} spin size="2x" /> Cargando encuesta...</div>;
 
     return (
         <form onSubmit={handleSubmit} className="p-6 bg-white rounded-lg">

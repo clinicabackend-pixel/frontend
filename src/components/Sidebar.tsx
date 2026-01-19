@@ -79,7 +79,7 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Sidebar Container */}
       <aside
         className={`fixed md:static inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out shadow-sm group
-          ${isDark ? 'bg-red-900 border-red-800' : 'bg-white border-gray-200'}
+              ${isDark ? 'bg-red-900 border-red-800' : 'bg-white border-gray-200'}
           border-r
           ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
           ${isCollapsed ? 'w-20' : 'w-64'}

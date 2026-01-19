@@ -32,6 +32,11 @@ const usuarioService = {
         return response.data;
     },
 
+    updateUsuario: async (username: string, usuario: Partial<Usuario>): Promise<Usuario> => {
+        const response = await api.put<Usuario>(`/usuarios/${username}`, usuario);
+        return response.data;
+    },
+
     deleteUsuario: async (username: string): Promise<void> => {
         await api.delete(`/usuarios/${username}`);
     }

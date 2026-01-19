@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import SearchBar from '../components/common/SearchBar';
 import Pagination from '../components/common/Pagination';
@@ -11,10 +12,14 @@ import {
     Mail,
     User,
     Upload,
-    Plus
+    Plus,
+    MoreVertical,
+    Trash2,
+    X
 } from 'lucide-react';
 
 export default function UsuariosPage() {
+    const navigate = useNavigate();
     const { theme } = useTheme();
     const [isDark, setIsDark] = useState(() => {
         if (theme === 'dark') return true;
@@ -30,12 +35,32 @@ export default function UsuariosPage() {
     const [searchText, setSearchText] = useState('');
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+    const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [userToDelete, setUserToDelete] = useState<Usuario | null>(null);
+    const menuRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
     const itemsPerPage = 10;
 
     useEffect(() => {
         fetchUsuarios();
     }, []);
+
+    // Cerrar menú al hacer clic fuera
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (openMenuId && menuRefs.current[openMenuId]) {
+                if (!menuRefs.current[openMenuId]?.contains(event.target as Node)) {
+                    setOpenMenuId(null);
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [openMenuId]);
 
     // Actualizar isDark cuando cambia el theme
     useEffect(() => {
@@ -92,6 +117,32 @@ export default function UsuariosPage() {
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
+    };
+
+    const handleDeleteClick = (user: Usuario, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setUserToDelete(user);
+        setDeleteModalOpen(true);
+        setOpenMenuId(null);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!userToDelete) return;
+        
+        try {
+            await usuarioService.deleteUsuario(userToDelete.username);
+            await fetchUsuarios();
+            setDeleteModalOpen(false);
+            setUserToDelete(null);
+        } catch (error) {
+            console.error('Error desactivando usuario:', error);
+            alert('Error al desactivar el usuario. Por favor, intente nuevamente.');
+        }
+    };
+
+    const toggleMenu = (username: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setOpenMenuId(openMenuId === username ? null : username);
     };
 
     // Helper for status badge
@@ -155,7 +206,7 @@ export default function UsuariosPage() {
                             }`}
                         >
                             <Upload size={18} className="mr-2" />
-                            Importar Masivo
+                            Importar
                         </button>
                         <button
                             onClick={() => setIsUserModalOpen(true)}
@@ -190,7 +241,11 @@ export default function UsuariosPage() {
                             </thead>
                             <tbody className={`divide-y divide-border ${isDark ? 'bg-[#630000]' : 'bg-white'}`}>
                                 {currentItems.map((user) => (
-                                    <tr key={user.username} className={`transition-colors ${isDark ? 'hover:bg-red-950/50' : 'hover:bg-gray-50'}`}>
+                                    <tr 
+                                        key={user.username} 
+                                        className={`transition-colors cursor-pointer ${isDark ? 'hover:bg-red-950/50' : 'hover:bg-gray-50'}`}
+                                        onClick={() => navigate(`/usuarios/${user.username}`)}
+                                    >
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
                                                 <div className={`shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${isDark ? 'bg-red-950/50 text-gray-400' : 'bg-gray-200 text-gray-500'}`}>
@@ -215,7 +270,39 @@ export default function UsuariosPage() {
                                             {getStatusBadge(user.estatus)}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            {/* Future: Add Edit/View buttons */}
+                                            <div className="relative" ref={(el) => (menuRefs.current[user.username] = el)}>
+                                                <button
+                                                    onClick={(e) => toggleMenu(user.username, e)}
+                                                    className={`p-2 rounded-md transition-colors ${
+                                                        isDark
+                                                            ? 'text-gray-300 hover:text-white hover:bg-red-950/50'
+                                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                                                    }`}
+                                                    title="Opciones"
+                                                >
+                                                    <MoreVertical size={20} />
+                                                </button>
+                                                
+                                                {openMenuId === user.username && (
+                                                    <div className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg z-10 ${
+                                                        isDark ? 'bg-[#630000] border border-red-800/50' : 'bg-white border border-gray-200'
+                                                    }`}>
+                                                        <div className="py-1">
+                                                            <button
+                                                                onClick={(e) => handleDeleteClick(user, e)}
+                                                                className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors ${
+                                                                    isDark
+                                                                        ? 'text-red-300 hover:bg-red-950/50 hover:text-red-200'
+                                                                        : 'text-red-600 hover:bg-red-50 hover:text-red-900'
+                                                                }`}
+                                                            >
+                                                                <Trash2 size={16} />
+                                                                Desactivar Usuario
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
@@ -253,6 +340,54 @@ export default function UsuariosPage() {
                 onClose={() => setIsUserModalOpen(false)}
                 onSuccess={fetchUsuarios}
             />
+
+            {/* Modal de Confirmación de Desactivación */}
+            {deleteModalOpen && userToDelete && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white backdrop-blur-md rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-slide-up-modal">
+                        <div className="flex items-center justify-between p-4 bg-red-900">
+                            <h3 className="text-xl font-bold text-white">Confirmar Desactivación</h3>
+                            <button
+                                onClick={() => {
+                                    setDeleteModalOpen(false);
+                                    setUserToDelete(null);
+                                }}
+                                className="p-1 text-white hover:text-gray-200 transition-colors duration-200"
+                                aria-label="Cerrar modal"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <div className="overflow-y-auto bg-white p-6">
+                            <p className="text-gray-700 mb-4">
+                                ¿Está seguro de que desea desactivar al usuario <strong>{userToDelete.nombre}</strong> ({userToDelete.username})?
+                            </p>
+                            <p className="text-sm text-gray-500 mb-6">
+                                El usuario será desactivado y no podrá acceder al sistema. Esta acción puede revertirse editando el usuario.
+                            </p>
+
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    onClick={() => {
+                                        setDeleteModalOpen(false);
+                                        setUserToDelete(null);
+                                    }}
+                                    className="px-4 py-2 text-sm font-medium rounded-md transition-colors text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={handleConfirmDelete}
+                                    className="px-4 py-2 text-sm font-medium text-white rounded-md transition-colors bg-red-600 hover:bg-red-700"
+                                >
+                                    Desactivar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </MainLayout>
     );
 }

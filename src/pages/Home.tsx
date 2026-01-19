@@ -107,40 +107,57 @@ function Home() {
         {/* WIDGET B: Accesos Rápidos (1 columna) */}
         <div className={`${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-100'} p-6 rounded-xl shadow-sm border flex flex-col justify-between`}>
           <h3 className={`text-lg font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-800'}`}>Accesos Rápidos</h3>
-          <div className="space-y-3">
-            <button onClick={() => navigate('/solicitantes?mode=create')} className={`w-full flex items-center gap-3 p-3 text-left rounded-lg transition-colors group ${
-              isDark 
-                ? 'hover:bg-red-800/50 text-gray-200 hover:text-white' 
-                : 'hover:bg-red-50 text-gray-700 hover:text-red-900'
-            }`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+          <div className="space-y-2">
+            <button 
+              onClick={() => navigate('/solicitantes?mode=create')} 
+              className={`w-full flex items-center gap-3 p-3 text-left rounded-lg transition-all duration-200 group ${
                 isDark 
-                  ? 'bg-red-800/50 group-hover:bg-red-800 text-gray-300 group-hover:text-white' 
-                  : 'bg-gray-100 group-hover:bg-red-100 text-gray-500 group-hover:text-red-900'
+                  ? 'hover:bg-red-800/50 text-white border border-transparent hover:border-red-700/50' 
+                  : 'hover:bg-red-50 text-gray-700 hover:text-red-900 border border-transparent hover:border-red-100'
+              }`}
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
+                isDark 
+                  ? 'bg-red-800/70 group-hover:bg-red-800 text-white group-hover:scale-110' 
+                  : 'bg-red-100 group-hover:bg-red-200 text-red-900 group-hover:scale-110'
               }`}>
-                <FontAwesomeIcon icon={faUserPlus} className="text-sm" />
+                <FontAwesomeIcon icon={faUserPlus} className="text-base" />
               </div>
               <span className="font-medium text-sm">Registrar Solicitante</span>
             </button>
-            <button onClick={() => navigate('/casos')} className="w-full flex items-center gap-3 p-3 text-left rounded-lg hover:bg-red-50 text-gray-700 hover:text-red-900 transition-colors group">
-              <div className="w-8 h-8 rounded-full bg-gray-100 group-hover:bg-red-100 flex items-center justify-center text-gray-500 group-hover:text-red-900 transition-colors">
-                <FontAwesomeIcon icon={faSearch} className="text-sm" />
+            <button 
+              onClick={() => navigate('/casos')} 
+              className={`w-full flex items-center gap-3 p-3 text-left rounded-lg transition-all duration-200 group ${
+                isDark 
+                  ? 'hover:bg-red-800/50 text-white border border-transparent hover:border-red-700/50' 
+                  : 'hover:bg-red-50 text-gray-700 hover:text-red-900 border border-transparent hover:border-red-100'
+              }`}
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
+                isDark 
+                  ? 'bg-red-800/70 group-hover:bg-red-800 text-white group-hover:scale-110' 
+                  : 'bg-red-100 group-hover:bg-red-200 text-red-900 group-hover:scale-110'
+              }`}>
+                <FontAwesomeIcon icon={faSearch} className="text-base" />
               </div>
               <span className="font-medium text-sm">Buscar Caso</span>
             </button>
-            <button onClick={() => navigate('/calendario')} className={`w-full flex items-center gap-3 p-3 text-left rounded-lg transition-colors group ${
-              isDark 
-                ? 'hover:bg-red-800/50 text-gray-200 hover:text-white' 
-                : 'hover:bg-red-50 text-gray-700 hover:text-red-900'
-            }`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+            <button 
+              onClick={() => navigate('/calendario')} 
+              className={`w-full flex items-center gap-3 p-3 text-left rounded-lg transition-all duration-200 group ${
                 isDark 
-                  ? 'bg-red-800/50 group-hover:bg-red-800 text-gray-300 group-hover:text-white' 
-                  : 'bg-gray-100 group-hover:bg-red-100 text-gray-500 group-hover:text-red-900'
+                  ? 'hover:bg-red-800/50 text-white border border-transparent hover:border-red-700/50' 
+                  : 'hover:bg-red-50 text-gray-700 hover:text-red-900 border border-transparent hover:border-red-100'
+              }`}
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
+                isDark 
+                  ? 'bg-red-800/70 group-hover:bg-red-800 text-white group-hover:scale-110' 
+                  : 'bg-red-100 group-hover:bg-red-200 text-red-900 group-hover:scale-110'
               }`}>
-                <FontAwesomeIcon icon={faCalendarAlt} className="text-sm" />
+                <FontAwesomeIcon icon={faCalendarAlt} className="text-base" />
               </div>
-              <span className="font-medium text-sm">Ver Calendario</span>
+              <span className="font-medium text-sm">Ver Agenda</span>
             </button>
           </div>
         </div>

@@ -26,7 +26,7 @@ function Header({ title, onMenuClick }: HeaderProps) {
   };
 
   return (
-    <header className={`relative w-full h-16 ${isDark ? 'bg-red-900 border-red-800' : 'bg-white border-gray-200'} border-b flex items-center justify-between px-3 md:px-6 shadow-sm`}>
+        <header className={`relative w-full h-16 ${isDark ? 'bg-red-900 border-red-800' : 'bg-white border-gray-200'} border-b flex items-center justify-between px-3 md:px-6 shadow-sm`}>
       {/* Botón de menú (izquierda) */}
       <button
         onClick={handleMenuClick}
