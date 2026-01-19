@@ -1,4 +1,5 @@
 
+import { useTheme } from '../../context/ThemeContext';
 
 interface SwitchProps {
     checked: boolean;
@@ -15,6 +16,8 @@ export default function Switch({
     disabled = false,
     className = ''
 }: SwitchProps) {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const handleToggle = () => {
         if (!disabled) {
             onChange(!checked);
@@ -48,7 +51,7 @@ export default function Switch({
             </button>
             {label && (
                 <span
-                    className={`ml-3 text-sm font-medium select-none cursor-pointer ${disabled ? 'text-gray-400' : 'text-gray-700'}`}
+                    className={`ml-3 text-sm font-medium select-none cursor-pointer ${disabled ? (isDark ? 'text-gray-500' : 'text-gray-400') : isDark ? 'text-white' : 'text-gray-700'}`}
                     onClick={handleToggle}
                 >
                     {label}

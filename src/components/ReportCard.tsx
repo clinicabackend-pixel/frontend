@@ -1,6 +1,8 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
+import { useTheme } from '../context/ThemeContext';
+import { useEffect, useState } from 'react';
 
 interface ReportCardProps {
     title: string;
@@ -12,25 +14,45 @@ interface ReportCardProps {
     fileType?: 'PDF' | 'EXCEL';
 }
 
-const ReportCard = ({ title, description, icon, children, onDownload, loading, fileType = 'EXCEL' }: ReportCardProps) => (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full">
-        <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-            <h3 className="font-semibold text-gray-800 text-lg">{title}</h3>
-            <div className={`p-2 rounded-lg ${fileType === 'PDF' ? 'bg-red-50 text-red-900' : 'bg-green-50 text-green-900'}`}>
-                <FontAwesomeIcon icon={icon} className="text-xl" />
+const ReportCard = ({ title, description, icon, children, onDownload, loading, fileType = 'EXCEL' }: ReportCardProps) => {
+    const { theme } = useTheme();
+    const [isDark, setIsDark] = useState(false);
+
+    useEffect(() => {
+        if (theme === 'dark') {
+            setIsDark(true);
+        } else if (theme === 'light') {
+            setIsDark(false);
+        } else {
+            if (typeof window !== 'undefined') {
+                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                setIsDark(mediaQuery.matches);
+                const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
+                mediaQuery.addEventListener('change', handler);
+                return () => mediaQuery.removeEventListener('change', handler);
+            }
+        }
+    }, [theme]);
+
+    return (
+        <div className={`rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
+            <div className={`p-5 border-b flex items-center justify-between ${isDark ? 'border-red-800/50 bg-red-900/30' : 'border-gray-100 bg-gray-50/50'}`}>
+                <h3 className={`font-semibold text-lg ${isDark ? 'text-white' : 'text-gray-800'}`}>{title}</h3>
+                <div className={`p-2 rounded-lg ${fileType === 'PDF' ? (isDark ? 'bg-red-900/50 text-red-300' : 'bg-red-50 text-red-900') : (isDark ? 'bg-green-900/50 text-green-300' : 'bg-green-50 text-green-900')}`}>
+                    <FontAwesomeIcon icon={icon} className="text-xl" />
+                </div>
             </div>
-        </div>
-        <div className="p-5 flex-1 flex flex-col">
-            <div className="flex justify-between items-start mb-2">
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${fileType === 'PDF' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-                    {fileType}
-                </span>
-            </div>
-            <p className="text-sm text-gray-500 mb-4 h-10 line-clamp-2">{description}</p>
-            <div className="space-y-4 flex-1">
-                {children}
-            </div>
-            <div className="mt-6 pt-4 border-t border-gray-50">
+            <div className="p-5 flex-1 flex flex-col">
+                <div className="flex justify-between items-start mb-2">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${fileType === 'PDF' ? (isDark ? 'bg-red-900/50 text-red-300' : 'bg-red-100 text-red-800') : (isDark ? 'bg-green-900/50 text-green-300' : 'bg-green-100 text-green-800')}`}>
+                        {fileType}
+                    </span>
+                </div>
+                <p className={`text-sm mb-4 h-10 line-clamp-2 ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>{description}</p>
+                <div className="space-y-4 flex-1">
+                    {children}
+                </div>
+                <div className={`mt-6 pt-4 border-t ${isDark ? 'border-red-800/50' : 'border-gray-50'}`}>
                 <button
                     onClick={onDownload}
                     disabled={loading}
@@ -59,6 +81,7 @@ const ReportCard = ({ title, description, icon, children, onDownload, loading, f
             </div>
         </div>
     </div>
-);
+    );
+};
 
 export default ReportCard;

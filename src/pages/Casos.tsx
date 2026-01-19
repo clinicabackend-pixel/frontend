@@ -15,8 +15,18 @@ import catalogoService from '../services/catalogoService';
 
 import type { CasoSummary } from '../types/caso';
 import type { AmbitoLegal, Semestre } from '../types/catalogo';
+import { useTheme } from '../context/ThemeContext';
 
 function CasosPage() {
+  const { theme } = useTheme();
+  const [isDark, setIsDark] = useState(() => {
+    if (theme === 'dark') return true;
+    if (theme === 'light') return false;
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
   const [casos, setCasos] = useState<CasoSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -49,35 +59,11 @@ function CasosPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const buildHierarchyMap = (
-    ambitos: AmbitoLegal[],
-    map: Record<number, string> = {},
-    parentPath: string = ''
-  ) => {
-    ambitos.forEach(ambito => {
-      // Logic for "Sin Categoría/Subcategoría": 
-      // If the description acts as a placeholder (starts with "Sin "), we might want to skip it in the path, 
-      // BUT normally we just want the path. 
-      // The backend code used strict checks. 
-      // Let's implement a clean "Parent > Child" logic. 
-      // If parentPath exists, append " > ".
-
-      // Optional: Filter out "Sin ..." if you want cleaner UI, matching SmartAmbitoSelector style
-      const label = ambito.descripcion.startsWith("Sin ") ? "" : ambito.descripcion;
-
-      let currentPath = parentPath;
-      if (label) {
-        currentPath = parentPath ? `${parentPath} > ${label}` : label;
-      }
-
-      // Store the full path for this ID
-      // If current label was empty (e.g. "Sin Categoría"), we might typically NOT show it as a leaf, 
-      // but if this ID is referenced, we must show SOMETHING.
-      // If "Sin Categoria" is the leaf, we probably want to show the parent path at least.
-      map[ambito.id] = currentPath || ambito.descripcion; // Fallback to raw desc if path is empty
-
+  const buildAmbitoMap = (ambitos: AmbitoLegal[], map: Record<number, string> = {}) => {
+    ambitos.forEach((ambito) => {
+      map[ambito.id] = ambito.descripcion;
       if (ambito.children && ambito.children.length > 0) {
-        buildHierarchyMap(ambito.children, map, currentPath);
+        buildAmbitoMap(ambito.children, map);
       }
     });
     return map;
@@ -91,7 +77,7 @@ function CasosPage() {
           catalogoService.getAmbitosLegales(),
           catalogoService.getSemestres()
         ]);
-        setAmbitosLegales(buildHierarchyMap(ambitosData));
+        setAmbitosLegales(buildAmbitoMap(ambitosData));
         setSemestres(semestresData);
       } catch (error) {
         console.error('Error cargando catálogos:', error);
@@ -178,8 +164,25 @@ function CasosPage() {
 
   const semesterOptions = [
     { value: '', label: 'Todos los Semestres' },
-    ...semestres.map(s => ({ value: s.termino, label: s.nombre }))
+    ...semestres.map((s) => ({ value: s.termino, label: s.nombre })),
   ];
+
+  // Actualizar isDark cuando cambia el theme
+  useEffect(() => {
+    if (theme === 'dark') {
+      setIsDark(true);
+    } else if (theme === 'light') {
+      setIsDark(false);
+    } else {
+      if (typeof window !== 'undefined') {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        setIsDark(mediaQuery.matches);
+        const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
+        mediaQuery.addEventListener('change', handler);
+        return () => mediaQuery.removeEventListener('change', handler);
+      }
+    }
+  }, [theme]);
 
   return (
     <MainLayout title="GESTIÓN DE CASOS">
@@ -269,26 +272,28 @@ function CasosPage() {
 
         {/* Resumen de Resultados */}
         {!loading && (
-          <div className="mb-4 text-sm text-gray-600">
+          <div className={`mb-4 text-sm ${isDark ? 'text-white' : 'text-gray-600'}`}>
             Mostrando {casosActuales.length} de {casosOrdenados.length} casos encontrados
-            {(selectedStatus !== 'TODOS' || selectedSemestre || onlyMyCases || searchText) &&
-              <span className="ml-2 italic text-gray-500">(filtros activos)</span>
-            }
+            {(selectedStatus !== 'TODOS' || selectedSemestre || onlyMyCases || searchText) && (
+              <span className={`ml-2 italic ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>(filtros activos)</span>
+            )}
           </div>
         )}
 
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="flex flex-col items-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-900 mb-4"></div>
-              <p className="text-gray-600">Cargando casos...</p>
+              <div className={`animate-spin rounded-full h-12 w-12 border-b-2 mb-4 ${isDark ? 'border-red-700' : 'border-red-900'}`}></div>
+              <p className={isDark ? 'text-white' : 'text-gray-600'}>Cargando casos...</p>
             </div>
           </div>
         ) : (
           <>
             {casosOrdenados.length === 0 ? (
-              <div className="text-center py-16 bg-white rounded-lg border border-dashed border-gray-300">
-                <p className="text-gray-500 text-lg">No se encontraron casos con los criterios seleccionados.</p>
+              <div className={`text-center py-16 rounded-lg border border-dashed ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-300'}`}>
+                <p className={`text-lg ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                  No se encontraron casos con los criterios seleccionados.
+                </p>
                 <Button
                   variant="link"
                   onClick={() => {
@@ -306,21 +311,46 @@ function CasosPage() {
             ) : (
               <>
                 {viewMode === 'list' ? (
-                  <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
+                  <div className={`shadow overflow-hidden sm:rounded-lg border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
+                    <table className="min-w-full divide-y divide-border">
+                      <thead className={isDark ? 'bg-red-950/30' : 'bg-gray-50'}>
                         <tr>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Caso</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitante</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Materia</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estatus</th>
+                          <th
+                            scope="col"
+                            className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                          >
+                            Caso
+                          </th>
+                          <th
+                            scope="col"
+                            className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                          >
+                            Solicitante
+                          </th>
+                          <th
+                            scope="col"
+                            className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                          >
+                            Materia
+                          </th>
+                          <th
+                            scope="col"
+                            className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                          >
+                            Fecha
+                          </th>
+                          <th
+                            scope="col"
+                            className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                          >
+                            Estatus
+                          </th>
                           <th scope="col" className="relative px-6 py-3">
                             <span className="sr-only">Ver</span>
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
+                      <tbody className={`divide-y divide-border ${isDark ? 'bg-[#630000]' : 'bg-white'}`}>
                         {casosActuales.map((caso) => (
                           <CasoRow
                             key={caso.numCaso}

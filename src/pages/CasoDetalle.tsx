@@ -645,23 +645,34 @@ export default function CasoDetalle() {
         onSuccess={handleAddEncuentro}
       />
 
-      {/* Add Beneficiario (Simplified) - In real app, reuse the complex modal or form */}
+      {/* Add Beneficiario Modal */}
       <Modal
         isOpen={isAddBeneficiarioModalOpen}
         onClose={() => setIsAddBeneficiarioModalOpen(false)}
         title="Agregar Beneficiario"
       >
         <div className="space-y-4">
+          {/* Buscar por Cédula */}
           <div className="flex gap-2">
             <input
-              className="flex-1 border rounded px-3 py-2"
+              type="text"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-900/20 focus:border-red-900"
               placeholder="Buscar por Cédula"
               value={cedulaSearch}
               onChange={e => setCedulaSearch(e.target.value)}
             />
-            <Button variant="secondary" onClick={handleSearchPerson}>Buscar</Button>
+            <button
+              type="button"
+              onClick={handleSearchPerson}
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+            >
+              Buscar
+            </button>
           </div>
-          {searchError && <p className="text-red-500 text-sm">{searchError}</p>}
+          
+          {searchError && (
+            <p className="text-red-500 text-sm">{searchError}</p>
+          )}
 
           {foundPerson && (
             <div className="bg-green-50 p-3 rounded border border-green-200">
@@ -670,31 +681,41 @@ export default function CasoDetalle() {
             </div>
           )}
 
+          {/* Parentesco */}
           <div>
-            <label className="block text-sm font-medium">Parentesco</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Parentesco</label>
             <input
-              className="w-full border rounded px-3 py-2"
+              type="text"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-900/20 focus:border-red-900"
               value={newBenParentesco}
               onChange={e => setNewBenParentesco(e.target.value)}
             />
           </div>
+
+          {/* Tipo */}
           <div>
-            <label className="block text-sm font-medium">Tipo</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
             <select
-              className="w-full border rounded px-3 py-2"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-900/20 focus:border-red-900 appearance-none bg-white"
               value={newBenTipo}
               onChange={e => setNewBenTipo(e.target.value)}
             >
               <option value="">Seleccione...</option>
-              <option value="NNA">NNA</option>
-              <option value="ADULTO MAYOR">Adulto Mayor</option>
-              <option value="DISCAPACIDAD">Discapacidad</option>
-              <option value="OTROS">Otros</option>
+              <option value="DIRECTO">Directo</option>
+              <option value="INDIRECTO">Indirecto</option>
             </select>
           </div>
 
+          {/* Botón Agregar */}
           <div className="flex justify-end pt-4">
-            <Button disabled={!foundPerson} onClick={handleAddBeneficiarioClick}>Agregar</Button>
+            <button
+              type="button"
+              onClick={handleAddBeneficiarioClick}
+              disabled={!foundPerson || !newBenParentesco || !newBenTipo}
+              className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
+            >
+              Agregar
+            </button>
           </div>
         </div>
       </Modal>

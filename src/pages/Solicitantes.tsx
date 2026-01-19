@@ -17,11 +17,22 @@ import SolicitanteRow from '../components/SolicitanteRow';
 import solicitanteService from '../services/solicitanteService';
 import type { SolicitanteResponse } from '../types/solicitante';
 import Loader from '../components/common/Loader';
+import { useTheme } from '../context/ThemeContext';
 
 function Solicitantes() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const [showForm, setShowForm] = useState(searchParams.get('mode') === 'create');
+    const { theme } = useTheme();
+    const [isDark, setIsDark] = useState(() => {
+        if (theme === 'dark') return true;
+        if (theme === 'light') return false;
+        if (typeof window !== 'undefined') {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+        return false;
+    });
+    const [showForm, setShowForm] = useState(false);
 
     // Edit Modal State
     const [showEditForm, setShowEditForm] = useState(false);
@@ -141,6 +152,23 @@ function Solicitantes() {
         setCurrentPage(1);
     }, [searchText]);
 
+    // Actualizar isDark cuando cambia el theme
+    useEffect(() => {
+        if (theme === 'dark') {
+            setIsDark(true);
+        } else if (theme === 'light') {
+            setIsDark(false);
+        } else {
+            if (typeof window !== 'undefined') {
+                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                setIsDark(mediaQuery.matches);
+                const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
+                mediaQuery.addEventListener('change', handler);
+                return () => mediaQuery.removeEventListener('change', handler);
+            }
+        }
+    }, [theme]);
+
     return (
         <MainLayout title="GESTIÓN DE SOLICITANTES Y BENEFICIARIOS">
             <div className="max-w-7xl mx-auto w-full">
@@ -151,13 +179,13 @@ function Solicitantes() {
                         <Button
                             variant="ghost"
                             onClick={() => setShowForm(false)}
-                            className="mb-6 pl-0 hover:bg-transparent hover:text-red-900 text-gray-600"
+                            className={`mb-6 pl-0 hover:bg-transparent hover:text-red-900 ${isDark ? 'text-white' : 'text-gray-600'}`}
                             icon={faArrowLeft}
                         >
                             Volver a la lista
                         </Button>
-                        <div className="bg-white/90 backdrop-blur-md border border-white/20 rounded-lg shadow-xl p-6 md:p-8">
-                            <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Nuevo Solicitante</h2>
+                        <div className={`${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'} backdrop-blur-md border rounded-lg shadow-xl p-6 md:p-8`}>
+                            <h2 className={`text-3xl font-bold mb-8 text-center ${isDark ? 'text-white' : 'text-gray-800'}`}>Nuevo Solicitante</h2>
                             <SolicitanteForm onSuccess={handleSuccess} formMode='create' />
                         </div>
                     </div>
@@ -165,10 +193,10 @@ function Solicitantes() {
                     // LISTA DE SOLICITANTES
                     <>
                         {/* Toolbar */}
-                        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <div className={`flex flex-col md:flex-row justify-between items-center gap-4 mb-8 p-4 rounded-lg shadow-sm border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
                             {/* Buscador */}
                             {/* Buscador y Switch */}
-                            <div className="flex flex-col xl:flex-row items-center gap-4 flex-1 min-w-0">
+                            <div className="flex flex-col xl:flex-row items-center gap-6 flex-1 min-w-0">
                                 <div className="w-full xl:w-80">
                                     <SearchBar
                                         value={searchText}
@@ -228,8 +256,8 @@ function Solicitantes() {
                         ) : (
                             <>
                                 {filteredSolicitantes.length === 0 ? (
-                                    <div className="text-center py-16 bg-white rounded-lg border border-dashed border-gray-300">
-                                        <p className="text-gray-500 text-lg">No se encontraron solicitantes.</p>
+                                    <div className={`text-center py-16 rounded-lg border border-dashed ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-300'}`}>
+                                        <p className={`text-lg ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>No se encontraron solicitantes.</p>
                                         {searchText && (
                                             <Button
                                                 variant="link"
@@ -254,18 +282,18 @@ function Solicitantes() {
                                                 ))}
                                             </div>
                                         ) : (
-                                            <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-                                                <table className="min-w-full divide-y divide-gray-200">
-                                                    <thead className="bg-gray-50">
+                                            <div className={`rounded-xl shadow-md border overflow-hidden ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-100'}`}>
+                                                <table className="min-w-full divide-y divide-border">
+                                                    <thead className={isDark ? 'bg-red-950/30' : 'bg-gray-50'}>
                                                         <tr>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitante</th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cédula</th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contacto</th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado Civil</th>
-                                                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                                                            <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Solicitante</th>
+                                                            <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Cédula</th>
+                                                            <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Contacto</th>
+                                                            <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Estado Civil</th>
+                                                            <th className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Acciones</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody className="bg-white divide-y divide-gray-200">
+                                                    <tbody className={`divide-y divide-border ${isDark ? 'bg-[#630000]' : 'bg-white'}`}>
                                                         {currentItems.map((sol) => (
                                                             <SolicitanteRow
                                                                 key={sol.cedula}

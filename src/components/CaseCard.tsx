@@ -1,5 +1,7 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarAlt, faIdCard } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Keep for other usages if any
+import { faCalendarAlt, faIdCard } from '@fortawesome/free-solid-svg-icons'; // Keep if used in valid code blocks I might have missed, or just standard imports
+import { useTheme } from '../context/ThemeContext';
+import { useEffect, useState } from 'react';
 
 interface CaseCardProps {
   numCaso: string;
@@ -14,6 +16,25 @@ interface CaseCardProps {
 }
 
 function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, onClick }: CaseCardProps) {
+  const { theme } = useTheme();
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      setIsDark(true);
+    } else if (theme === 'light') {
+      setIsDark(false);
+    } else {
+      if (typeof window !== 'undefined') {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        setIsDark(mediaQuery.matches);
+        const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
+        mediaQuery.addEventListener('change', handler);
+        return () => mediaQuery.removeEventListener('change', handler);
+      }
+    }
+  }, [theme]);
+
   // Función para determinar el color del badge
   const getStatusColor = (status: string) => {
     const statusUpper = status.toUpperCase();
@@ -44,75 +65,77 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
     }
   };
 
-  // Parse chips from "Category > Subcategory" string
-  const chips = materia.split('>').map(s => s.trim()).filter(Boolean);
-
   return (
     <div
       onClick={onClick}
-      className="group bg-white rounded-lg border border-gray-200 border-l-4 border-l-red-900 shadow-sm hover:shadow-md transition-all duration-200 p-5 flex flex-col h-full relative"
+      className={`group cursor-pointer relative shadow-md hover:shadow-xl transition-all duration-300 h-[380px] w-full flex flex-col rounded-sm overflow-hidden border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'
+        }`}
     >
+      {/* 1. Left Vertical Red Bar */}
+      <div
+        className={`absolute left-0 top-0 bottom-0 w-3 group-hover:w-4 transition-all duration-300 ${isDark ? 'bg-red-700' : 'bg-red-900'
+          }`}
+      ></div>
 
+      {/* Main Content Container */}
+      <div className="pl-8 pr-6 pt-5 pb-4 flex flex-col h-full w-full">
 
-
-      {/* Status Pill (Moved to top right in visual hierarchy, but positioned via flex in header or absolute? 
-            Req says "Coloca la Etiqueta de Estado ... en la esquina superior derecha".
-            The menu is usually extreme top right. I'll put status next to name or just below, 
-            OR absolute top right and move menu? 
-            Let's put Status absolute top right, and Menu below it? Or Menu top right, Status top left?
-            Req: "Coloca la Etiqueta de Estado (ej. 'Abierto' en verde) en la esquina superior derecha de la tarjeta"
-            Req: "Acciones: Añade un icono de menú ... en la esquina inferior o superior derecha"
-            I'll put Status top-right, and Menu bottom-right to avoid clutter/conflict.
-        */}
-
-      {/* Re-structuring based on strict reqs: 
-          Header: Name Left, Status Right.
-          Subtitle: Case ID below Name.
-      */}
-      <div className="flex justify-between items-start w-full mb-1">
-        <div className="flex-1 pr-2">
-          <h3 className="text-lg font-bold text-gray-900 leading-tight mb-0.5 line-clamp-1">
-            {nombre}
-          </h3>
-          <span className="text-xs text-gray-500 font-mono block">
+        {/* 2. Top Right: Case Number */}
+        <div className="flex justify-between items-start mb-1">
+          <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getStatusColor(estatus)} whitespace-nowrap self-start`}>
+            {estatus}
+          </span>
+          <span
+            className={`font-bold text-lg tracking-wide group-hover:scale-110 origin-right transition-all duration-300 ${isDark
+              ? 'text-white group-hover:text-red-500'
+              : 'text-gray-900 group-hover:text-red-900'
+              }`}
+          >
             {numCaso}
           </span>
         </div>
-        <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getStatusColor(estatus)} whitespace-nowrap`}>
-          {estatus}
-        </span>
-      </div>
 
-      {/* Body: Chips */}
-      <div className="flex flex-wrap gap-2 mt-3 mb-3">
-        {chips.map((chip, idx) => (
-          <span key={idx} className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-md font-medium">
-            {chip}
-          </span>
-        ))}
-      </div>
 
-      {/* Body: Description Excerpt */}
-      <div className="flex-1 mb-4">
-        <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed">
-          {sintesis || <span className="italic text-gray-400">Sin descripción disponible.</span>}
-        </p>
-      </div>
-
-      {/* Footer: Cedula & Date */}
-      <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto text-xs text-gray-500">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5" title="Cédula">
-            <FontAwesomeIcon icon={faIdCard} className="text-red-900" />
-            <span className="text-gray-600">{cedula}</span>
-          </div>
-          <div className="flex items-center gap-1.5" title="Fecha de Recepción">
-            <FontAwesomeIcon icon={faCalendarAlt} className="text-red-900" />
-            <span className="text-gray-600">{formatFecha(fecha)}</span>
-          </div>
+        {/* 3. Title: Name */}
+        <div className="h-[64px] mb-1 flex items-center">
+          <h2
+            className={`text-2xl font-black leading-tight line-clamp-2 w-full ${isDark ? 'text-white' : 'text-gray-900'
+              }`}
+          >
+            {nombre}
+          </h2>
         </div>
 
+        {/* Requirements: Materia (Ambito Legal) below name */}
+        <div className="h-[32px] mb-3 flex items-center">
+          <p
+            className={`text-xs font-bold uppercase tracking-widest line-clamp-2 ${isDark ? 'text-red-200' : 'text-red-900'
+              }`}
+          >
+            {materia}
+          </p>
+        </div>
 
+        {/* 4. Body: Synthesis */}
+        <div className="flex-1 overflow-hidden relative flex items-center justify-center px-2">
+          <p
+            className={`text-sm leading-relaxed line-clamp-3 text-center ${isDark ? 'text-white' : 'text-gray-600'
+              }`}
+          >
+            {sintesis || <span className="italic opacity-50">Sin síntesis disponible.</span>}
+          </p>
+        </div>
+
+        {/* Footer: Metadata */}
+        <div
+          className={`text-xs font-medium flex justify-between items-end border-t pt-2 mt-auto ${isDark ? 'text-gray-200 border-red-800/50' : 'text-gray-400 border-gray-100'
+            }`}
+        >
+          <div>
+            <p className="mb-0.5">Cédula: {cedula}</p>
+            <p>Fecha: {formatFecha(fecha)}</p>
+          </div>
+        </div>
       </div>
     </div>
   );
