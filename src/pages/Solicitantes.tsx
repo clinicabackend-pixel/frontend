@@ -32,7 +32,7 @@ function Solicitantes() {
         }
         return false;
     });
-    const [showForm, setShowForm] = useState(false);
+    // Duplicate declaration removed
 
     // Edit Modal State
     const [showEditForm, setShowEditForm] = useState(false);
