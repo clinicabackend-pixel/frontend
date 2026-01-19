@@ -104,6 +104,29 @@ export function Catalogos() {
 
     const handleToggleStatus = async (item: any, parentId?: number) => {
         const newStatus = item.estatus === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
+        
+        // Optimistic update: actualizar el estado local inmediatamente
+        if (activeTab === 'VIVIENDA' && parentId) {
+            setHousingData(prevData => 
+                prevData.map(type => 
+                    type.id === parentId
+                        ? {
+                            ...type,
+                            categorias: type.categorias.map(cat =>
+                                cat.id === item.id ? { ...cat, estatus: newStatus } : cat
+                            )
+                        }
+                        : type
+                )
+            );
+        } else {
+            setItems(prevItems =>
+                prevItems.map(prevItem =>
+                    prevItem.id === item.id ? { ...prevItem, estatus: newStatus } : prevItem
+                )
+            );
+        }
+
         try {
             switch (activeTab) {
                 case 'NIVEL_EDUCATIVO':
@@ -125,9 +148,30 @@ export function Catalogos() {
                     // Checked service: updateCategoriaViviendaStatus exists. No updateTipoViviendaStatus.
                     break;
             }
-            fetchCatalogData();
+            // No recargamos los datos, ya actualizamos el estado local
         } catch (error) {
             console.error("Error updating status:", error);
+            // Revertir el cambio optimista en caso de error
+            if (activeTab === 'VIVIENDA' && parentId) {
+                setHousingData(prevData => 
+                    prevData.map(type => 
+                        type.id === parentId
+                            ? {
+                                ...type,
+                                categorias: type.categorias.map(cat =>
+                                    cat.id === item.id ? { ...cat, estatus: item.estatus } : cat
+                                )
+                            }
+                            : type
+                    )
+                );
+            } else {
+                setItems(prevItems =>
+                    prevItems.map(prevItem =>
+                        prevItem.id === item.id ? { ...prevItem, estatus: item.estatus } : prevItem
+                    )
+                );
+            }
             alert('Error al actualizar estatus');
         }
     };
