@@ -9,12 +9,12 @@ export default defineConfig({
     allowedHosts: ['.trycloudflare.com'],
     proxy: {
       '/auth': {
-        target: 'https://backend-8ao1.onrender.com',
+        target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
       },
       '/api': {
-        target: 'https://backend-8ao1.onrender.com',
+        target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
       },

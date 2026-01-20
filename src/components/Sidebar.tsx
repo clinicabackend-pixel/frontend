@@ -22,7 +22,7 @@ interface SidebarProps {
 }
 
 function Sidebar({ isOpen, onClose }: SidebarProps) {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -45,8 +45,8 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-3 px-3 py-3 font-medium rounded-lg transition-all duration-300 group relative ${isActive
-      ? isDark 
-        ? 'bg-red-800/50 text-white' 
+      ? isDark
+        ? 'bg-red-800/50 text-white'
         : 'bg-red-50 text-red-900'
       : isDark
         ? 'text-white hover:bg-red-800/50'
@@ -173,7 +173,7 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
                   </NavLink>
                 </li>
                 <li>
-                  <NavLink to="/calendario" className={navLinkClasses} onClick={() => isOpen && onClose()}>
+                  <NavLink to="/agenda" className={navLinkClasses} onClick={() => isOpen && onClose()}>
                     <FontAwesomeIcon icon={faCalendarAlt} className={`${isCollapsed ? 'text-2xl' : 'text-xl'}`} />
                     {!isCollapsed && <span className="truncate">Agenda</span>}
                     <Tooltip text="Agenda" />
@@ -215,15 +215,22 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
             </div>
           </nav>
 
+          {/* User Info (Bottom) */}
+          <div className={`p-4 border-t ${isDark ? 'border-red-800' : 'border-gray-100'} ${isCollapsed ? 'hidden' : 'block'}`}>
+            <p className={`font-semibold truncate ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{user?.nombre || 'Usuario'}</p>
+            <p className={`text-xs truncate capitalize ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+              {user?.tipoUsuario ? user.tipoUsuario.toLowerCase() : 'Rol desconocido'}
+            </p>
+          </div>
+
           {/* Footer / Logout */}
-          <div className={`p-4 border-t ${isDark ? 'border-red-800' : 'border-gray-100'}`}>
+          <div className={`p-4 ${isCollapsed ? 'border-t-0' : 'border-t'} ${isDark ? 'border-red-800' : 'border-gray-100'}`}>
             <button
               onClick={handleLogout}
-              className={`flex items-center gap-3 w-full px-3 py-3 font-medium rounded-lg transition-colors group relative ${isCollapsed ? 'justify-center text-2xl' : 'text-base'} ${
-                isDark
-                  ? 'text-white hover:bg-red-800/50'
-                  : 'text-gray-600 hover:text-red-700 hover:bg-red-50'
-              }`}
+              className={`flex items-center gap-3 w-full px-3 py-3 font-medium rounded-lg transition-colors group relative ${isCollapsed ? 'justify-center text-2xl' : 'text-base'} ${isDark
+                ? 'text-white hover:bg-red-800/50'
+                : 'text-gray-600 hover:text-red-700 hover:bg-red-50'
+                }`}
             >
               <FontAwesomeIcon icon={faRightFromBracket} className={isCollapsed ? 'text-2xl' : 'text-xl'} />
               {!isCollapsed && <span className="truncate">Cerrar Sesión</span>}

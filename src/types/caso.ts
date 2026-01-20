@@ -1,3 +1,31 @@
+// --- Master Data Stub (since masterData file is missing) ---
+export interface Tribunal {
+  idTribunal: number;
+  nombreTribunal: string;
+}
+
+export interface Materia {
+  idMateria: number;
+  nombreMateria: string;
+}
+
+export interface Solicitante {
+  idSolicitante?: number;
+  cedula: string;
+  nombre: string;
+  apellido: string;
+  fechaNacimiento?: string;
+  telefono?: string;
+  correo?: string;
+  direccion?: string;
+  genero?: string;
+  estadoCivil?: string;
+  ingresosMensuales?: number;
+  tipoVivienda?: string;
+  nivelEducativo?: string;
+  ocupacion?: string;
+}
+
 // --- Beneficiario ---
 export interface BeneficiarioCreateRequest {
   cedula: string;
@@ -30,7 +58,7 @@ export interface CasoCreateRequest {
   estudiantesAtencion?: string[];
 }
 
-export interface CasoUpdateRequest {
+export interface CasoUpdateDTO {
   sintesis?: string;
   codCasoTribunal?: string;
   fechaResCasoTri?: string;
@@ -38,6 +66,8 @@ export interface CasoUpdateRequest {
   idTribunal?: number;
   comAmbLegal?: number;
 }
+// Alias for backward compatibility if needed, though DTO is preferred for inputs
+export type CasoUpdateRequest = CasoUpdateDTO;
 
 export interface CasoResponse {
   numCaso: string;
@@ -56,6 +86,7 @@ export interface CasoResponse {
   cedula: string;
   username: string;
   comAmbLegal: number;
+  ambitoLegal?: number; // Some parts of code used this
 }
 
 export interface AccionCreateRequest {
@@ -115,6 +146,21 @@ export interface PruebaResponse {
   observacion?: string;
   titulo: string;
 }
+export interface PruebaCreateRequest {
+  fecha: string;
+  documento: string; // Título o nombre del documento probatorio
+  observacion?: string;
+  titulo: string;
+  username?: string;
+}
+
+
+export interface CasoAsignadoProjection {
+  numCaso: string;
+  username: string;
+  termino: string;
+  nombre: string;
+}
 
 export interface CasoDetalleResponse {
   caso: CasoResponse;
@@ -122,9 +168,10 @@ export interface CasoDetalleResponse {
   encuentros: EncuentroResponse[];
   documentos: DocumentoResponse[];
   pruebas: PruebaResponse[];
-  asignados: any[];
+  asignados: CasoAsignadoProjection[];
   supervisores: any[];
   beneficiarios: BeneficiarioResponse[];
+  solicitante: Solicitante; // Added missing property
 }
 
 export interface CasoSummary {
