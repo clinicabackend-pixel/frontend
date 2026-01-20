@@ -40,6 +40,7 @@ export default function UsuariosPage() {
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
     const [openMenuId, setOpenMenuId] = useState<string | null>(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [permanentDeleteModalOpen, setPermanentDeleteModalOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState<Usuario | null>(null);
     const menuRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
@@ -143,6 +144,26 @@ export default function UsuariosPage() {
         setOpenMenuId(null);
     };
 
+    const handlePermanentDeleteClick = (user: Usuario, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setUserToDelete(user);
+        setPermanentDeleteModalOpen(true);
+        setOpenMenuId(null);
+    }
+
+    const handleConfirmPermanentDelete = async () => {
+        if (!userToDelete) return;
+        try {
+            await usuarioService.deleteUsuario(userToDelete.username);
+            await fetchUsuarios();
+            setPermanentDeleteModalOpen(false);
+            setUserToDelete(null);
+        } catch (error) {
+            console.error('Error eliminando usuario permanentemente:', error);
+            alert('Error al eliminar el usuario. Por favor, intente nuevamente.');
+        }
+    }
+
     const handleConfirmToggleStatus = async () => {
         if (!userToDelete) return;
 
@@ -244,7 +265,7 @@ export default function UsuariosPage() {
                                     }`}
                             >
                                 <Upload size={18} className="mr-2" />
-                                Importar
+                                import
                             </button>
                             <button
                                 onClick={() => setIsUserModalOpen(true)}
@@ -347,6 +368,18 @@ export default function UsuariosPage() {
                                                                     </>
                                                                 )}
                                                             </button>
+                                                            {(currentUser?.tipoUsuario === 'COORDINADOR' || currentUser?.tipoUsuario === 'ADMINISTRADOR') && (
+                                                                <button
+                                                                    onClick={(e) => handlePermanentDeleteClick(user, e)}
+                                                                    className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors border-t ${isDark
+                                                                        ? 'border-red-800/50 text-red-400 hover:bg-red-950/50 hover:text-red-300'
+                                                                        : 'border-gray-100 text-red-600 hover:bg-red-50 hover:text-red-800'
+                                                                        }`}
+                                                                >
+                                                                    <Trash2 size={16} />
+                                                                    Eliminar Permanentemente
+                                                                </button>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 )}
@@ -438,6 +471,56 @@ export default function UsuariosPage() {
                                         }`}
                                 >
                                     {userToDelete.estatus === 'ACTIVO' ? 'Desactivar' : 'Activar'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal de Confirmación de Eliminación Permanente */}
+            {permanentDeleteModalOpen && userToDelete && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white backdrop-blur-md rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-slide-up-modal">
+                        <div className="flex items-center justify-between p-4 bg-red-900">
+                            <h3 className="text-xl font-bold text-white">
+                                Confirmar Eliminación Permanente
+                            </h3>
+                            <button
+                                onClick={() => {
+                                    setPermanentDeleteModalOpen(false);
+                                    setUserToDelete(null);
+                                }}
+                                className="p-1 text-white hover:text-gray-200 transition-colors duration-200"
+                                aria-label="Cerrar modal"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <div className="overflow-y-auto bg-white p-6">
+                            <p className="text-gray-700 mb-4">
+                                ¿Está seguro de que desea <strong>eliminar permanentemente</strong> al usuario <strong>{userToDelete.nombre}</strong> ({userToDelete.username})?
+                            </p>
+                            <p className="text-sm text-red-600 mb-6 font-semibold">
+                                Esta acción NO se puede deshacer. El usuario y toda su información serán borrados del sistema.
+                            </p>
+
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    onClick={() => {
+                                        setPermanentDeleteModalOpen(false);
+                                        setUserToDelete(null);
+                                    }}
+                                    className="px-4 py-2 text-sm font-medium rounded-md transition-colors text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={handleConfirmPermanentDelete}
+                                    className="px-4 py-2 text-sm font-medium text-white rounded-md transition-colors bg-red-600 hover:bg-red-700"
+                                >
+                                    Eliminar Definitivamente
                                 </button>
                             </div>
                         </div>
