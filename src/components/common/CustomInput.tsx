@@ -37,7 +37,7 @@ export default function CustomInput({
     pattern,
     title,
     className = '',
-    isDark = false
+
 }: CustomInputProps) {
     const handleIncrement = () => {
         if (disabled) return;

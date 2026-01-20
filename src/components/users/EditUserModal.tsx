@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import usuarioService from '../../services/usuarioService';
 import type { Usuario } from '../../types/usuario';
-import { useTheme } from '../../context/ThemeContext';
+
 
 interface EditUserModalProps {
     isOpen: boolean;
@@ -12,8 +12,7 @@ interface EditUserModalProps {
 }
 
 export default function EditUserModal({ isOpen, onClose, onSuccess, usuario }: EditUserModalProps) {
-    const { theme } = useTheme();
-    const isDark = theme === 'dark';
+
     const [formData, setFormData] = useState<Partial<Usuario>>({
         nombre: '',
         email: '',
@@ -78,7 +77,7 @@ export default function EditUserModal({ isOpen, onClose, onSuccess, usuario }: E
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in" onClick={onClose}>
-            <div 
+            <div
                 className="bg-white backdrop-blur-md rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col animate-slide-up-modal"
                 onClick={(e) => e.stopPropagation()}
                 role="dialog"
@@ -87,9 +86,9 @@ export default function EditUserModal({ isOpen, onClose, onSuccess, usuario }: E
                 <form onSubmit={handleSubmit} className="flex flex-col h-full">
                     <div className="flex items-center justify-between p-4 bg-red-900 border-b border-red-800">
                         <h3 className="text-xl font-bold text-white">Modificar Usuario</h3>
-                        <button 
-                            type="button" 
-                            onClick={onClose} 
+                        <button
+                            type="button"
+                            onClick={onClose}
                             className="p-1 text-white hover:text-gray-200 transition-colors duration-200"
                             aria-label="Cerrar modal"
                         >
@@ -107,56 +106,56 @@ export default function EditUserModal({ isOpen, onClose, onSuccess, usuario }: E
                         <div className="grid grid-cols-1 gap-4">
                             <div>
                                 <label className="block text-sm font-medium mb-1 text-gray-700">Nombre Completo</label>
-                                <input 
-                                    type="text" 
-                                    name="nombre" 
-                                    required 
-                                    value={formData.nombre} 
-                                    onChange={handleChange} 
+                                <input
+                                    type="text"
+                                    name="nombre"
+                                    required
+                                    value={formData.nombre}
+                                    onChange={handleChange}
                                     className="mt-1 block w-full rounded-md shadow-sm sm:text-sm border border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-gray-900 p-2"
                                 />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium mb-1 text-gray-700">Correo Electrónico</label>
-                                <input 
-                                    type="email" 
-                                    name="email" 
-                                    required 
-                                    value={formData.email} 
-                                    onChange={handleChange} 
+                                <input
+                                    type="email"
+                                    name="email"
+                                    required
+                                    value={formData.email}
+                                    onChange={handleChange}
                                     className="mt-1 block w-full rounded-md shadow-sm sm:text-sm border border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-gray-900 p-2"
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium mb-1 text-gray-700">Usuario (Username)</label>
-                                    <input 
-                                        type="text" 
-                                        name="username" 
-                                        required 
-                                        value={formData.username} 
-                                        onChange={handleChange} 
+                                    <input
+                                        type="text"
+                                        name="username"
+                                        required
+                                        value={formData.username}
+                                        onChange={handleChange}
                                         className="mt-1 block w-full rounded-md shadow-sm sm:text-sm border border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-gray-900 p-2"
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium mb-1 text-gray-700">Cédula</label>
-                                    <input 
-                                        type="text" 
-                                        name="idUsuario" 
-                                        required 
-                                        value={formData.idUsuario} 
-                                        onChange={handleChange} 
+                                    <input
+                                        type="text"
+                                        name="idUsuario"
+                                        required
+                                        value={formData.idUsuario}
+                                        onChange={handleChange}
                                         className="mt-1 block w-full rounded-md shadow-sm sm:text-sm border border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-gray-900 p-2"
                                     />
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium mb-1 text-gray-700">Sexo</label>
-                                <select 
-                                    name="sexo" 
-                                    value={formData.sexo} 
-                                    onChange={handleChange} 
+                                <select
+                                    name="sexo"
+                                    value={formData.sexo}
+                                    onChange={handleChange}
                                     className="mt-1 block w-full rounded-md shadow-sm sm:text-sm border border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-gray-900 p-2"
                                 >
                                     <option value="">Seleccione...</option>
@@ -167,10 +166,10 @@ export default function EditUserModal({ isOpen, onClose, onSuccess, usuario }: E
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium mb-1 text-gray-700">Rol</label>
-                                    <select 
-                                        name="tipoUsuario" 
-                                        value={formData.tipoUsuario} 
-                                        onChange={handleChange} 
+                                    <select
+                                        name="tipoUsuario"
+                                        value={formData.tipoUsuario}
+                                        onChange={handleChange}
                                         className="mt-1 block w-full rounded-md shadow-sm sm:text-sm border border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-gray-900 p-2"
                                     >
                                         <option value="ESTUDIANTE">Estudiante</option>
@@ -181,10 +180,10 @@ export default function EditUserModal({ isOpen, onClose, onSuccess, usuario }: E
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium mb-1 text-gray-700">Estatus</label>
-                                    <select 
-                                        name="estatus" 
-                                        value={formData.estatus} 
-                                        onChange={handleChange} 
+                                    <select
+                                        name="estatus"
+                                        value={formData.estatus}
+                                        onChange={handleChange}
                                         className="mt-1 block w-full rounded-md shadow-sm sm:text-sm border border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-gray-900 p-2"
                                     >
                                         <option value="ACTIVO">Activo</option>

@@ -50,7 +50,7 @@ export const findMateriaByAmbitoId = (tree: AmbitoLegal[], idAmbito: number): st
  * Útil si solo necesitas el nombre del nodo específico y no su jerarquía.
  */
 export const flattenAmbitos = (tree: AmbitoLegal[]): Record<number, string> => {
-    let map: Record<number, string> = {};
+    const map: Record<number, string> = {};
 
     const traverse = (nodes: AmbitoLegal[]) => {
         nodes.forEach(node => {

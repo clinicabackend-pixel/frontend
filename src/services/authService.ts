@@ -17,6 +17,7 @@ export interface User {
     username: string;
     estatus: string; // was status
     tipoUsuario: string; // was tipo
+    tipo?: string; // Compatibility alias
 }
 
 export const authService = {
@@ -29,6 +30,7 @@ export const authService = {
         const response = await api.get<any>('/auth/me');
         // El backend devuelve 'idUsuario' pero el frontend espera 'cedula'
         // Mapear idUsuario -> cedula
+        const tipo = response.data.tipoUsuario || response.data.tipo || '';
         return {
             idUsuario: response.data.idUsuario || response.data.cedula || '',
             nombre: response.data.nombre || '',
@@ -36,9 +38,11 @@ export const authService = {
             email: response.data.email || '',
             username: response.data.username || '',
             estatus: response.data.estatus || response.data.status || '',
-            tipoUsuario: response.data.tipoUsuario || response.data.tipo || ''
+            tipoUsuario: tipo,
+            tipo: tipo
         };
     },
+
 
     logout: (): void => {
         localStorage.removeItem('token');

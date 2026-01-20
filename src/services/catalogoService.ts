@@ -33,8 +33,12 @@ const catalogoService = {
     },
 
     getEstadosCiviles: async () => {
-        const response = await api.get<EstadoCivil[]>('/catalogos/estados-civiles');
-        return response.data;
+        const response = await api.get<any[]>('/catalogos/estados-civiles');
+        return response.data.map(item => ({
+            id: item.idEstadoCivil,
+            nombre: item.nombreEstadoCivil,
+            estatus: item.estatus
+        }));
     },
 
     getAmbitosLegales: async () => {
@@ -48,8 +52,15 @@ const catalogoService = {
     },
 
     getTribunales: async () => {
-        const response = await api.get<import('../types/catalogo').Tribunal[]>('/catalogos/tribunales');
-        return response.data;
+        const response = await api.get<any[]>('/catalogos/tribunales');
+        return response.data.map(t => ({
+            id: t.idTribunal,
+            nombre: t.nombreTribunal,
+            materia: t.materia,
+            instancia: t.instancia,
+            ubicacion: t.ubicacion,
+            estatus: t.estatus
+        }));
     },
 
     getSemestres: async () => {
@@ -123,8 +134,68 @@ const catalogoService = {
         const response = await api.patch(`/catalogos/viviendas/${idTipo}/${idCat}/estatus`, null, { params: { estatus } });
         return response.data;
     },
+
+    // --- ESTADO CIVIL METHODS ---
+    createEstadoCivil: async (nombre: string) => {
+        const response = await api.post('/catalogos/estados-civiles', { nombre });
+        return response.data;
+    },
+
+    updateEstadoCivilStatus: async (id: number, estatus: 'ACTIVO' | 'INACTIVO') => {
+        const response = await api.patch(`/catalogos/estados-civiles/${id}/estatus`, null, { params: { estatus } });
+        return response.data;
+    },
+
+    // --- TRIBUNAL METHODS ---
+    createTribunal: async (tribunal: Partial<import('../types/catalogo').Tribunal>) => {
+        const response = await api.post('/catalogos/tribunales', tribunal);
+        return response.data;
+    },
+
+    updateTribunalStatus: async (id: number, estatus: 'ACTIVO' | 'INACTIVO') => {
+        const response = await api.patch(`/catalogos/tribunales/${id}/estatus`, null, { params: { estatus } });
+        return response.data;
+    },
+
+    // --- SEMESTRE METHODS ---
+    createSemestre: async (semestre: Partial<Semestre>) => {
+        const response = await api.post('/catalogos/semestres', semestre);
+        return response.data;
+    },
+
+    // Optional: Update Semestre if needed (e.g. change dates)
+    updateSemestre: async (termino: string, data: Partial<Semestre>) => {
+        const response = await api.put(`/catalogos/semestres/${termino}`, data);
+        return response.data;
+    },
+
+    // --- CENTRO METHODS ---
+    createCentro: async (centro: { nombre: string; abreviatura: string; idParroquia: number }) => {
+        const response = await api.post('/catalogos/centros', centro);
+        return response.data;
+    },
+
+    // --- AMBITO LEGAL SCHEMA METHODS ---
+    createMateria: async (nombre: string) => {
+        const response = await api.post('/catalogos/materias', { nombre });
+        return response.data;
+    },
+
+    createCategoria: async (nombre: string, idMateria: number) => {
+        const response = await api.post('/catalogos/categorias', { nombre, idMateria });
+        return response.data;
+    },
+
+    createSubcategoria: async (nombre: string, idCategoria: number) => {
+        const response = await api.post('/catalogos/subcategorias', { nombre, idCategoria });
+        return response.data;
+    },
+
+    createAmbito: async (nombre: string, idSubcategoria: number) => {
+        const response = await api.post('/catalogos/ambitos', { nombre, idSubcategoria });
+        return response.data;
+    },
+
 };
-
-
 
 export default catalogoService;

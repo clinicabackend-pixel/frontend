@@ -45,6 +45,19 @@ export const reporteService = {
     }
   },
 
+  downloadReporteSocioeconomico: async () => {
+    try {
+      const response = await api.get('/reportes/socioeconomico', {
+        responseType: 'blob',
+      });
+      const filename = 'reporte_socioeconomico.xlsx';
+      downloadBlob(response.data, filename);
+    } catch (error) {
+      console.error('Error downloading socioeconomic report:', error);
+      throw error;
+    }
+  },
+
   downloadFichaSolicitante: async (cedula: string) => {
     try {
       const response = await api.get(`/reportes/solicitante/${cedula}`, {
@@ -70,7 +83,7 @@ export const reporteService = {
 
   downloadHistorialCasos: async (inicio: string, fin: string, usuario?: string, cedula?: string) => {
     try {
-      const params: any = { inicio, fin };
+      const params: Record<string, string> = { inicio, fin };
       if (cedula) params.cedula = cedula;
       if (usuario) params.usuario = usuario;
 
@@ -109,26 +122,18 @@ export const reporteService = {
   },
 
   downloadReportePorEstatus: async (estatus: string) => {
-    try {
-      const response = await api.get(`/reportes/por-estatus/${estatus}`, {
-        responseType: 'blob'
-      });
-      downloadBlob(response.data, `casos_${estatus}.xlsx`);
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get(`/reportes/por-estatus/${estatus}`, {
+      responseType: 'blob'
+    });
+    downloadBlob(response.data, `casos_${estatus}.xlsx`);
   },
 
   downloadResumenSemestral: async (semestre: string, tipoCaso: number) => {
-    try {
-      const response = await api.get('/reportes/resumen', {
-        params: { semestre, tipoCaso },
-        responseType: 'blob'
-      });
-      downloadBlob(response.data, `resumen_${semestre}.xlsx`);
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get('/reportes/resumen', {
+      params: { semestre, tipoCaso },
+      responseType: 'blob'
+    });
+    downloadBlob(response.data, `resumen_${semestre}.xlsx`);
   },
 
   getChartData: async (tipo: TipoReporte): Promise<ReporteData> => {
