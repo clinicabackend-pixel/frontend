@@ -192,7 +192,7 @@ function CasosPage() {
           <div className="flex flex-col lg:flex-row gap-3 justify-between items-stretch lg:items-center">
             {/* Buscador de Texto */}
             <div className="w-full lg:w-64 xl:w-80">
-              <SearchBar value={searchText} onChange={setSearchText} placeholder="Buscar..." isDark={isDark} />
+              <SearchBar value={searchText} onChange={setSearchText} placeholder="Buscar..." />
             </div>
 
             {/* Filtros Dropdowns y Toggles */}
