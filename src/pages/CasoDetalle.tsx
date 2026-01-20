@@ -12,7 +12,8 @@ import {
   faUser,
   faUsers,
   faHistory,
-  faCalendarAlt
+  faCalendarAlt,
+  faCheckCircle
 } from '@fortawesome/free-solid-svg-icons';
 import MainLayout from '../components/layout/MainLayout';
 import casoService from '../services/casoService';
@@ -23,6 +24,7 @@ import Button from '../components/common/Button';
 import AddAccionModal from '../components/modals/AddAccionModal';
 import AddEncuentroModal from '../components/modals/AddEncuentroModal';
 import Modal from '../components/common/Modal';
+import UniversalUploader from '../components/common/UniversalUploader'; // Importar Uploader
 import { getFullAmbitoPath } from '../utils/ambitoUtils';
 import type {
   CasoDetalleResponse,
@@ -79,6 +81,9 @@ export default function CasoDetalle() {
   const [newBenParentesco, setNewBenParentesco] = useState('');
   const [newBenTipo, setNewBenTipo] = useState('');
   const [searchError, setSearchError] = useState('');
+
+  // Upload State
+  const [uploadedFiles, setUploadedFiles] = useState<Array<{ url: string, type: string, name: string }>>([]);
 
   // Accion/Encuentro State
   const [isAddAccionModalOpen, setIsAddAccionModalOpen] = useState(false);
@@ -265,7 +270,7 @@ export default function CasoDetalle() {
     );
   }
 
-  const { caso, beneficiarios, acciones, encuentros, documentos, /* pruebas */ } = casoDetalle;
+  const { caso, beneficiarios, acciones, encuentros, documentos, pruebas } = casoDetalle;
 
   return (
     <MainLayout title={`Caso ${caso.numCaso}`}>
@@ -556,30 +561,101 @@ export default function CasoDetalle() {
 
           {/* DOCUMENTOS */}
           {activeTab === 'documentos' && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Documentos del Expediente</h3>
-              {!documentos || documentos.length === 0 ? (
-                <div className="text-center py-8 text-gray-500 italic">
-                  No hay documentos asociados a este caso.
+            <div className="space-y-6">
+              {/* Uploader Section */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Subir Nuevo Documento</h3>
+                <UniversalUploader
+                  onUploadComplete={async (data) => {
+                    const newFile = { url: data.url, type: data.type, name: `Archivo ${data.type}` };
+                    setUploadedFiles(prev => [...prev, newFile]);
+
+                    // Persist as Prueba
+                    if (numCaso && casoDetalle) {
+                      try {
+                        await casoService.createPrueba(numCaso, {
+                          fecha: new Date().toISOString().split('T')[0],
+                          documento: data.url, // Store URL in documento field
+                          titulo: `Archivo Digital (${data.type})`,
+                          observacion: 'Subido desde el detalle del caso'
+                        });
+                        // Refresh data
+                        const updated = await casoService.getById(numCaso);
+                        setCasoDetalle(updated);
+                      } catch (err) {
+                        console.error("Error creating prueba from upload:", err);
+                      }
+                    }
+                  }}
+                />
+
+                {/* Mostrar Pruebas (Archivos Digitales) */}
+                <div className="mt-8">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Archivos Digitales</h3>
+                  {!pruebas || pruebas.length === 0 ? (
+                    <p className="text-gray-500 italic">No hay archivos digitales asociados.</p>
+                  ) : (
+                    <ul className="space-y-3">
+                      {pruebas.map((prueba) => {
+                        // Check if documento is a URL (simple check)
+                        const isUrl = prueba.documento.startsWith('http');
+                        return (
+                          <li key={prueba.idPrueba} className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:shadow-sm">
+                            <div className="flex items-center gap-3">
+                              <div className="bg-blue-50 text-blue-600 p-2 rounded">
+                                <FontAwesomeIcon icon={faFilePdf} />
+                              </div>
+                              <div>
+                                <p className="font-semibold text-gray-800">{prueba.titulo}</p>
+                                <p className="text-xs text-gray-500">{new Date(prueba.fecha).toLocaleDateString()} - {prueba.observacion}</p>
+                              </div>
+                            </div>
+                            {isUrl ? (
+                              <a
+                                href={prueba.documento}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-sm bg-blue-50 text-blue-600 px-3 py-1.5 rounded-md hover:bg-blue-100 font-medium transition-colors"
+                              >
+                                Ver Archivo
+                              </a>
+                            ) : (
+                              <span className="text-sm text-gray-500">{prueba.documento}</span>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
                 </div>
-              ) : (
-                <ul className="divide-y divide-gray-100">
-                  {documentos.map((doc, _idx) => (
-                    <li key={_idx} className="py-3 flex items-start gap-3">
-                      <div className="p-2 bg-gray-100 rounded text-gray-500">
-                        <FontAwesomeIcon icon={faFolderOpen} />
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{doc.titulo || 'Documento sin título'}</p>
-                        <p className="text-sm text-gray-500">{doc.observacion}</p>
-                        <div className="text-xs text-gray-400 mt-1">
-                          Fila: {doc.folioIni} - {doc.folioFin} | Registrado: {new Date(doc.fechaRegistro).toLocaleDateString()}
+              </div>
+
+              {/* Existing Documents List */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Expediente Físico</h3>
+                {!documentos || documentos.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500 italic">
+                    No hay documentos físicos registrados en este caso.
+                  </div>
+                ) : (
+                  <ul className="divide-y divide-gray-100">
+                    {documentos.map((doc, _idx) => (
+                      <li key={_idx} className="py-3 flex items-start gap-3">
+                        <div className="p-2 bg-gray-100 rounded text-gray-500">
+                          <FontAwesomeIcon icon={faFolderOpen} />
                         </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
+                        <div>
+                          <p className="font-medium text-gray-900">{doc.titulo || 'Documento sin título'}</p>
+                          <p className="text-sm text-gray-500">{doc.observacion}</p>
+                          <div className="text-xs text-gray-400 mt-1">
+                            Fila: {doc.folioIni} - {doc.folioFin} | Registrado: {new Date(doc.fechaRegistro).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -669,7 +745,7 @@ export default function CasoDetalle() {
               Buscar
             </button>
           </div>
-          
+
           {searchError && (
             <p className="text-red-500 text-sm">{searchError}</p>
           )}
