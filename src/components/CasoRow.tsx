@@ -45,14 +45,14 @@ export default function CasoRow({ caso, materia, onClick }: CasoRowProps) {
                 {new Date(caso.fechaRecepcion).toLocaleDateString()}
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
-                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                     caso.estatus === 'ABIERTO' 
-                        ? (isDark ? 'bg-green-900/50 text-green-300' : 'bg-green-100 text-green-800')
+                        ? (isDark ? 'bg-green-300 text-green-900' : 'bg-green-100 text-green-800')
                         : caso.estatus === 'CERRADO' 
-                        ? (isDark ? 'bg-red-900/50 text-red-300' : 'bg-red-100 text-red-800')
+                        ? (isDark ? 'bg-gray-300 text-gray-900' : 'bg-gray-100 text-gray-800')
                         : caso.estatus === 'EN PAUSA' 
-                        ? (isDark ? 'bg-yellow-900/50 text-yellow-300' : 'bg-yellow-100 text-yellow-800')
-                        : (isDark ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-100 text-blue-800')
+                        ? (isDark ? 'bg-yellow-300 text-yellow-900' : 'bg-yellow-100 text-yellow-800')
+                        : (isDark ? 'bg-blue-300 text-blue-900' : 'bg-blue-100 text-blue-800')
                 }`}>
                     {caso.estatus}
                 </span>

@@ -123,7 +123,7 @@ export default function AgendaPage() {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             {/* Ideally we show count of cases or a link. Since backend only filters, we assume > 0 */}
-                                            <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${darkMode ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-800'}`}>
+                                            <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${darkMode ? 'bg-green-300 text-green-900' : 'bg-green-100 text-green-800'}`}>
                                                 Activo con Casos
                                             </span>
                                         </td>

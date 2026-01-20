@@ -57,7 +57,7 @@ export default function SolicitanteRow({ solicitante, onClick, onEncuestaClick, 
                 </div>
             </td>
             <td className={`px-6 py-5 whitespace-nowrap text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
-                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full border ${isDark ? 'bg-red-950/30 border-red-800/50 text-white' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
+                <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${isDark ? 'bg-indigo-300 text-indigo-900' : 'bg-indigo-100 text-indigo-800'}`}>
                     {solicitante.estadoCivil}
                 </span>
             </td>
