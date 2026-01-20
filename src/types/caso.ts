@@ -115,6 +115,12 @@ export interface PruebaResponse {
   observacion?: string;
   titulo: string;
 }
+export interface PruebaCreateRequest {
+  fecha: string;
+  documento: string; // Título o nombre del documento probatorio
+  observacion?: string;
+  titulo: string;
+}
 
 
 export interface CasoAsignadoProjection {
