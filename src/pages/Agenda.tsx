@@ -91,7 +91,7 @@ export default function AgendaPage() {
                     </div>
                 ) : (
                     <div className={`shadow overflow-hidden sm:rounded-lg border ${darkMode ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
-                        <table className="min-w-full divide-y divide-border">
+                        <table className={`min-w-full divide-y ${darkMode ? 'divide-red-800/50' : 'divide-gray-200'}`}>
                             <thead className={darkMode ? 'bg-red-950/30' : 'bg-gray-50'}>
                                 <tr>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-500'}`}>Estudiante</th>
@@ -100,9 +100,13 @@ export default function AgendaPage() {
                                     <th className="relative px-6 py-3"><span className="sr-only">Ver</span></th>
                                 </tr>
                             </thead>
-                            <tbody className={`divide-y divide-border ${darkMode ? 'bg-[#630000]' : 'bg-white'}`}>
+                            <tbody className={`divide-y ${darkMode ? 'divide-red-800/50 bg-[#630000]' : 'divide-gray-200 bg-white'}`}>
                                 {currentItems.map((est) => (
-                                    <tr key={est.username} className={`transition-colors ${darkMode ? 'hover:bg-red-950/50' : 'hover:bg-gray-50'}`}>
+                                    <tr 
+                                        key={est.username} 
+                                        onClick={() => navigate(`/casos?username=${est.username}`)}
+                                        className={`transition-colors cursor-pointer ${darkMode ? 'hover:bg-red-950/50' : 'hover:bg-gray-50'}`}
+                                    >
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
                                                 <div className={`shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${darkMode ? 'bg-red-950/50 text-gray-400' : 'bg-gray-200 text-gray-500'}`}>
@@ -125,8 +129,11 @@ export default function AgendaPage() {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <button
-                                                onClick={() => navigate(`/casos?username=${est.username}`)} // Filter cases by this student
-                                                className={`text-blue-600 hover:text-blue-900 ${darkMode ? 'text-blue-400 hover:text-blue-300' : ''}`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    navigate(`/casos?username=${est.username}`);
+                                                }}
+                                                className={`${darkMode ? 'text-white hover:text-gray-200' : 'text-blue-600 hover:text-blue-900'}`}
                                             >
                                                 Ver Casos
                                             </button>

@@ -35,18 +35,10 @@ function CasosPage() {
   const [ambitosLegales, setAmbitosLegales] = useState<Record<number, string>>({});
   const [semestres, setSemestres] = useState<Semestre[]>([]);
 
-  // Filtros de API
-  const [selectedStatus, setSelectedStatus] = useState<string>('ABIERTO');
+  // Filtros de API - Por defecto mostrar todos los casos
+  const [selectedStatus, setSelectedStatus] = useState<string>('TODOS');
   const [selectedSemestre, setSelectedSemestre] = useState<string>('');
-  const [onlyMyCases, setOnlyMyCases] = useState<boolean>(true);
-
-  // Ajustar onlyMyCases cuando el usuario se carga
-  useEffect(() => {
-    const esCoordinadorOAdmin = user?.tipo === 'COORDINADOR' || user?.tipo === 'ADMINISTRADOR';
-    if (esCoordinadorOAdmin) {
-      setOnlyMyCases(false); // COORDINADOR/ADMINISTRADOR ven todos los casos por defecto
-    }
-  }, [user]);
+  const [onlyMyCases, setOnlyMyCases] = useState<boolean>(false);
 
   const casosPerPage = 12;
   const navigate = useNavigate();
@@ -101,19 +93,7 @@ function CasosPage() {
         const statusFilter = selectedStatus === 'TODOS' ? undefined : selectedStatus;
         const terminoFilter = selectedSemestre === '' ? undefined : selectedSemestre;
 
-        console.log('Casos: Cargando casos con filtros:', {
-          statusFilter,
-          userFilter,
-          terminoFilter,
-          onlyMyCases,
-          username,
-          esCoordinadorOAdmin,
-          userTipo: user?.tipo
-        });
-
         const data = await casoService.getAll(statusFilter, userFilter, terminoFilter);
-        console.log('Casos: Total casos obtenidos:', data.length);
-        console.log('Casos: Primeros 3 casos:', data.slice(0, 3));
         setCasos(data);
         setCurrentPage(1); // Reset page only when API data changes
       } catch (error) {
@@ -308,7 +288,7 @@ function CasosPage() {
               <>
                 {viewMode === 'list' ? (
                   <div className={`${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'} shadow overflow-hidden sm:rounded-lg border`}>
-                    <table className="min-w-full divide-y divide-border">
+                    <table className={`min-w-full divide-y ${isDark ? 'divide-red-800/50' : 'divide-gray-200'}`}>
                       <thead className={isDark ? 'bg-red-950/30' : 'bg-gray-50'}>
                         <tr>
                           <th
@@ -346,7 +326,7 @@ function CasosPage() {
                           </th>
                         </tr>
                       </thead>
-                      <tbody className={`${isDark ? 'bg-[#630000]' : 'bg-white'} divide-y divide-border`}>
+                      <tbody className={`divide-y ${isDark ? 'divide-red-800/50 bg-[#630000]' : 'divide-gray-200 bg-white'}`}>
                         {casosActuales.map((caso) => (
                           <CasoRow
                             key={caso.numCaso}
@@ -360,8 +340,7 @@ function CasosPage() {
                   </div>
                 ) : (
                   <div
-                    className="grid gap-6 mb-8"
-                    style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8"
                   >
                     {casosActuales.map((caso) => (
                       <CaseCard

@@ -255,7 +255,7 @@ export default function UsuariosPage() {
                     </div>
                 ) : (
                     <div className={`shadow overflow-hidden sm:rounded-lg border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
-                        <table className="min-w-full divide-y divide-border">
+                        <table className={`min-w-full divide-y ${isDark ? 'divide-red-800/50' : 'divide-gray-200'}`}>
                             <thead className={isDark ? 'bg-red-950/30' : 'bg-gray-50'}>
                                 <tr>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Usuario</th>
@@ -265,7 +265,7 @@ export default function UsuariosPage() {
                                     <th className="relative px-6 py-3"><span className="sr-only">Ver</span></th>
                                 </tr>
                             </thead>
-                            <tbody className={`divide-y divide-border ${isDark ? 'bg-[#630000]' : 'bg-white'}`}>
+                            <tbody className={`divide-y ${isDark ? 'divide-red-800/50 bg-[#630000]' : 'divide-gray-200 bg-white'}`}>
                                 {currentItems.map((user) => (
                                     <tr
                                         key={user.username}

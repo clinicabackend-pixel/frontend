@@ -262,7 +262,7 @@ export function Catalogos() {
                                                         Agregar Categoría
                                                     </Button>
                                                 </div>
-                                                <ul className={isDark ? 'divide-y divide-red-800/50' : 'divide-y divide-gray-100'}>
+                                                <ul className={isDark ? 'divide-y divide-red-800/50' : 'divide-y divide-gray-200'}>
                                                     {type.categorias.length > 0 ? type.categorias.map(cat => (
                                                         <li key={cat.id} className={`px-4 py-3 flex justify-between items-center transition-colors ${isDark ? 'hover:bg-red-950/30' : 'hover:bg-gray-50'}`}>
                                                             <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{cat.descripcion}</span>

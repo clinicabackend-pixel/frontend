@@ -256,7 +256,7 @@ function Solicitantes() {
                         ) : (
                             <>
                                 {filteredSolicitantes.length === 0 ? (
-                                    <div className={`text-center py-20 rounded-2xl border-2 border-dashed ${isDark ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                                    <div className={`text-center py-20 rounded-2xl border-2 border-dashed ${isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-200'}`}>
                                         <p className={`text-lg font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>No se encontraron solicitantes.</p>
                                         {searchText && (
                                             <Button
@@ -282,18 +282,18 @@ function Solicitantes() {
                                                 ))}
                                             </div>
                                         ) : (
-                                            <div className={`rounded-2xl shadow-sm border overflow-hidden ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                                            <div className={`rounded-2xl shadow-sm border overflow-hidden ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-100'}`}>
                                                 <table className="min-w-full">
                                                     <thead>
-                                                        <tr className={`border-b ${isDark ? 'border-gray-800' : 'border-gray-100'}`}>
-                                                            <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>Solicitante</th>
-                                                            <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>Cédula</th>
-                                                            <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>Contacto</th>
-                                                            <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>Estado Civil</th>
-                                                            <th className={`px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>Acciones</th>
+                                                        <tr className={`border-b ${isDark ? 'border-red-800/50 bg-red-950/30' : 'border-gray-200 bg-gray-50'}`}>
+                                                            <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Solicitante</th>
+                                                            <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Cédula</th>
+                                                            <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Contacto</th>
+                                                            <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Estado Civil</th>
+                                                            <th className={`px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Acciones</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody className={`divide-y divide-gray-50 ${isDark ? 'divide-gray-800 bg-gray-900' : 'bg-white'}`}>
+                                                    <tbody className={`divide-y ${isDark ? 'divide-red-800/50 bg-[#630000]' : 'divide-gray-200 bg-white'}`}>
                                                         {currentItems.map((sol) => (
                                                             <SolicitanteRow
                                                                 key={sol.cedula}

@@ -64,7 +64,7 @@ export default function CasoRow({ caso, materia, onClick }: CasoRowProps) {
                         e.stopPropagation();
                         onClick();
                     }}
-                    className={`p-0 ${isDark ? 'text-red-300 hover:text-red-200' : 'text-red-900 hover:text-red-700'}`}
+                    className={`p-0 ${isDark ? 'text-white hover:text-gray-200' : 'text-red-900 hover:text-red-700'}`}
                 >
                     Ver Detalles
                 </Button>

@@ -82,7 +82,7 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
     <>
       <div
         onClick={onClick}
-        className={`group cursor-pointer relative shadow-md hover:shadow-xl transition-all duration-300 h-[380px] w-full flex flex-col rounded-sm overflow-hidden border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'
+        className={`group cursor-pointer relative shadow-md hover:shadow-xl transition-all duration-300 h-[360px] w-full flex flex-col rounded-lg overflow-hidden border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'
           }`}
       >
         {/* 1. Left Vertical Red Bar */}
@@ -127,9 +127,9 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
 
 
           {/* 3. Title: Name */}
-          <div className="h-[64px] mb-1 flex items-center">
+          <div className="mb-2 flex items-center">
             <h2
-              className={`text-2xl font-black leading-tight line-clamp-2 w-full ${isDark ? 'text-white' : 'text-gray-900'
+              className={`text-xl font-bold leading-tight line-clamp-2 w-full ${isDark ? 'text-white' : 'text-gray-900'
                 }`}
             >
               {nombre}
@@ -137,9 +137,9 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
           </div>
 
           {/* Requirements: Materia (Ambito Legal) below name */}
-          <div className="h-[32px] mb-3 flex items-center">
+          <div className="mb-3 flex items-center">
             <p
-              className={`text-xs font-bold uppercase tracking-widest line-clamp-2 ${isDark ? 'text-red-200' : 'text-red-900'
+              className={`text-xs font-semibold uppercase tracking-wide line-clamp-1 ${isDark ? 'text-red-300' : 'text-red-700'
                 }`}
             >
               {materia}
@@ -147,13 +147,20 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
           </div>
 
           {/* 4. Body: Synthesis */}
-          <div className="flex-1 overflow-hidden relative flex items-center justify-center px-2">
-            <p
-              className={`text-sm leading-relaxed line-clamp-3 text-center ${isDark ? 'text-white' : 'text-gray-600'
-                }`}
-            >
-              {sintesis || <span className="italic opacity-50">Sin síntesis disponible.</span>}
-            </p>
+          <div className="flex-1 overflow-hidden relative flex flex-col justify-start py-2">
+            <div className={`mb-2 px-2 py-1.5 rounded-md ${isDark ? 'bg-red-950/30 border border-red-800/30' : 'bg-gray-50 border border-gray-100'}`}>
+              <p className={`text-xs font-semibold uppercase tracking-wide mb-1 ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                Síntesis
+              </p>
+            </div>
+            <div className="px-2 flex-1 overflow-hidden">
+              <p
+                className={`text-sm leading-relaxed line-clamp-4 ${isDark ? 'text-gray-200' : 'text-gray-700'
+                  }`}
+              >
+                {sintesis || <span className={`italic ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>Sin síntesis disponible.</span>}
+              </p>
+            </div>
           </div>
 
           {/* Footer: Metadata */}
