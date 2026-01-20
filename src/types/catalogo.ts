@@ -17,8 +17,9 @@ export interface Parroquia {
 }
 
 export interface EstadoCivil {
-    idEstadoCivil: number;
-    nombreEstadoCivil: string;
+    id: number;
+    nombre: string;
+    estatus?: 'ACTIVO' | 'INACTIVO';
 }
 
 export interface Centro {
@@ -50,6 +51,8 @@ export interface TipoViviendaResponse {
 export interface Semestre {
     termino: string;
     nombre: string;
+    fechaInicio?: string;
+    fechaFin?: string;
 }
 
 export interface CondicionLaboralResponse {
@@ -71,8 +74,11 @@ export interface NivelEducativoResponse {
 }
 
 export interface Tribunal {
-    idTribunal: number;
-    tipoTribunal: string;
-    nombreTribunal: string;
+    id: number;
+    nombre: string;
+    materia: string;
+    instancia: string;
+    ubicacion: string;
+    estatus?: 'ACTIVO' | 'INACTIVO';
 }
 
