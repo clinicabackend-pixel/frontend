@@ -44,7 +44,7 @@ const ReportCard = ({ title, description, icon, children, onDownload, loading, f
             </div>
             <div className="p-5 flex-1 flex flex-col">
                 <div className="flex justify-between items-start mb-2">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${fileType === 'PDF' ? (isDark ? 'bg-red-900/50 text-red-300' : 'bg-red-100 text-red-800') : (isDark ? 'bg-green-900/50 text-green-300' : 'bg-green-100 text-green-800')}`}>
+                    <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider ${fileType === 'PDF' ? (isDark ? 'bg-red-300 text-red-900' : 'bg-red-100 text-red-800') : (isDark ? 'bg-green-300 text-green-900' : 'bg-green-100 text-green-800')}`}>
                         {fileType}
                     </span>
                 </div>

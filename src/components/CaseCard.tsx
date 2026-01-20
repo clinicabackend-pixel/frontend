@@ -44,15 +44,16 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
       case 'EN PROGRESO':
       case 'ACTIVO':
       case 'ABIERTO':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return isDark ? 'bg-green-300 text-green-900' : 'bg-green-100 text-green-800';
       case 'CERRADO':
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return isDark ? 'bg-gray-300 text-gray-900' : 'bg-gray-100 text-gray-800';
       case 'PENDIENTE':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'EN PAUSA':
+        return isDark ? 'bg-yellow-300 text-yellow-900' : 'bg-yellow-100 text-yellow-800';
       case 'REVISIÓN':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return isDark ? 'bg-blue-300 text-blue-900' : 'bg-blue-100 text-blue-800';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return isDark ? 'bg-gray-300 text-gray-900' : 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -96,7 +97,7 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
 
           {/* 2. Top Right: Case Number */}
           <div className="flex justify-between items-start mb-1">
-            <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getStatusColor(estatus)} whitespace-nowrap self-start`}>
+            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(estatus)} whitespace-nowrap self-start`}>
               {estatus}
             </span>
             <div className="flex flex-col items-end">

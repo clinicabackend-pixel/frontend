@@ -76,7 +76,7 @@ function SolicitanteCard({ solicitante, onClick, onEncuestaClick }: SolicitanteC
             <div className={`mt-4 pt-3 border-t flex justify-between items-center text-xs ${isDark ? 'border-red-800/50 text-gray-300' : 'border-gray-100 text-gray-500'}`}>
                 <div className="flex flex-col gap-2">
                     <span className={isDark ? 'text-white' : ''}>{solicitante.estadoCivil}</span>
-                    <span className={`px-2 py-0.5 rounded-full w-fit ${solicitante.trabaja ? (isDark ? 'bg-green-900/50 text-green-300' : 'bg-green-50 text-green-700') : (isDark ? 'bg-gray-800/50 text-white' : 'bg-gray-100 text-gray-600')}`}>
+                    <span className={`px-2 py-1 rounded-full w-fit text-xs font-semibold ${solicitante.trabaja ? (isDark ? 'bg-green-300 text-green-900' : 'bg-green-100 text-green-800') : (isDark ? 'bg-gray-300 text-gray-900' : 'bg-gray-100 text-gray-800')}`}>
                         {solicitante.trabaja ? 'Trabaja' : 'No trabaja'}
                     </span>
                 </div>

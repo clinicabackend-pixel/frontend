@@ -57,10 +57,10 @@ export default function UsuarioDetalle() {
     const getStatusBadge = (status: string) => {
         const isActive = status === 'ACTIVO';
         return (
-            <span className={`px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${
+            <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                 isActive 
-                    ? isDark ? 'bg-green-900/50 text-green-300 border border-green-700' : 'bg-green-100 text-green-800 border border-green-200'
-                    : isDark ? 'bg-gray-800 text-gray-300 border border-gray-700' : 'bg-red-100 text-red-800 border border-red-200'
+                    ? (isDark ? 'bg-green-300 text-green-900' : 'bg-green-100 text-green-800')
+                    : (isDark ? 'bg-gray-300 text-gray-900' : 'bg-red-100 text-red-800')
             }`}>
                 {isActive ? 'Activo' : 'Inactivo'}
             </span>
@@ -68,19 +68,19 @@ export default function UsuarioDetalle() {
     };
 
     const getRoleBadge = (tipo: string) => {
-        let colorClass = isDark ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-gray-100 text-gray-800 border-gray-200';
+        let colorClass = isDark ? 'bg-gray-300 text-gray-900' : 'bg-gray-100 text-gray-800';
         switch (tipo) {
             case 'ESTUDIANTE':
-                colorClass = isDark ? 'bg-blue-900/50 text-blue-300 border-blue-700' : 'bg-blue-100 text-blue-800 border-blue-200';
+                colorClass = isDark ? 'bg-blue-300 text-blue-900' : 'bg-blue-100 text-blue-800';
                 break;
             case 'PROFESOR':
-                colorClass = isDark ? 'bg-purple-900/50 text-purple-300 border-purple-700' : 'bg-purple-100 text-purple-800 border-purple-200';
+                colorClass = isDark ? 'bg-purple-300 text-purple-900' : 'bg-purple-100 text-purple-800';
                 break;
             case 'COORDINADOR':
-                colorClass = isDark ? 'bg-indigo-900/50 text-indigo-300 border-indigo-700' : 'bg-indigo-100 text-indigo-800 border-indigo-200';
+                colorClass = isDark ? 'bg-indigo-300 text-indigo-900' : 'bg-indigo-100 text-indigo-800';
                 break;
             case 'ADMINISTRADOR':
-                colorClass = isDark ? 'bg-yellow-900/50 text-yellow-300 border-yellow-700' : 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                colorClass = isDark ? 'bg-yellow-300 text-yellow-900' : 'bg-yellow-100 text-yellow-800';
                 break;
         }
         return (
