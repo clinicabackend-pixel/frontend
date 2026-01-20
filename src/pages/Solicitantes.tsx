@@ -193,7 +193,7 @@ function Solicitantes() {
                     // LISTA DE SOLICITANTES
                     <>
                         {/* Toolbar */}
-                        <div className={`flex flex-col md:flex-row justify-between items-center gap-4 mb-8 p-4 rounded-xl shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                        <div className={`flex flex-col md:flex-row justify-between items-center gap-4 mb-8 p-4 rounded-xl shadow-sm border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
                             {/* Buscador y Switch */}
                             <div className="flex flex-col xl:flex-row items-center gap-6 flex-1 min-w-0">
                                 <div className="w-full xl:w-96">
@@ -201,6 +201,7 @@ function Solicitantes() {
                                         value={searchText}
                                         onChange={setSearchText}
                                         placeholder="Buscar por nombre o cédula..."
+                                        isDark={isDark}
                                     />
                                 </div>
                                 <Switch

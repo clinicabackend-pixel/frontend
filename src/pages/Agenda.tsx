@@ -80,6 +80,7 @@ export default function AgendaPage() {
                             value={searchText}
                             onChange={setSearchText}
                             placeholder="Buscar estudiante..."
+                            isDark={darkMode}
                         />
                     </div>
                 </div>

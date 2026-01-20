@@ -222,6 +222,7 @@ export default function UsuariosPage() {
                             value={searchText}
                             onChange={setSearchText}
                             placeholder="Buscar por nombre, cédula, usuario..."
+                            isDark={isDark}
                         />
                     </div>
                     <div className="flex gap-2 w-full md:w-auto">
