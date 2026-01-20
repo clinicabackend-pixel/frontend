@@ -252,11 +252,10 @@ export default function Reportes() {
                 </div>
 
                 {notification && (
-                    <div className={`mb-6 p-4 rounded-lg border-l-4 ${
-                        notification.type === 'success' 
-                            ? (isDark ? 'bg-green-900/50 border-green-500 text-green-200' : 'bg-green-50 border-green-500 text-green-700')
-                            : (isDark ? 'bg-red-900/50 border-red-500 text-red-200' : 'bg-red-50 border-red-500 text-red-700')
-                    }`} role="alert">
+                    <div className={`mb-6 p-4 rounded-lg border-l-4 ${notification.type === 'success'
+                        ? (isDark ? 'bg-green-900/50 border-green-500 text-green-200' : 'bg-green-50 border-green-500 text-green-700')
+                        : (isDark ? 'bg-red-900/50 border-red-500 text-red-200' : 'bg-red-50 border-red-500 text-red-700')
+                        }`} role="alert">
                         <p className="font-medium">{notification.message}</p>
                     </div>
                 )}
@@ -282,11 +281,10 @@ export default function Reportes() {
                                 type="text"
                                 value={cedulaSolicitante}
                                 onChange={(e) => setCedulaSolicitante(e.target.value)}
-                                className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 focus:border-transparent outline-none transition-shadow ${
-                                    isDark 
-                                        ? 'bg-red-900/50 border-red-800/50 text-white placeholder-gray-400' 
-                                        : 'border-gray-300'
-                                }`}
+                                className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 focus:border-transparent outline-none transition-shadow ${isDark
+                                    ? 'bg-red-900/50 border-red-800/50 text-white placeholder-gray-400'
+                                    : 'border-gray-300'
+                                    }`}
                                 placeholder="Ej: V-12345678"
                             />
                         </div>
@@ -313,11 +311,10 @@ export default function Reportes() {
                                         type="date"
                                         value={historialInicio}
                                         onChange={(e) => setHistorialInicio(e.target.value)}
-                                        className={`w-full h-10 px-2 border rounded-md focus:ring-red-900 outline-none text-sm ${
-                                            isDark 
-                                                ? 'bg-red-900/50 border-red-800/50 text-white' 
-                                                : 'border-gray-300'
-                                        }`}
+                                        className={`w-full h-10 px-2 border rounded-md focus:ring-red-900 outline-none text-sm ${isDark
+                                            ? 'bg-red-900/50 border-red-800/50 text-white'
+                                            : 'border-gray-300'
+                                            }`}
                                     />
                                 </div>
                                 <div>
@@ -326,11 +323,10 @@ export default function Reportes() {
                                         type="date"
                                         value={historialFin}
                                         onChange={(e) => setHistorialFin(e.target.value)}
-                                        className={`w-full h-10 px-2 border rounded-md focus:ring-red-900 outline-none text-sm ${
-                                            isDark 
-                                                ? 'bg-red-900/50 border-red-800/50 text-white' 
-                                                : 'border-gray-300'
-                                        }`}
+                                        className={`w-full h-10 px-2 border rounded-md focus:ring-red-900 outline-none text-sm ${isDark
+                                            ? 'bg-red-900/50 border-red-800/50 text-white'
+                                            : 'border-gray-300'
+                                            }`}
                                     />
                                 </div>
                             </div>
@@ -340,11 +336,10 @@ export default function Reportes() {
                                     type="text"
                                     value={historialUsuario}
                                     onChange={(e) => setHistorialUsuario(e.target.value)}
-                                    className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${
-                                        isDark 
-                                            ? 'bg-red-900/50 border-red-800/50 text-white placeholder-gray-400' 
-                                            : 'border-gray-300'
-                                    }`}
+                                    className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${isDark
+                                        ? 'bg-red-900/50 border-red-800/50 text-white placeholder-gray-400'
+                                        : 'border-gray-300'
+                                        }`}
                                     placeholder="Ej: jperez"
                                 />
                             </div>
@@ -369,11 +364,10 @@ export default function Reportes() {
                                 type="text"
                                 value={casoId}
                                 onChange={(e) => setCasoId(e.target.value)}
-                                className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${
-                                    isDark 
-                                        ? 'bg-red-900/50 border-red-800/50 text-white placeholder-gray-400' 
-                                        : 'border-gray-300'
-                                }`}
+                                className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${isDark
+                                    ? 'bg-red-900/50 border-red-800/50 text-white placeholder-gray-400'
+                                    : 'border-gray-300'
+                                    }`}
                                 placeholder="Ej: C-2024-001"
                             />
                         </div>
@@ -394,11 +388,10 @@ export default function Reportes() {
                             <select
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
-                                className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${
-                                    isDark 
-                                        ? 'bg-red-900/50 border-red-800/50 text-white' 
-                                        : 'border-gray-300 bg-white'
-                                }`}
+                                className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${isDark
+                                    ? 'bg-red-900/50 border-red-800/50 text-white'
+                                    : 'border-gray-300 bg-white'
+                                    }`}
                             >
                                 <option value="ABIERTO">Abierto</option>
                                 <option value="CERRADO">Cerrado</option>
@@ -429,11 +422,10 @@ export default function Reportes() {
                                     type="text"
                                     value={resumenSemestre}
                                     onChange={(e) => setResumenSemestre(e.target.value)}
-                                    className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${
-                                        isDark 
-                                            ? 'bg-red-900/50 border-red-800/50 text-white placeholder-gray-400' 
-                                            : 'border-gray-300'
-                                    }`}
+                                    className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${isDark
+                                        ? 'bg-red-900/50 border-red-800/50 text-white placeholder-gray-400'
+                                        : 'border-gray-300'
+                                        }`}
                                     placeholder="Ej: 2024-1"
                                 />
                             </div>
@@ -443,11 +435,10 @@ export default function Reportes() {
                                     value={resumenTipo}
                                     onChange={(e) => setResumenTipo(Number(e.target.value))}
                                     disabled={loadingMaterias}
-                                    className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${
-                                        isDark 
-                                            ? 'bg-red-900/50 border-red-800/50 text-white' 
-                                            : 'border-gray-300 bg-white'
-                                    } ${loadingMaterias ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${isDark
+                                        ? 'bg-red-900/50 border-red-800/50 text-white'
+                                        : 'border-gray-300 bg-white'
+                                        } ${loadingMaterias ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                     <option value={0}>Seleccione...</option>
                                     {materias.map((materia) => (
@@ -464,6 +455,26 @@ export default function Reportes() {
                                 )}
                             </div>
                         </div>
+                    </ReportCard>
+
+
+                    {/* 6. Memoria y Cuenta */}
+                    <ReportCard
+                        title="Memoria y Cuenta"
+                        description="Generación del informe anual con gráficos estadísticos, usuarios por parroquia y comparativas."
+                        icon={faChartPie}
+                        loading={false}
+                        onDownload={() => {
+                            window.location.href = '/reportes/memoria-cuenta';
+                        }}
+                    >
+                        <button
+                            onClick={() => window.location.href = '/reportes/memoria-cuenta'}
+                            className={`w-full py-2 px-4 rounded-md font-semibold text-white transition-colors ${isDark ? 'bg-red-700 hover:bg-red-600' : 'bg-red-900 hover:bg-red-800'
+                                }`}
+                        >
+                            Ir al Generador
+                        </button>
                     </ReportCard>
 
                 </div>

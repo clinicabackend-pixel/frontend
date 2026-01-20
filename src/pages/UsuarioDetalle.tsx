@@ -6,16 +6,13 @@ import {
     faUser,
     faEnvelope,
     faIdCard,
-    faShieldAlt,
-    faCheckCircle,
-    faTimesCircle,
     faEdit,
 } from '@fortawesome/free-solid-svg-icons';
 import MainLayout from '../components/layout/MainLayout';
 import Button from '../components/common/Button';
 import usuarioService from '../services/usuarioService';
 import { useTheme } from '../context/ThemeContext';
-import { useAuth } from '../context/AuthContext';
+// import { useAuth } from '../context/AuthContext'; // No longer used
 import EditUserModal from '../components/users/EditUserModal';
 import type { Usuario } from '../types/usuario';
 import Loader from '../components/common/Loader';
@@ -24,13 +21,13 @@ export default function UsuarioDetalle() {
     const { username } = useParams<{ username: string }>();
     const navigate = useNavigate();
     const { theme } = useTheme();
-    const { user: currentUser } = useAuth();
+    // const { user: currentUser } = useAuth(); // Unused
     const isDark = theme === 'dark';
     const [usuario, setUsuario] = useState<Usuario | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    
+
     // Por ahora el botón está disponible para todos, más adelante se implementará control por roles
     const canEdit = true;
 

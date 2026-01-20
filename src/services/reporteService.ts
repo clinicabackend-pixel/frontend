@@ -1,4 +1,6 @@
 import api from './api';
+import type { ReporteData } from '../types/reporteStats';
+import { TipoReporte } from '../types/reporteStats';
 
 const downloadBlob = (data: Blob, filename: string) => {
   const url = window.URL.createObjectURL(new Blob([data]));
@@ -127,5 +129,18 @@ export const reporteService = {
     } catch (error) {
       throw error;
     }
+  },
+
+  getChartData: async (tipo: TipoReporte): Promise<ReporteData> => {
+    try {
+      const response = await api.get<ReporteData>('/reportes/chart-data', {
+        params: { tipo }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching chart data:', error);
+      throw error;
+    }
   }
 };
+

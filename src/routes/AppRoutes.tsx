@@ -13,6 +13,7 @@ import Reportes from '../pages/Reportes';
 import SetupPassword from '../pages/auth/SetupPassword';
 import Catalogos from '../pages/Catalogos';
 import AgendaPage from '../pages/Agenda';
+import ReportGenerator from '../pages/ReportGenerator';
 
 export default function AppRoutes() {
     return (
@@ -31,6 +32,7 @@ export default function AppRoutes() {
                 <Route path="/usuarios" element={<UsuariosPage />} />
                 <Route path="/usuarios/:username" element={<UsuarioDetalle />} />
                 <Route path="/reportes" element={<Reportes />} />
+                <Route path="/reportes/memoria-cuenta" element={<ReportGenerator />} />
                 <Route path="/catalogos" element={<Catalogos />} />
             </Route>
         </Routes>
