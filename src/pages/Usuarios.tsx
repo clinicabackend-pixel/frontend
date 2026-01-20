@@ -179,8 +179,8 @@ export default function UsuariosPage() {
         const isActive = status === 'ACTIVO';
         return (
             <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${isActive
-                    ? (isDark ? 'bg-green-300 text-green-900' : 'bg-green-100 text-green-800')
-                    : (isDark ? 'bg-gray-300 text-gray-900' : 'bg-red-100 text-red-800')
+                ? (isDark ? 'bg-green-300 text-green-900' : 'bg-green-100 text-green-800')
+                : (isDark ? 'bg-gray-300 text-gray-900' : 'bg-red-100 text-red-800')
                 }`}>
                 {isActive ? 'Activo' : 'Inactivo'}
             </span>
@@ -211,6 +211,16 @@ export default function UsuariosPage() {
         );
     };
 
+    // Verify access
+    useEffect(() => {
+        if (currentUser?.tipoUsuario === 'ESTUDIANTE') {
+            navigate('/home');
+        }
+    }, [currentUser, navigate]);
+
+    // Check permissions for actions
+    const canManageUsers = currentUser?.tipoUsuario === 'COORDINADOR' || currentUser?.tipoUsuario === 'ADMINISTRADOR';
+
     return (
         <MainLayout title="GESTIÓN DE USUARIOS">
             <div className="w-full mx-auto">
@@ -224,28 +234,30 @@ export default function UsuariosPage() {
                             placeholder="Buscar por nombre, cédula, usuario..."
                         />
                     </div>
-                    <div className="flex gap-2 w-full md:w-auto">
-                        <button
-                            onClick={() => setIsImportModalOpen(true)}
-                            className={`flex items-center justify-center px-4 py-2 border rounded-md transition-colors w-full md:w-auto ${isDark
+                    {canManageUsers && (
+                        <div className="flex gap-2 w-full md:w-auto">
+                            <button
+                                onClick={() => setIsImportModalOpen(true)}
+                                className={`flex items-center justify-center px-4 py-2 border rounded-md transition-colors w-full md:w-auto ${isDark
                                     ? 'border-red-700 text-red-300 hover:bg-red-950/50 hover:border-red-600'
                                     : 'border-red-900 text-red-900 hover:bg-red-50'
-                                }`}
-                        >
-                            <Upload size={18} className="mr-2" />
-                            Importar
-                        </button>
-                        <button
-                            onClick={() => setIsUserModalOpen(true)}
-                            className={`flex items-center justify-center px-4 py-2 rounded-md transition-colors w-full md:w-auto ${isDark
+                                    }`}
+                            >
+                                <Upload size={18} className="mr-2" />
+                                Importar
+                            </button>
+                            <button
+                                onClick={() => setIsUserModalOpen(true)}
+                                className={`flex items-center justify-center px-4 py-2 rounded-md transition-colors w-full md:w-auto ${isDark
                                     ? 'bg-red-900 text-white hover:bg-red-800'
                                     : 'bg-red-900 text-white hover:bg-red-800'
-                                }`}
-                        >
-                            <Plus size={18} className="mr-2" />
-                            Crear usuario
-                        </button>
-                    </div>
+                                    }`}
+                            >
+                                <Plus size={18} className="mr-2" />
+                                Crear usuario
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Content */}
@@ -300,8 +312,8 @@ export default function UsuariosPage() {
                                                 <button
                                                     onClick={(e) => toggleMenu(user.username, e)}
                                                     className={`p-2 rounded-md transition-colors ${isDark
-                                                            ? 'text-gray-300 hover:text-white hover:bg-red-950/50'
-                                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                                                        ? 'text-gray-300 hover:text-white hover:bg-red-950/50'
+                                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                                                         }`}
                                                     title="Opciones"
                                                 >
@@ -315,12 +327,12 @@ export default function UsuariosPage() {
                                                             <button
                                                                 onClick={(e) => handleDeleteClick(user, e)}
                                                                 className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors ${user.estatus === 'ACTIVO'
-                                                                        ? (isDark
-                                                                            ? 'text-red-300 hover:bg-red-950/50 hover:text-red-200'
-                                                                            : 'text-red-600 hover:bg-red-50 hover:text-red-900')
-                                                                        : (isDark
-                                                                            ? 'text-green-300 hover:bg-green-950/50 hover:text-green-200'
-                                                                            : 'text-green-600 hover:bg-green-50 hover:text-green-900')
+                                                                    ? (isDark
+                                                                        ? 'text-red-300 hover:bg-red-950/50 hover:text-red-200'
+                                                                        : 'text-red-600 hover:bg-red-50 hover:text-red-900')
+                                                                    : (isDark
+                                                                        ? 'text-green-300 hover:bg-green-950/50 hover:text-green-200'
+                                                                        : 'text-green-600 hover:bg-green-50 hover:text-green-900')
                                                                     }`}
                                                             >
                                                                 {user.estatus === 'ACTIVO' ? (
@@ -421,8 +433,8 @@ export default function UsuariosPage() {
                                 <button
                                     onClick={handleConfirmToggleStatus}
                                     className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors ${userToDelete.estatus === 'ACTIVO'
-                                            ? 'bg-red-600 hover:bg-red-700'
-                                            : 'bg-green-600 hover:bg-green-700'
+                                        ? 'bg-red-600 hover:bg-red-700'
+                                        : 'bg-green-600 hover:bg-green-700'
                                         }`}
                                 >
                                     {userToDelete.estatus === 'ACTIVO' ? 'Desactivar' : 'Activar'}

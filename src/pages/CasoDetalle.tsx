@@ -134,7 +134,7 @@ function CasoDetalle() {
   const [editFormData, setEditFormData] = useState<CasoUpdateRequest>({});
 
   // Permisos
-  const canAssign = user?.tipoUsuario === 'ADMINISTRADOR' || user?.tipoUsuario === 'COORDINADOR';
+  const canAssign = user?.tipoUsuario === 'ADMINISTRADOR' || user?.tipoUsuario === 'COORDINADOR' || user?.tipoUsuario === 'PROFESOR';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -442,6 +442,30 @@ function CasoDetalle() {
                 Volver
               </button>
               <div className="flex gap-2 items-center">
+                {/* Botón Eliminar Caso (Solo Coordinador) */}
+                {user?.tipoUsuario === 'COORDINADOR' && (
+                  <button
+                    onClick={async () => {
+                      if (window.confirm('¿Está seguro de que desea eliminar este caso? Esta acción no se puede deshacer.')) {
+                        try {
+                          if (caso.numCaso) {
+                            await casoService.delete(caso.numCaso);
+                            navigate('/casos');
+                          }
+                        } catch (e) {
+                          console.error(e);
+                          alert('Error al eliminar el caso');
+                        }
+                      }
+                    }}
+                    className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors flex items-center gap-2 text-sm"
+                    title="Eliminar Caso Permanentemente"
+                  >
+                    <FontAwesomeIcon icon={faTrash} />
+                    <span className="hidden sm:inline">Eliminar</span>
+                  </button>
+                )}
+
                 {/* Botón Exportar Reporte Caso */}
                 <button
                   onClick={() => caso.numCaso && reporteService.downloadReporteCaso(caso.numCaso)}
@@ -452,18 +476,45 @@ function CasoDetalle() {
                   <span className="hidden sm:inline">Exportar</span>
                 </button>
 
-                <span
-                  className={`px-4 py-1 rounded-full text-sm font-semibold border ${caso.estatus === 'ABIERTO'
+                {/* Selector de Estatus (Coordinador / Profesor) */}
+                {(user?.tipoUsuario === 'COORDINADOR' || user?.tipoUsuario === 'PROFESOR') ? (
+                  <select
+                    value={caso.estatus}
+                    onChange={async (e) => {
+                      const newStatus = e.target.value;
+                      if (!caso.numCaso) return;
+                      try {
+                        await casoService.updateEstatus(caso.numCaso, newStatus);
+                        await handleRefresh();
+                      } catch (err) {
+                        console.error(err);
+                        alert('Error al cambiar el estatus');
+                      }
+                    }}
+                    className={`px-4 py-1.5 rounded-full text-sm font-semibold border outline-none cursor-pointer ${caso.estatus === 'ABIERTO'
+                        ? isDark ? 'bg-green-900/50 text-green-300 border-green-700' : 'bg-green-100 text-green-800 border-green-200'
+                        : isDark ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-gray-100 text-gray-800 border-gray-200'
+                      }`}
+                  >
+                    <option value="ABIERTO">ABIERTO</option>
+                    <option value="EN TRÁMITE">EN TRÁMITE</option>
+                    <option value="EN PAUSA">EN PAUSA</option>
+                    <option value="CERRADO">CERRADO</option>
+                  </select>
+                ) : (
+                  <span
+                    className={`px-4 py-1 rounded-full text-sm font-semibold border ${caso.estatus === 'ABIERTO'
                       ? isDark
                         ? 'bg-green-900/50 text-green-300 border-green-700'
                         : 'bg-green-100 text-green-800 border-green-200'
                       : isDark
                         ? 'bg-gray-800 text-gray-300 border-gray-700'
                         : 'bg-gray-100 text-gray-800 border-gray-200'
-                    }`}
-                >
-                  {caso.estatus}
-                </span>
+                      }`}
+                  >
+                    {caso.estatus}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -674,8 +725,8 @@ function CasoDetalle() {
                     <button
                       onClick={openEditModal}
                       className={`px-3 py-1 text-sm font-medium border rounded-md transition-colors ${isDark
-                          ? 'text-red-400 border-red-600 hover:bg-red-950'
-                          : 'text-red-900 border-red-900 hover:bg-red-50'
+                        ? 'text-red-400 border-red-600 hover:bg-red-950'
+                        : 'text-red-900 border-red-900 hover:bg-red-50'
                         }`}
                     >
                       Editar Informacion
@@ -683,8 +734,8 @@ function CasoDetalle() {
                   </div>
                   <p
                     className={`whitespace-pre-line leading-relaxed p-4 rounded-lg border ${isDark
-                        ? 'text-white bg-red-950/30 border-red-800/50'
-                        : 'text-gray-700 bg-gray-50 border-gray-100'
+                      ? 'text-white bg-red-950/30 border-red-800/50'
+                      : 'text-gray-700 bg-gray-50 border-gray-100'
                       }`}
                   >
                     {caso.sintesis || 'No hay síntesis registrada.'}
@@ -807,8 +858,8 @@ function CasoDetalle() {
                                 <button
                                   onClick={() => handleEditBeneficiario(ben.cedula)}
                                   className={`transition-colors ${isDark
-                                      ? 'text-gray-400 hover:text-red-400'
-                                      : 'text-gray-400 hover:text-red-900'
+                                    ? 'text-gray-400 hover:text-red-400'
+                                    : 'text-gray-400 hover:text-red-900'
                                     }`}
                                   title="Editar información del beneficiario"
                                 >
@@ -930,8 +981,8 @@ function CasoDetalle() {
                         {/* Línea vertical */}
                         <div
                           className={`absolute left-8 top-0 bottom-0 w-0.5 bg-linear-to-b ${isDark
-                              ? 'from-red-700 via-red-600 to-red-800'
-                              : 'from-red-900 via-red-600 to-gray-300'
+                            ? 'from-red-700 via-red-600 to-red-800'
+                            : 'from-red-900 via-red-600 to-gray-300'
                             }`}
                         ></div>
 
@@ -1015,8 +1066,8 @@ function CasoDetalle() {
                                     {evento.type === 'encuentro' && evento.fechaProxima && (
                                       <span
                                         className={`ml-3 text-xs font-semibold px-2 py-1 rounded-full border ${isDark
-                                            ? 'text-blue-300 bg-blue-900/50 border-blue-700'
-                                            : 'text-blue-700 bg-blue-50 border-blue-200'
+                                          ? 'text-blue-300 bg-blue-900/50 border-blue-700'
+                                          : 'text-blue-700 bg-blue-50 border-blue-200'
                                           }`}
                                       >
                                         📅 Próxima:{' '}
@@ -1041,8 +1092,8 @@ function CasoDetalle() {
                                   {evento.observacion && (
                                     <div
                                       className={`mt-3 rounded p-3 border ${isDark
-                                          ? 'bg-red-950/30 border-red-800/50'
-                                          : 'bg-gray-50 border-gray-200'
+                                        ? 'bg-red-950/30 border-red-800/50'
+                                        : 'bg-gray-50 border-gray-200'
                                         }`}
                                     >
                                       <p
@@ -1242,8 +1293,8 @@ function CasoDetalle() {
                   ) : (
                     <ul
                       className={`divide-y border rounded-lg overflow-hidden ${isDark
-                          ? 'divide-red-800/50 border-red-800/50'
-                          : 'divide-gray-200 border-gray-200'
+                        ? 'divide-red-800/50 border-red-800/50'
+                        : 'divide-gray-200 border-gray-200'
                         }`}
                     >
                       {documentos.map((doc) => (
@@ -1630,10 +1681,10 @@ function CasoDetalle() {
               <div>
                 <span
                   className={`inline-block px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wide ${selectedEvento.type === 'accion'
-                      ? 'bg-green-50 text-green-700'
-                      : selectedEvento.type === 'encuentro'
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'bg-red-50 text-red-900'
+                    ? 'bg-green-50 text-green-700'
+                    : selectedEvento.type === 'encuentro'
+                      ? 'bg-blue-50 text-blue-700'
+                      : 'bg-red-50 text-red-900'
                     }`}
                 >
                   {selectedEvento.type === 'accion'

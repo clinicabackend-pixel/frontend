@@ -97,6 +97,16 @@ const casoService = {
     getSolicitanteByCedula: async (cedula: string): Promise<Solicitante> => {
         const response = await api.get<Solicitante>(`/solicitantes/${cedula}`);
         return response.data;
+    },
+
+    updateEstatus: async (id: string, nuevoEstatus: string): Promise<void> => {
+        await api.patch(`/casos/${id}/estatus`, null, {
+            params: { nuevoEstatus }
+        });
+    },
+
+    delete: async (id: string): Promise<void> => {
+        await api.delete(`/casos/${id}`);
     }
 };
 
