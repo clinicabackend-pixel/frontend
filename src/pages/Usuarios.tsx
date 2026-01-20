@@ -230,8 +230,8 @@ export default function UsuariosPage() {
                             onClick={() => setIsImportModalOpen(true)}
                             className={`flex items-center justify-center px-4 py-2 border rounded-md transition-colors w-full md:w-auto ${
                                 isDark 
-                                    ? 'border-red-700 text-red-300 hover:bg-red-950/50 hover:border-red-600' 
-                                    : 'border-red-900 text-red-900 hover:bg-red-50'
+                                    ? 'border-blue-500 text-blue-400 hover:bg-blue-950/50' 
+                                    : 'border-blue-600 text-blue-600 hover:bg-blue-50'
                             }`}
                         >
                             <Upload size={18} className="mr-2" />
@@ -241,8 +241,8 @@ export default function UsuariosPage() {
                             onClick={() => setIsUserModalOpen(true)}
                             className={`flex items-center justify-center px-4 py-2 rounded-md transition-colors w-full md:w-auto ${
                                 isDark 
-                                    ? 'bg-red-900 text-white hover:bg-red-800' 
-                                    : 'bg-red-900 text-white hover:bg-red-800'
+                                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                                    : 'bg-blue-600 text-white hover:bg-blue-700'
                             }`}
                         >
                             <Plus size={18} className="mr-2" />
