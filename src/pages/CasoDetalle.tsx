@@ -186,7 +186,7 @@ const CasoDetalle: React.FC = () => {
   // Export PDF
   const handleExportPdf = () => {
     if (numCaso) {
-      window.open(`http://localhost:3000/api/casos/${numCaso}/pdf`, '_blank');
+      console.log(numCaso);
     }
   };
 
