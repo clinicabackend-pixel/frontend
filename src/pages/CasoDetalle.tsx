@@ -25,6 +25,7 @@ import AddAccionModal from '../components/modals/AddAccionModal';
 import AddEncuentroModal from '../components/modals/AddEncuentroModal';
 import Modal from '../components/common/Modal';
 import UniversalUploader from '../components/common/UniversalUploader'; // Importar Uploader
+import { useAuth } from '../context/AuthContext';
 import { getFullAmbitoPath } from '../utils/ambitoUtils';
 import type {
   CasoDetalleResponse,
@@ -56,6 +57,7 @@ interface TimelineEvent {
 export default function CasoDetalle() {
   const { numCaso } = useParams<{ numCaso: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -577,7 +579,8 @@ export default function CasoDetalle() {
                           fecha: new Date().toISOString().split('T')[0],
                           documento: data.url, // Store URL in documento field
                           titulo: `Archivo Digital (${data.type})`,
-                          observacion: 'Subido desde el detalle del caso'
+                          observacion: 'Subido desde el detalle del caso',
+                          username: user?.username || 'Desconocido'
                         });
                         // Refresh data
                         const updated = await casoService.getById(numCaso);
