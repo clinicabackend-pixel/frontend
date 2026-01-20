@@ -253,6 +253,7 @@ export function Catalogos() {
                                                         variant="ghost"
                                                         size="sm"
                                                         icon={faPlus}
+                                                        isDark={isDark}
                                                         onClick={() => {
                                                             setSelectedParentId(type.id);
                                                             setShowModal(true);
@@ -323,10 +324,11 @@ export function Catalogos() {
                 isOpen={showModal}
                 onClose={() => { setShowModal(false); setNewItemName(''); setSelectedParentId(null); }}
                 title={`Nuevo registro - ${activeTab === 'VIVIENDA' && selectedParentId ? 'Categoría' : 'Elemento'}`}
+                isDark={isDark}
             >
                 <div className="space-y-4">
-                    <p className={`text-sm mb-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Ingrese el nombre para el nuevo registro en <strong>{tabs.find(t => t.id === activeTab)?.label}</strong>.
+                    <p className="text-sm mb-2 text-gray-700">
+                        Ingrese el nombre para el nuevo registro en <strong className="text-gray-900">{tabs.find(t => t.id === activeTab)?.label}</strong>.
                     </p>
                     <CustomInput
                         name="itemName"
@@ -336,7 +338,7 @@ export function Catalogos() {
                         placeholder="Ej. Primaria Completa"
                     />
                     <div className="flex justify-end gap-3 mt-6">
-                        <Button variant="ghost" onClick={() => setShowModal(false)}>Cancelar</Button>
+                        <Button variant="ghost" isDark={isDark} onClick={() => setShowModal(false)}>Cancelar</Button>
                         <Button variant="primary" onClick={handleCreate} disabled={!newItemName.trim()}>Guardar</Button>
                     </div>
                 </div>

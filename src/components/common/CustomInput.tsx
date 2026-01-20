@@ -18,6 +18,7 @@ interface CustomInputProps {
     pattern?: string;
     title?: string;
     className?: string;
+    isDark?: boolean;
 }
 
 export default function CustomInput({
@@ -35,7 +36,8 @@ export default function CustomInput({
     maxLength,
     pattern,
     title,
-    className = ''
+    className = '',
+    isDark = false
 }: CustomInputProps) {
     const handleIncrement = () => {
         if (disabled) return;
@@ -82,10 +84,10 @@ export default function CustomInput({
 
             {type === 'number' ? (
                 <div className={`
-                    relative flex items-center w-full bg-white border border-gray-300 rounded-full px-4 py-2 shadow-sm
+                    relative flex items-center w-full border rounded-full px-4 py-2 shadow-sm
                     focus-within:ring-2 focus-within:ring-red-900 focus-within:border-transparent
                     transition-all duration-200
-                    ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-100' : 'hover:border-red-900'}
+                    bg-white border-gray-300 ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-100' : 'hover:border-red-900'}
                 `}>
                     <input
                         type={type}
@@ -98,7 +100,7 @@ export default function CustomInput({
                         min={min !== undefined ? min : 0}
                         max={max}
                         step={step}
-                        className="flex-1 bg-transparent border-none outline-none text-gray-900 placeholder-gray-400 w-full appearance-none m-0 p-0"
+                        className="flex-1 bg-transparent border-none outline-none w-full appearance-none m-0 p-0 text-gray-900 placeholder-gray-400"
                         style={{
                             appearance: 'textfield',
                             MozAppearance: 'textfield',
@@ -158,12 +160,10 @@ export default function CustomInput({
                     pattern={pattern}
                     title={title}
                     className={`
-                        w-full px-4 h-11 bg-white border border-gray-300 rounded-lg shadow-sm
+                        w-full px-4 h-11 border rounded-lg shadow-sm
                         outline-none transition-all duration-200
-                        placeholder-gray-400 text-gray-900
                         focus:ring-2 focus:ring-red-900 focus:border-transparent
-                        hover:border-red-900
-                        disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50
+                        bg-white border-gray-300 placeholder-gray-400 text-gray-900 hover:border-red-900 ${disabled ? 'bg-gray-100 cursor-not-allowed opacity-50' : ''}
                     `}
                 />
             )}

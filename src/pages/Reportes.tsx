@@ -12,6 +12,8 @@ import Layout from '../components/layout/MainLayout';
 import ReportCard from '../components/ReportCard';
 import { reporteService } from '../services/reporteService';
 import { useTheme } from '../context/ThemeContext';
+import catalogoService from '../services/catalogoService';
+import type { AmbitoLegal } from '../types/catalogo';
 
 export default function Reportes() {
     const { theme } = useTheme();
@@ -43,6 +45,8 @@ export default function Reportes() {
 
     const [dashboardStats, setDashboardStats] = useState<import('../services/reporteService').DashboardStats | null>(null);
     const [loadingStats, setLoadingStats] = useState(true);
+    const [materias, setMaterias] = useState<AmbitoLegal[]>([]);
+    const [loadingMaterias, setLoadingMaterias] = useState(true);
 
     // Initial fetch for dashboard stats
     useEffect(() => {
@@ -50,6 +54,25 @@ export default function Reportes() {
             .then(stats => setDashboardStats(stats))
             .catch(err => console.error("Error loading stats", err))
             .finally(() => setLoadingStats(false));
+    }, []);
+
+    // Cargar materias del catálogo
+    useEffect(() => {
+        const loadMaterias = async () => {
+            setLoadingMaterias(true);
+            try {
+                const ambitosLegales = await catalogoService.getAmbitosLegales();
+                // Filtrar solo las materias (tipo === 'MATERIA')
+                const materiasList = ambitosLegales.filter(ambito => ambito.tipo === 'MATERIA');
+                setMaterias(materiasList);
+            } catch (error) {
+                console.error("Error cargando materias:", error);
+                setMaterias([]);
+            } finally {
+                setLoadingMaterias(false);
+            }
+        };
+        loadMaterias();
     }, []);
 
     // Actualizar isDark cuando cambia el theme
@@ -419,20 +442,26 @@ export default function Reportes() {
                                 <select
                                     value={resumenTipo}
                                     onChange={(e) => setResumenTipo(Number(e.target.value))}
+                                    disabled={loadingMaterias}
                                     className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${
                                         isDark 
                                             ? 'bg-red-900/50 border-red-800/50 text-white' 
                                             : 'border-gray-300 bg-white'
-                                    }`}
+                                    } ${loadingMaterias ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                     <option value={0}>Seleccione...</option>
-                                    <option value={1}>Civil</option>
-                                    <option value={2}>Penal</option>
-                                    <option value={3}>Laboral</option>
-                                    <option value={4}>LOPNNA</option>
-                                    <option value={5}>Violencia de Género</option>
-                                    {/* Add more IDs as per catalog */}
+                                    {materias.map((materia) => (
+                                        <option key={materia.id} value={materia.id}>
+                                            {materia.descripcion}
+                                        </option>
+                                    ))}
                                 </select>
+                                {loadingMaterias && (
+                                    <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Cargando materias...</p>
+                                )}
+                                {!loadingMaterias && materias.length === 0 && (
+                                    <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>No hay materias disponibles</p>
+                                )}
                             </div>
                         </div>
                     </ReportCard>
