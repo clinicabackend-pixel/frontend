@@ -9,7 +9,7 @@ interface ModalProps {
     isDark?: boolean;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, isDark = false }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
     const modalRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {

@@ -1,8 +1,6 @@
 // --- Master Data Stub (since masterData file is missing) ---
-export interface Tribunal {
-  idTribunal: number;
-  nombreTribunal: string;
-}
+// --- Master Data Stub (since masterData file is missing) ---
+
 
 export interface Materia {
   idMateria: number;

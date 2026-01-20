@@ -418,7 +418,7 @@ function CasoDetalle() {
   return (
     <div className={`flex w-screen h-screen overflow-hidden ${isDark ? 'bg-red-900' : 'bg-gray-50'}`}>
       <Sidebar isOpen={isSidebarOpen} onClose={handleCloseSidebar} />
-      
+
       <div className={`flex-1 flex flex-col w-full min-w-0 ${isDark ? 'bg-red-900' : ''}`}>
         <Header title={`CASO ${caso.numCaso}`} onMenuClick={handleMenuClick} />
 
@@ -428,9 +428,8 @@ function CasoDetalle() {
             <div className="flex justify-between items-center">
               <button
                 onClick={() => navigate('/casos')}
-                className={`flex items-center hover:text-red-900 transition-colors font-medium ${
-                  isDark ? 'text-gray-300' : 'text-gray-600'
-                }`}
+                className={`flex items-center hover:text-red-900 transition-colors font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'
+                  }`}
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -454,15 +453,14 @@ function CasoDetalle() {
                 </button>
 
                 <span
-                  className={`px-4 py-1 rounded-full text-sm font-semibold border ${
-                    caso.estatus === 'ABIERTO'
+                  className={`px-4 py-1 rounded-full text-sm font-semibold border ${caso.estatus === 'ABIERTO'
                       ? isDark
                         ? 'bg-green-900/50 text-green-300 border-green-700'
                         : 'bg-green-100 text-green-800 border-green-200'
                       : isDark
                         ? 'bg-gray-800 text-gray-300 border-gray-700'
                         : 'bg-gray-100 text-gray-800 border-gray-200'
-                  }`}
+                    }`}
                 >
                   {caso.estatus}
                 </span>
@@ -471,9 +469,8 @@ function CasoDetalle() {
 
             {/* Header Card */}
             <div
-              className={`rounded-xl shadow-sm border p-6 ${
-                isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'
-              }`}
+              className={`rounded-xl shadow-sm border p-6 ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'
+                }`}
             >
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
                 <div>
@@ -488,9 +485,8 @@ function CasoDetalle() {
                 </div>
                 <div className="text-right">
                   <div
-                    className={`text-lg font-semibold text-right ${
-                      isDark ? 'text-red-400' : 'text-red-900'
-                    }`}
+                    className={`text-lg font-semibold text-right ${isDark ? 'text-red-400' : 'text-red-900'
+                      }`}
                   >
                     {materiaNombre}
                   </div>
@@ -503,14 +499,12 @@ function CasoDetalle() {
               {/* Información del Solicitante Expandida */}
               {solicitante && (
                 <div
-                  className={`rounded-lg p-4 mb-6 border ${
-                    isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-100'
-                  }`}
+                  className={`rounded-lg p-4 mb-6 border ${isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-100'
+                    }`}
                 >
                   <h3
-                    className={`text-xs font-bold uppercase tracking-wider mb-3 ${
-                      isDark ? 'text-gray-300' : 'text-gray-400'
-                    }`}
+                    className={`text-xs font-bold uppercase tracking-wider mb-3 ${isDark ? 'text-gray-300' : 'text-gray-400'
+                      }`}
                   >
                     Datos del Solicitante
                   </h3>
@@ -551,9 +545,8 @@ function CasoDetalle() {
               )}
 
               <div
-                className={`grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t ${
-                  isDark ? 'border-red-800/50' : 'border-gray-100'
-                }`}
+                className={`grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t ${isDark ? 'border-red-800/50' : 'border-gray-100'
+                  }`}
               >
                 <div>
                   <span
@@ -648,15 +641,14 @@ function CasoDetalle() {
                     onClick={() => setActiveTab(tab.id as any)}
                     className={`
                                 py-4 px-1 border-b-2 font-medium text-sm capitalize transition-colors
-                                ${
-                                  activeTab === tab.id
-                                    ? isDark
-                                      ? 'border-red-600 text-red-400'
-                                      : 'border-red-900 text-red-900'
-                                    : isDark
-                                      ? 'border-transparent text-gray-300 hover:text-white hover:border-red-700'
-                                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                }
+                                ${activeTab === tab.id
+                        ? isDark
+                          ? 'border-red-600 text-red-400'
+                          : 'border-red-900 text-red-900'
+                        : isDark
+                          ? 'border-transparent text-gray-300 hover:text-white hover:border-red-700'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      }
                             `}
                   >
                     {tab.label}
@@ -667,9 +659,8 @@ function CasoDetalle() {
 
             {/* Content Area */}
             <div
-              className={`rounded-xl shadow-sm border min-h-[400px] ${
-                isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'
-              }`}
+              className={`rounded-xl shadow-sm border min-h-[400px] ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'
+                }`}
             >
               {/* GENERAL TAB */}
               {activeTab === 'general' && (
@@ -682,21 +673,19 @@ function CasoDetalle() {
                     </h3>
                     <button
                       onClick={openEditModal}
-                      className={`px-3 py-1 text-sm font-medium border rounded-md transition-colors ${
-                        isDark
+                      className={`px-3 py-1 text-sm font-medium border rounded-md transition-colors ${isDark
                           ? 'text-red-400 border-red-600 hover:bg-red-950'
                           : 'text-red-900 border-red-900 hover:bg-red-50'
-                      }`}
+                        }`}
                     >
                       Editar Informacion
                     </button>
                   </div>
                   <p
-                    className={`whitespace-pre-line leading-relaxed p-4 rounded-lg border ${
-                      isDark
+                    className={`whitespace-pre-line leading-relaxed p-4 rounded-lg border ${isDark
                         ? 'text-white bg-red-950/30 border-red-800/50'
                         : 'text-gray-700 bg-gray-50 border-gray-100'
-                    }`}
+                      }`}
                   >
                     {caso.sintesis || 'No hay síntesis registrada.'}
                   </p>
@@ -709,9 +698,8 @@ function CasoDetalle() {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div
-                        className={`p-3 rounded border ${
-                          isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-100'
-                        }`}
+                        className={`p-3 rounded border ${isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-100'
+                          }`}
                       >
                         <div className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
                           Tribunal
@@ -721,9 +709,8 @@ function CasoDetalle() {
                         </div>
                       </div>
                       <div
-                        className={`p-3 rounded border ${
-                          isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-100'
-                        }`}
+                        className={`p-3 rounded border ${isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-100'
+                          }`}
                       >
                         <div className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
                           Causa / Expediente
@@ -761,37 +748,32 @@ function CasoDetalle() {
                   ) : (
                     <div className="overflow-x-auto">
                       <table
-                        className={`min-w-full divide-y ${
-                          isDark ? 'divide-red-800/50' : 'divide-gray-200'
-                        }`}
+                        className={`min-w-full divide-y ${isDark ? 'divide-red-800/50' : 'divide-gray-200'
+                          }`}
                       >
                         <thead className={isDark ? 'bg-red-950/30' : 'bg-gray-50'}>
                           <tr>
                             <th
-                              className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                isDark ? 'text-gray-300' : 'text-gray-500'
-                              }`}
+                              className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'
+                                }`}
                             >
                               Cédula
                             </th>
                             <th
-                              className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                isDark ? 'text-gray-300' : 'text-gray-500'
-                              }`}
+                              className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'
+                                }`}
                             >
                               Parentesco
                             </th>
                             <th
-                              className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                isDark ? 'text-gray-300' : 'text-gray-500'
-                              }`}
+                              className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'
+                                }`}
                             >
                               Tipo
                             </th>
                             <th
-                              className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${
-                                isDark ? 'text-gray-300' : 'text-gray-500'
-                              }`}
+                              className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'
+                                }`}
                             >
                               Acciones
                             </th>
@@ -824,11 +806,10 @@ function CasoDetalle() {
                               <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                                 <button
                                   onClick={() => handleEditBeneficiario(ben.cedula)}
-                                  className={`transition-colors ${
-                                    isDark
+                                  className={`transition-colors ${isDark
                                       ? 'text-gray-400 hover:text-red-400'
                                       : 'text-gray-400 hover:text-red-900'
-                                  }`}
+                                    }`}
                                   title="Editar información del beneficiario"
                                 >
                                   <Pencil size={18} />
@@ -948,11 +929,10 @@ function CasoDetalle() {
                       <div className="relative w-full">
                         {/* Línea vertical */}
                         <div
-                          className={`absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b ${
-                            isDark
+                          className={`absolute left-8 top-0 bottom-0 w-0.5 bg-linear-to-b ${isDark
                               ? 'from-red-700 via-red-600 to-red-800'
                               : 'from-red-900 via-red-600 to-gray-300'
-                          }`}
+                            }`}
                         ></div>
 
                         {/* Eventos de la línea de tiempo */}
@@ -1005,9 +985,8 @@ function CasoDetalle() {
                                     setSelectedEvento(evento);
                                     setIsEventoModalOpen(true);
                                   }}
-                                  className={`w-full rounded-lg shadow-md border-l-4 ${style.borderColor} p-5 hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer ${
-                                    isDark ? 'bg-red-700/50' : 'bg-white'
-                                  } ${isLast ? 'opacity-80' : ''}`}
+                                  className={`w-full rounded-lg shadow-md border-l-4 ${style.borderColor} p-5 hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer ${isDark ? 'bg-red-700/50' : 'bg-white'
+                                    } ${isLast ? 'opacity-80' : ''}`}
                                 >
                                   {/* Header */}
                                   <div className="flex justify-between items-start mb-3">
@@ -1035,11 +1014,10 @@ function CasoDetalle() {
                                     {/* Badge para cita próxima programada */}
                                     {evento.type === 'encuentro' && evento.fechaProxima && (
                                       <span
-                                        className={`ml-3 text-xs font-semibold px-2 py-1 rounded-full border ${
-                                          isDark
+                                        className={`ml-3 text-xs font-semibold px-2 py-1 rounded-full border ${isDark
                                             ? 'text-blue-300 bg-blue-900/50 border-blue-700'
                                             : 'text-blue-700 bg-blue-50 border-blue-200'
-                                        }`}
+                                          }`}
                                       >
                                         📅 Próxima:{' '}
                                         {new Date(evento.fechaProxima).toLocaleDateString('es-ES', {
@@ -1062,11 +1040,10 @@ function CasoDetalle() {
                                   {/* Observación */}
                                   {evento.observacion && (
                                     <div
-                                      className={`mt-3 rounded p-3 border ${
-                                        isDark
+                                      className={`mt-3 rounded p-3 border ${isDark
                                           ? 'bg-red-950/30 border-red-800/50'
                                           : 'bg-gray-50 border-gray-200'
-                                      }`}
+                                        }`}
                                     >
                                       <p
                                         className={`text-xs uppercase font-semibold mb-1 ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
@@ -1264,24 +1241,21 @@ function CasoDetalle() {
                     </p>
                   ) : (
                     <ul
-                      className={`divide-y border rounded-lg overflow-hidden ${
-                        isDark
+                      className={`divide-y border rounded-lg overflow-hidden ${isDark
                           ? 'divide-red-800/50 border-red-800/50'
                           : 'divide-gray-200 border-gray-200'
-                      }`}
+                        }`}
                     >
                       {documentos.map((doc) => (
                         <li
                           key={doc.idDocumento}
-                          className={`p-4 flex items-center justify-between transition-colors ${
-                            isDark ? 'bg-red-950/30 hover:bg-red-950/50' : 'bg-white hover:bg-gray-50'
-                          }`}
+                          className={`p-4 flex items-center justify-between transition-colors ${isDark ? 'bg-red-950/30 hover:bg-red-950/50' : 'bg-white hover:bg-gray-50'
+                            }`}
                         >
                           <div className="flex items-start gap-3">
                             <div
-                              className={`p-2 rounded-lg ${
-                                isDark ? 'bg-red-900/50 text-red-400' : 'bg-red-50 text-red-700'
-                              }`}
+                              className={`p-2 rounded-lg ${isDark ? 'bg-red-900/50 text-red-400' : 'bg-red-50 text-red-700'
+                                }`}
                             >
                               <svg
                                 className="w-6 h-6"
@@ -1655,13 +1629,12 @@ function CasoDetalle() {
             <div className="flex items-center justify-between border-b pb-4">
               <div>
                 <span
-                  className={`inline-block px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wide ${
-                    selectedEvento.type === 'accion'
+                  className={`inline-block px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wide ${selectedEvento.type === 'accion'
                       ? 'bg-green-50 text-green-700'
                       : selectedEvento.type === 'encuentro'
                         ? 'bg-blue-50 text-blue-700'
                         : 'bg-red-50 text-red-900'
-                  }`}
+                    }`}
                 >
                   {selectedEvento.type === 'accion'
                     ? 'Acción Legal'

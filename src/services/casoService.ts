@@ -10,7 +10,8 @@ import type {
 } from '../types/caso';
 // Assuming these are added to types/caso.ts as per previous step, or we use `any` if temporarily needed, 
 // but best to use the types we just defined.
-import type { Tribunal, Materia, Solicitante } from '../types/caso';
+import type { Materia, Solicitante } from '../types/caso';
+import type { Tribunal } from '../types/catalogo';
 
 const casoService = {
     create: async (data: CasoCreateRequest): Promise<CasoDetalleResponse> => {

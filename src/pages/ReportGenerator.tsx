@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
+import { Chart as ChartJS } from 'chart.js';
 import type { ReporteEstadisticoDto } from '../types/reporteStats';
 import { TipoReporte, type ReporteData } from '../types/reporteStats';
 import { reporteService } from '../services/reporteService';
@@ -20,9 +21,9 @@ const ReportGenerator: React.FC = () => {
     const [chartImages, setChartImages] = useState<{ materia: string; parroquia: string; historico: string } | null>(null);
 
     // Refs for Charts (to capture image)
-    const materiaChartRef = useRef<any>(null);
-    const parroquiaChartRef = useRef<any>(null);
-    const historicoChartRef = useRef<any>(null);
+    const materiaChartRef = useRef<ChartJS>(null);
+    const parroquiaChartRef = useRef<ChartJS>(null);
+    const historicoChartRef = useRef<ChartJS>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -56,9 +57,12 @@ const ReportGenerator: React.FC = () => {
         // Allow charts to render if they weren't somehow
         setTimeout(() => {
             try {
-                const materiaImg = materiaChartRef.current?.toBase64Image();
-                const parroquiaImg = parroquiaChartRef.current?.toBase64Image();
-                const historicoImg = historicoChartRef.current?.toBase64Image();
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const materiaImg = materiaChartRef.current?.toBase64Image() as string;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const parroquiaImg = parroquiaChartRef.current?.toBase64Image() as string;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const historicoImg = historicoChartRef.current?.toBase64Image() as string;
 
                 if (materiaImg && parroquiaImg && historicoImg) {
                     setChartImages({
