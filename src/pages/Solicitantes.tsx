@@ -193,11 +193,10 @@ function Solicitantes() {
                     // LISTA DE SOLICITANTES
                     <>
                         {/* Toolbar */}
-                        <div className={`flex flex-col md:flex-row justify-between items-center gap-4 mb-8 p-4 rounded-lg shadow-sm border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
-                            {/* Buscador */}
+                        <div className={`flex flex-col md:flex-row justify-between items-center gap-4 mb-8 p-4 rounded-xl shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                             {/* Buscador y Switch */}
                             <div className="flex flex-col xl:flex-row items-center gap-6 flex-1 min-w-0">
-                                <div className="w-full xl:w-80">
+                                <div className="w-full xl:w-96">
                                     <SearchBar
                                         value={searchText}
                                         onChange={setSearchText}
@@ -212,7 +211,7 @@ function Solicitantes() {
                             </div>
 
                             {/* Filter Role */}
-                            <div className="w-48">
+                            <div className="w-40">
                                 <CustomSelect
                                     value={filterRole}
                                     options={roleOptions}
@@ -222,7 +221,7 @@ function Solicitantes() {
                             </div>
 
                             {/* Sorting */}
-                            <div className="w-48">
+                            <div className="w-40">
                                 <CustomSelect
                                     value={sortOption}
                                     options={sortOptions}
@@ -244,7 +243,7 @@ function Solicitantes() {
                                 variant="primary"
                                 onClick={() => setShowForm(true)}
                                 icon={faPlus}
-                                className="w-full md:w-auto shadow-md"
+                                className="w-full md:w-auto shadow-sm bg-red-900 hover:bg-red-800 text-white border-transparent"
                             >
                                 Nuevo Solicitante
                             </Button>
@@ -256,13 +255,13 @@ function Solicitantes() {
                         ) : (
                             <>
                                 {filteredSolicitantes.length === 0 ? (
-                                    <div className={`text-center py-16 rounded-lg border border-dashed ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-300'}`}>
-                                        <p className={`text-lg ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>No se encontraron solicitantes.</p>
+                                    <div className={`text-center py-20 rounded-2xl border-2 border-dashed ${isDark ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                                        <p className={`text-lg font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>No se encontraron solicitantes.</p>
                                         {searchText && (
                                             <Button
                                                 variant="link"
                                                 onClick={() => setSearchText('')}
-                                                className="mt-2"
+                                                className="mt-2 text-red-700 hover:text-red-900"
                                             >
                                                 Limpiar búsqueda
                                             </Button>
@@ -282,18 +281,18 @@ function Solicitantes() {
                                                 ))}
                                             </div>
                                         ) : (
-                                            <div className={`rounded-xl shadow-md border overflow-hidden ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-100'}`}>
-                                                <table className="min-w-full divide-y divide-border">
-                                                    <thead className={isDark ? 'bg-red-950/30' : 'bg-gray-50'}>
-                                                        <tr>
-                                                            <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Solicitante</th>
-                                                            <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Cédula</th>
-                                                            <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Contacto</th>
-                                                            <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Estado Civil</th>
-                                                            <th className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Acciones</th>
+                                            <div className={`rounded-2xl shadow-sm border overflow-hidden ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                                                <table className="min-w-full">
+                                                    <thead>
+                                                        <tr className={`border-b ${isDark ? 'border-gray-800' : 'border-gray-100'}`}>
+                                                            <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>Solicitante</th>
+                                                            <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>Cédula</th>
+                                                            <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>Contacto</th>
+                                                            <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>Estado Civil</th>
+                                                            <th className={`px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>Acciones</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody className={`divide-y divide-border ${isDark ? 'bg-[#630000]' : 'bg-white'}`}>
+                                                    <tbody className={`divide-y divide-gray-50 ${isDark ? 'divide-gray-800 bg-gray-900' : 'bg-white'}`}>
                                                         {currentItems.map((sol) => (
                                                             <SolicitanteRow
                                                                 key={sol.cedula}

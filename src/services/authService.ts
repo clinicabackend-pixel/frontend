@@ -30,13 +30,13 @@ export const authService = {
         // El backend devuelve 'idUsuario' pero el frontend espera 'cedula'
         // Mapear idUsuario -> cedula
         return {
-            cedula: response.data.idUsuario || response.data.cedula || '',
+            idUsuario: response.data.idUsuario || response.data.cedula || '',
             nombre: response.data.nombre || '',
             sexo: response.data.sexo || '',
             email: response.data.email || '',
             username: response.data.username || '',
-            status: response.data.estatus || response.data.status || '',
-            tipo: response.data.tipoUsuario || response.data.tipo || ''
+            estatus: response.data.estatus || response.data.status || '',
+            tipoUsuario: response.data.tipoUsuario || response.data.tipo || ''
         };
     },
 

@@ -12,11 +12,11 @@ export interface SolicitanteConRespuesta extends SolicitanteResponse {
 
 const solicitanteService = {
     getAll: async (activeCasesOnly: boolean = false, role: string = 'TODOS') => {
-        let url = '/solicitantes?';
-        if (activeCasesOnly) url += 'activeCases=true&';
-        if (role && role !== 'TODOS') url += `role=${role}`;
+        const params = new URLSearchParams();
+        if (activeCasesOnly) params.append('activeCases', 'true');
+        if (role && role !== 'TODOS') params.append('role', role);
 
-        const response = await api.get<SolicitanteResponse[]>(url);
+        const response = await api.get<SolicitanteResponse[]>(`/solicitantes?${params.toString()}`);
         return response.data;
     },
 
