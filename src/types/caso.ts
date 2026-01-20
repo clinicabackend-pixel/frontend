@@ -120,6 +120,7 @@ export interface PruebaCreateRequest {
   documento: string; // Título o nombre del documento probatorio
   observacion?: string;
   titulo: string;
+  username?: string;
 }
 
 

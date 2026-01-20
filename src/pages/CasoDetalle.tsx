@@ -13,9 +13,8 @@ import {
   faUsers,
   faHistory,
   faCalendarAlt,
-  faCheckCircle
-  faCalendarAlt,
-  faTrash
+  faTrash,
+
 } from '@fortawesome/free-solid-svg-icons';
 import MainLayout from '../components/layout/MainLayout';
 import casoService from '../services/casoService';
@@ -31,7 +30,7 @@ import ConfirmationModal from '../components/common/ConfirmationModal';
 import Modal from '../components/common/Modal';
 import UniversalUploader from '../components/common/UniversalUploader'; // Importar Uploader
 import { useAuth } from '../context/AuthContext';
-import { useAuth } from '../context/AuthContext';
+
 import { getFullAmbitoPath } from '../utils/ambitoUtils';
 import type {
   CasoDetalleResponse,
@@ -93,7 +92,7 @@ export default function CasoDetalle() {
   const [searchError, setSearchError] = useState('');
 
   // Upload State
-  const [uploadedFiles, setUploadedFiles] = useState<Array<{ url: string, type: string, name: string }>>([]);
+
 
   // Accion/Encuentro State
   // Accion/Encuentro State
@@ -101,7 +100,7 @@ export default function CasoDetalle() {
   const [isAddEncuentroModalOpen, setIsAddEncuentroModalOpen] = useState(false);
   const [isAddDocModalOpen, setIsAddDocModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-  const { user } = useAuth();
+
   const canAssign = user?.tipoUsuario === 'COORDINADOR' || user?.tipoUsuario === 'PROFESOR' || user?.tipoUsuario === 'ADMIN';
 
   // Edit Form State
@@ -339,8 +338,7 @@ export default function CasoDetalle() {
     );
   }
 
-  const { caso, beneficiarios, acciones, encuentros, documentos, pruebas } = casoDetalle;
-  const { caso, beneficiarios, acciones, encuentros, documentos, asignados /* pruebas */ } = casoDetalle;
+  const { caso, beneficiarios, acciones, encuentros, documentos, asignados, pruebas } = casoDetalle;
 
   return (
     <MainLayout title={`Caso ${caso.numCaso}`}>
@@ -377,18 +375,7 @@ export default function CasoDetalle() {
         </div>
 
         {/* Action Bar */}
-        {canAssign && (
-          <div className="mb-6 flex justify-end">
-            <Button
-              variant="primary"
-              onClick={() => setIsAssignModalOpen(true)}
-              icon={faUsers}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              Asignar Estudiantes
-            </Button>
-          </div>
-        )}
+
 
 
         {/* Header Summary Card */}
@@ -476,7 +463,7 @@ export default function CasoDetalle() {
               { id: 'responsables', label: 'Responsables' },
               { id: 'historial', label: 'Historial' },
               { id: 'folios', label: 'Folios de Expediente' },
-              // { id: 'pruebas', label: 'Pruebas' },
+              { id: 'pruebas', label: 'Archivos (Pruebas)' },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -484,7 +471,7 @@ export default function CasoDetalle() {
                 className={`
                       py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap
                       ${activeTab === tab.id
-                    ? 'border-red-900 text-red-900'
+                    ? 'border-blue-600 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
                     `}
               >
@@ -720,109 +707,80 @@ export default function CasoDetalle() {
             </div>
           )}
 
-          {/* DOCUMENTOS */}
-          {activeTab === 'documentos' && (
-            <div className="space-y-6">
-              {/* Uploader Section */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Subir Nuevo Documento</h3>
-                <UniversalUploader
-                  onUploadComplete={async (data) => {
-                    const newFile = { url: data.url, type: data.type, name: `Archivo ${data.type}` };
-                    setUploadedFiles(prev => [...prev, newFile]);
+          {/* PRUEBAS (ARCHIVOS DIGITALES) */}
+          {activeTab === 'pruebas' && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Archivos Digitales</h3>
 
-                    // Persist as Prueba
-                    if (numCaso && casoDetalle) {
-                      try {
-                        await casoService.createPrueba(numCaso, {
-                          fecha: new Date().toISOString().split('T')[0],
-                          documento: data.url, // Store URL in documento field
-                          titulo: `Archivo Digital (${data.type})`,
-                          observacion: 'Subido desde el detalle del caso',
-                          username: user?.username || 'Desconocido'
-                        });
-                        // Refresh data
-                        const updated = await casoService.getById(numCaso);
-                        setCasoDetalle(updated);
-                      } catch (err) {
-                        console.error("Error creating prueba from upload:", err);
-                      }
+              {/* Uploader */}
+              <UniversalUploader
+                onUploadComplete={async (data) => {
+                  if (numCaso && casoDetalle) {
+                    try {
+                      await casoService.createPrueba(numCaso, {
+                        fecha: new Date().toISOString().split('T')[0],
+                        documento: data.url,
+                        titulo: `Archivo Digital (${data.type})`,
+                        observacion: 'Subido desde el detalle del caso',
+                        username: user?.username || 'Desconocido'
+                      });
+                      const updated = await casoService.getById(numCaso);
+                      setCasoDetalle(updated);
+                    } catch (err) {
+                      console.error("Error creating prueba from upload:", err);
                     }
-                  }}
-                />
+                  }
+                }}
+              />
 
-                {/* Mostrar Pruebas (Archivos Digitales) */}
-                <div className="mt-8">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">Archivos Digitales</h3>
-                  {!pruebas || pruebas.length === 0 ? (
-                    <p className="text-gray-500 italic">No hay archivos digitales asociados.</p>
-                  ) : (
-                    <ul className="space-y-3">
-                      {pruebas.map((prueba) => {
-                        // Check if documento is a URL (simple check)
-                        const isUrl = prueba.documento.startsWith('http');
-                        return (
-                          <li key={prueba.idPrueba} className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:shadow-sm">
-                            <div className="flex items-center gap-3">
-                              <div className="bg-blue-50 text-blue-600 p-2 rounded">
-                                <FontAwesomeIcon icon={faFilePdf} />
-                              </div>
-                              <div>
-                                <p className="font-semibold text-gray-800">{prueba.titulo}</p>
-                                <p className="text-xs text-gray-500">{new Date(prueba.fecha).toLocaleDateString()} - {prueba.observacion}</p>
-                              </div>
-                            </div>
-                            {isUrl ? (
-                              <a
-                                href={prueba.documento}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-sm bg-blue-50 text-blue-600 px-3 py-1.5 rounded-md hover:bg-blue-100 font-medium transition-colors"
-                              >
-                                Ver Archivo
-                              </a>
-                            ) : (
-                              <span className="text-sm text-gray-500">{prueba.documento}</span>
-                            )}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </div>
-              </div>
-
-              {/* Existing Documents List */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Expediente Físico</h3>
-                {!documentos || documentos.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500 italic">
-                    No hay documentos físicos registrados en este caso.
-                  </div>
+              {/* Lista de Archivos Digitales (Pruebas) */}
+              <div className="mt-6">
+                {!pruebas || pruebas.length === 0 ? (
+                  <p className="text-sm text-gray-500 italic">No hay archivos digitales asociados.</p>
                 ) : (
-                  <ul className="divide-y divide-gray-100">
-                    {documentos.map((doc, _idx) => (
-                      <li key={_idx} className="py-3 flex items-start gap-3">
-                        <div className="p-2 bg-gray-100 rounded text-gray-500">
-                          <FontAwesomeIcon icon={faFolderOpen} />
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900">{doc.titulo || 'Documento sin título'}</p>
-                          <p className="text-sm text-gray-500">{doc.observacion}</p>
-                          <div className="text-xs text-gray-400 mt-1">
-                            Fila: {doc.folioIni} - {doc.folioFin} | Registrado: {new Date(doc.fechaRegistro).toLocaleDateString()}
+                  <ul className="space-y-3">
+                    {pruebas.map((prueba) => {
+                      const isUrl = prueba.documento.startsWith('http');
+                      return (
+                        <li key={prueba.idPrueba} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg hover:shadow-sm">
+                          <div className="flex items-center gap-3">
+                            <div className="bg-white text-blue-600 p-2 rounded border border-gray-200">
+                              <FontAwesomeIcon icon={faFilePdf} />
+                            </div>
+                            <div>
+                              <p className="font-semibold text-gray-800 text-sm">{prueba.titulo}</p>
+                              <p className="text-xs text-gray-500">
+                                {new Date(prueba.fecha).toLocaleDateString()}
+                                {prueba.observacion ? ` - ${prueba.observacion}` : ''}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      </li>
-                    ))}
+                          {isUrl ? (
+                            <a
+                              href={prueba.documento}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 font-medium transition-colors"
+                            >
+                              Ver
+                            </a>
+                          ) : (
+                            <span className="text-xs text-gray-400 truncate max-w-[150px]" title={prueba.documento}>{prueba.documento}</span>
+                          )}
+                        </li>
+                      );
+                    })}
                   </ul>
                 )}
               </div>
-          {/* FOLIOS (ANTIGUO DOCUMENTOS) */}
+            </div>
+          )}
+
+          {/* FOLIOS (EXPEDIENTE FÍSICO) */}
           {activeTab === 'folios' && (
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold text-gray-900">Folios del Expediente</h3>
+                <h3 className="text-lg font-bold text-gray-900">Expediente Físico</h3>
                 <Button variant="primary" size="sm" onClick={() => setIsAddDocModalOpen(true)} icon={faPlus}>
                   Añadir Folio
                 </Button>
@@ -830,7 +788,7 @@ export default function CasoDetalle() {
 
               {!documentos || documentos.length === 0 ? (
                 <div className="text-center py-10 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                  <p className="text-gray-500 italic">No hay documentos asociados a este caso.</p>
+                  <p className="text-gray-500 italic">No hay folios físicos registrados.</p>
                 </div>
               ) : (
                 <ul className="divide-y divide-gray-100">
@@ -841,7 +799,7 @@ export default function CasoDetalle() {
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-start">
-                          <h4 className="font-semibold text-gray-900 text-base">{doc.titulo || 'Documento sin título'}</h4>
+                          <h4 className="font-semibold text-gray-900 text-base">{doc.titulo || 'Folio sin título'}</h4>
                           <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
                             {new Date(doc.fechaRegistro).toLocaleDateString()}
                           </span>
@@ -861,6 +819,9 @@ export default function CasoDetalle() {
                             {doc.username}
                           </span>
                         </div>
+                      </div>
+                      <div className="flex gap-2">
+                        {/* Future: Edit/Delete buttons for physical docs */}
                       </div>
                     </li>
                   ))}
