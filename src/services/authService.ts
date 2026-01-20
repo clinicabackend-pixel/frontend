@@ -10,13 +10,13 @@ export interface AuthResponse {
 }
 
 export interface User {
-    cedula: string;
+    idUsuario: string; // was cedula
     nombre: string;
     sexo: string;
     email: string;
     username: string;
-    status: string;
-    tipo: string;
+    estatus: string; // was status
+    tipoUsuario: string; // was tipo
 }
 
 export const authService = {

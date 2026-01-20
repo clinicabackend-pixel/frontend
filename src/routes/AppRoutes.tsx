@@ -11,6 +11,7 @@ import UsuariosPage from '../pages/Usuarios';
 import Reportes from '../pages/Reportes';
 import SetupPassword from '../pages/auth/SetupPassword';
 import Catalogos from '../pages/Catalogos';
+import AgendaPage from '../pages/Agenda';
 
 export default function AppRoutes() {
     return (
@@ -20,6 +21,7 @@ export default function AppRoutes() {
 
             <Route element={<ProtectedRoute />}>
                 <Route path="/home" element={<Home />} />
+                <Route path="/agenda" element={<AgendaPage />} />
                 <Route path="/casos" element={<Casos />} />
                 <Route path="/casos/:numCaso" element={<CasoDetalle />} />
                 <Route path="/solicitantes" element={<Solicitantes />} />

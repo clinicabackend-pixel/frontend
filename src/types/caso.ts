@@ -116,13 +116,21 @@ export interface PruebaResponse {
   titulo: string;
 }
 
+
+export interface CasoAsignadoProjection {
+  numCaso: string;
+  username: string;
+  termino: string;
+  nombre: string;
+}
+
 export interface CasoDetalleResponse {
   caso: CasoResponse;
   acciones: AccionResponse[];
   encuentros: EncuentroResponse[];
   documentos: DocumentoResponse[];
   pruebas: PruebaResponse[];
-  asignados: any[];
+  asignados: CasoAsignadoProjection[];
   supervisores: any[];
   beneficiarios: BeneficiarioResponse[];
 }

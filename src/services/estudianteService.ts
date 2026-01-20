@@ -13,8 +13,10 @@ export interface EstudianteInfo {
 }
 
 const estudianteService = {
-    getActiveStudents: async (): Promise<EstudianteInfo[]> => {
-        const response = await api.get('/estudiantes', { params: { activo: true } });
+    getActiveStudents: async (conCasos?: boolean): Promise<EstudianteInfo[]> => {
+        const params: any = { activo: true };
+        if (conCasos) params.conCasos = true;
+        const response = await api.get('/estudiantes', { params });
         return response.data;
     }
 };

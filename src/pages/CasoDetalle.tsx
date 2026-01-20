@@ -12,7 +12,8 @@ import {
   faUser,
   faUsers,
   faHistory,
-  faCalendarAlt
+  faCalendarAlt,
+  faTrash
 } from '@fortawesome/free-solid-svg-icons';
 import MainLayout from '../components/layout/MainLayout';
 import casoService from '../services/casoService';
@@ -22,7 +23,11 @@ import { reporteService } from '../services/reporteService';
 import Button from '../components/common/Button';
 import AddAccionModal from '../components/modals/AddAccionModal';
 import AddEncuentroModal from '../components/modals/AddEncuentroModal';
+import AddDocumentoModal from '../components/modals/AddDocumentoModal';
+import AssignStudentModal from '../components/AssignStudentModal';
+import ConfirmationModal from '../components/common/ConfirmationModal';
 import Modal from '../components/common/Modal';
+import { useAuth } from '../context/AuthContext';
 import { getFullAmbitoPath } from '../utils/ambitoUtils';
 import type {
   CasoDetalleResponse,
@@ -68,10 +73,12 @@ export default function CasoDetalle() {
 
   // UI State
   const [activeTab, setActiveTab] = useState<
-    'general' | 'beneficiarios' | 'historial' | 'documentos' | 'pruebas'
+    'general' | 'beneficiarios' | 'responsables' | 'historial' | 'folios' | 'pruebas'
   >('general');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddBeneficiarioModalOpen, setIsAddBeneficiarioModalOpen] = useState(false);
+
+
 
   // Beneficiario Add State
   const [cedulaSearch, setCedulaSearch] = useState('');
@@ -81,14 +88,38 @@ export default function CasoDetalle() {
   const [searchError, setSearchError] = useState('');
 
   // Accion/Encuentro State
+  // Accion/Encuentro State
   const [isAddAccionModalOpen, setIsAddAccionModalOpen] = useState(false);
   const [isAddEncuentroModalOpen, setIsAddEncuentroModalOpen] = useState(false);
+  const [isAddDocModalOpen, setIsAddDocModalOpen] = useState(false);
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const { user } = useAuth();
+  const canAssign = user?.tipoUsuario === 'COORDINADOR' || user?.tipoUsuario === 'PROFESOR' || user?.tipoUsuario === 'ADMIN';
 
   // Edit Form State
   const [editFormData, setEditFormData] = useState<CasoUpdateRequest>({});
 
 
 
+
+  // Refresh Trigger
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // Modal State
+  const [unassignData, setUnassignData] = useState({
+    isOpen: false,
+    username: '',
+    termino: '',
+    nombre: ''
+  });
+  const [unassignLoading, setUnassignLoading] = useState(false);
+
+  // Info Modal State
+  const [infoModal, setInfoModal] = useState({
+    isOpen: false,
+    title: '',
+    message: ''
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -127,7 +158,42 @@ export default function CasoDetalle() {
     };
 
     fetchData();
-  }, [numCaso]);
+  }, [numCaso, refreshTrigger]);
+
+  const toggleRefresh = () => setRefreshTrigger(prev => prev + 1);
+
+  const handleUnassignConfirm = async () => {
+    if (!unassignData.username || !unassignData.termino || !numCaso) return;
+
+    setUnassignLoading(true);
+    try {
+      await casoService.unassignStudent(numCaso, unassignData.username, unassignData.termino);
+      toggleRefresh();
+      setUnassignData(prev => ({ ...prev, isOpen: false }));
+    } catch (err) {
+      console.error("Error al desasignar estudiante", err);
+      alert("Hubo un error al eliminar la asignación.");
+      setUnassignData(prev => ({ ...prev, isOpen: false }));
+    } finally {
+      setUnassignLoading(false);
+    }
+  };
+
+  // ... (rest of component methods)
+
+  // Inside return JSX, update AssignStudentModal prop:
+  /*
+        <AssignStudentModal
+          isOpen={isAssignModalOpen}
+          onClose={() => setIsAssignModalOpen(false)}
+          numCaso={numCaso || ''}
+          onAssignSuccess={() => {
+            toggleRefresh();
+            // Optional: switch to responsables tab if not already
+            if (activeTab !== 'responsables') setActiveTab('responsables');
+          }}
+        />
+  */
 
   const calculateAge = (birthDateString?: string) => {
     if (!birthDateString) return 'N/A';
@@ -265,7 +331,7 @@ export default function CasoDetalle() {
     );
   }
 
-  const { caso, beneficiarios, acciones, encuentros, documentos, /* pruebas */ } = casoDetalle;
+  const { caso, beneficiarios, acciones, encuentros, documentos, asignados /* pruebas */ } = casoDetalle;
 
   return (
     <MainLayout title={`Caso ${caso.numCaso}`}>
@@ -300,6 +366,21 @@ export default function CasoDetalle() {
             </span>
           </div>
         </div>
+
+        {/* Action Bar */}
+        {canAssign && (
+          <div className="mb-6 flex justify-end">
+            <Button
+              variant="primary"
+              onClick={() => setIsAssignModalOpen(true)}
+              icon={faUsers}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Asignar Estudiantes
+            </Button>
+          </div>
+        )}
+
 
         {/* Header Summary Card */}
         <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-8">
@@ -376,21 +457,23 @@ export default function CasoDetalle() {
           </div>
         </div>
 
+
         {/* Tabs Navigation */}
         <div className="border-b border-gray-200 mb-6">
-          <nav className="-mb-px flex space-x-8">
+          <nav className="-mb-px flex space-x-8 overflow-x-auto">
             {[
               { id: 'general', label: 'General' },
               { id: 'beneficiarios', label: 'Beneficiarios' },
+              { id: 'responsables', label: 'Responsables' },
               { id: 'historial', label: 'Historial' },
-              { id: 'documentos', label: 'Documentos' },
+              { id: 'folios', label: 'Folios de Expediente' },
               // { id: 'pruebas', label: 'Pruebas' },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`
-                      py-4 px-1 border-b-2 font-medium text-sm transition-colors
+                      py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap
                       ${activeTab === tab.id
                     ? 'border-red-900 text-red-900'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
@@ -454,13 +537,87 @@ export default function CasoDetalle() {
                       </div>
                       <button
                         onClick={() => {
-                          alert("Funcionalidad de edición en desarrollo");
+                          setInfoModal({
+                            isOpen: true,
+                            title: 'Funcionalidad en Desarrollo',
+                            message: 'La edición de beneficiarios estará disponible en la próxima actualización.'
+                          });
                         }}
                         className="text-gray-400 hover:text-red-900 p-2"
                       >            <FontAwesomeIcon icon={faPencil} />
                       </button>
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* RESPONSABLES */}
+          {activeTab === 'responsables' && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <FontAwesomeIcon icon={faUsers} className="text-gray-400" />
+                  Responsables Asignados
+                </h3>
+                {canAssign && (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => setIsAssignModalOpen(true)}
+                    className="bg-red-900 text-white"
+                    icon={faPlus}
+                  >
+                    Asignar Estudiante
+                  </Button>
+                )}
+              </div>
+
+              {!asignados || asignados.length === 0 ? (
+                <div className="text-center py-10 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                  <p className="text-gray-500">No hay estudiantes responsables asignados a este caso.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto rounded-lg border border-gray-200">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre Estudiante</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Semestre / Término</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {asignados.map((asig, idx) => (
+                        <tr key={`${asig.username}-${asig.termino}-${idx}`} className="hover:bg-gray-50 group">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{asig.nombre}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">{asig.username}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                              {asig.termino}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            {canAssign && (
+                              <button
+                                onClick={() => setUnassignData({
+                                  isOpen: true,
+                                  username: asig.username,
+                                  termino: asig.termino,
+                                  nombre: asig.nombre
+                                })}
+                                className="text-gray-400 hover:text-red-900 transition-colors opacity-0 group-hover:opacity-100"
+                                title="Desasignar Estudiante"
+                              >
+                                <FontAwesomeIcon icon={faTrash} />
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>
@@ -554,26 +711,48 @@ export default function CasoDetalle() {
             </div>
           )}
 
-          {/* DOCUMENTOS */}
-          {activeTab === 'documentos' && (
+          {/* FOLIOS (ANTIGUO DOCUMENTOS) */}
+          {activeTab === 'folios' && (
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Documentos del Expediente</h3>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-bold text-gray-900">Folios del Expediente</h3>
+                <Button variant="primary" size="sm" onClick={() => setIsAddDocModalOpen(true)} icon={faPlus}>
+                  Añadir Folio
+                </Button>
+              </div>
+
               {!documentos || documentos.length === 0 ? (
-                <div className="text-center py-8 text-gray-500 italic">
-                  No hay documentos asociados a este caso.
+                <div className="text-center py-10 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                  <p className="text-gray-500 italic">No hay documentos asociados a este caso.</p>
                 </div>
               ) : (
                 <ul className="divide-y divide-gray-100">
                   {documentos.map((doc, _idx) => (
-                    <li key={_idx} className="py-3 flex items-start gap-3">
-                      <div className="p-2 bg-gray-100 rounded text-gray-500">
-                        <FontAwesomeIcon icon={faFolderOpen} />
+                    <li key={_idx} className="py-4 flex items-start gap-4 hover:bg-gray-50 rounded-lg transition-colors px-4 -mx-4">
+                      <div className="p-3 bg-red-50 text-red-700 rounded-lg">
+                        <FontAwesomeIcon icon={faFolderOpen} size="lg" />
                       </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{doc.titulo || 'Documento sin título'}</p>
-                        <p className="text-sm text-gray-500">{doc.observacion}</p>
-                        <div className="text-xs text-gray-400 mt-1">
-                          Fila: {doc.folioIni} - {doc.folioFin} | Registrado: {new Date(doc.fechaRegistro).toLocaleDateString()}
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start">
+                          <h4 className="font-semibold text-gray-900 text-base">{doc.titulo || 'Documento sin título'}</h4>
+                          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                            {new Date(doc.fechaRegistro).toLocaleDateString()}
+                          </span>
+                        </div>
+                        {doc.observacion && (
+                          <p className="text-sm text-gray-600 mt-1 bg-yellow-50/50 p-2 rounded border border-yellow-100/50 inline-block">
+                            {doc.observacion}
+                          </p>
+                        )}
+                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                          <span className="flex items-center gap-1">
+                            <span className="font-medium text-gray-700">Folios:</span>
+                            {doc.folioIni} - {doc.folioFin}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <FontAwesomeIcon icon={faUser} className="text-gray-400" />
+                            {doc.username}
+                          </span>
                         </div>
                       </div>
                     </li>
@@ -645,6 +824,14 @@ export default function CasoDetalle() {
         onSuccess={handleAddEncuentro}
       />
 
+      {/* Add Documento Modal */}
+      <AddDocumentoModal
+        isOpen={isAddDocModalOpen}
+        onClose={() => setIsAddDocModalOpen(false)}
+        currentCasoId={numCaso || ''}
+        onSuccess={toggleRefresh}
+      />
+
       {/* Add Beneficiario Modal */}
       <Modal
         isOpen={isAddBeneficiarioModalOpen}
@@ -669,7 +856,7 @@ export default function CasoDetalle() {
               Buscar
             </button>
           </div>
-          
+
           {searchError && (
             <p className="text-red-500 text-sm">{searchError}</p>
           )}
@@ -720,6 +907,41 @@ export default function CasoDetalle() {
         </div>
       </Modal>
 
-    </MainLayout>
+      <AssignStudentModal
+        isOpen={isAssignModalOpen}
+        onClose={() => setIsAssignModalOpen(false)}
+        numCaso={numCaso || ''}
+        onAssignSuccess={() => {
+          toggleRefresh();
+          setActiveTab('responsables');
+        }}
+      />
+
+      {/* Unassign Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={unassignData.isOpen}
+        onClose={() => setUnassignData(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={handleUnassignConfirm}
+        title="Desasignar Estudiante"
+        message={`¿Estás seguro de que deseas eliminar la asignación de ${unassignData.nombre} de este caso? Esta acción no se puede deshacer.`}
+        confirmText="Sí, Desasignar"
+        cancelText="Cancelar"
+        variant="danger"
+        isLoading={unassignLoading}
+      />
+
+      {/* Info Modal */}
+      <ConfirmationModal
+        isOpen={infoModal.isOpen}
+        onClose={() => setInfoModal(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={() => setInfoModal(prev => ({ ...prev, isOpen: false }))}
+        title={infoModal.title}
+        message={infoModal.message}
+        confirmText="Entendido"
+        variant="info"
+        showCancel={false}
+      />
+
+    </MainLayout >
   );
 }

@@ -41,6 +41,18 @@ const casoService = {
         const response = await api.get<CasoDetalleResponse>(`/casos/${id}`);
         return response.data;
     },
+
+    assignStudent: async (id: string, data: { username: string; termino: string }): Promise<void> => {
+        await api.post(`/casos/${id}/asignacion`, data);
+    },
+
+    assignSupervisor: async (id: string, data: { username: string; termino: string }): Promise<void> => {
+        await api.post(`/casos/${id}/supervision`, data);
+    },
+
+    unassignStudent: async (id: string, username: string, termino: string): Promise<void> => {
+        await api.delete(`/casos/${id}/asignacion/estudiante/${username}/termino/${termino}`);
+    }
 };
 
 export default casoService;
