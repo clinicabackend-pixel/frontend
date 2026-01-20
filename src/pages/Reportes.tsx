@@ -38,6 +38,7 @@ export default function Reportes() {
 
     const [resumenSemestre, setResumenSemestre] = useState('');
     const [resumenTipo, setResumenTipo] = useState<number>(0); // 0 = Select...
+    const [cedulaSocioeconomico, setCedulaSocioeconomico] = useState('');
 
     // Estados de carga
     const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
@@ -475,6 +476,18 @@ export default function Reportes() {
                         >
                             Ir al Generador
                         </button>
+                    </ReportCard>
+
+                    <ReportCard
+                        title="Reporte Socioeconómico"
+                        description="Reporte unificado con datos laborales, familiares y de vivienda."
+                        icon={faFileAlt}
+                        loading={loading['socioeconomico'] || false}
+                        onDownload={() => {
+                            handleDownload('socioeconomico', () => reporteService.downloadReporteSocioeconomico());
+                        }}
+                    >
+                        <div className="h-4"></div>
                     </ReportCard>
 
                 </div>

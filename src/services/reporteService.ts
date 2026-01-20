@@ -45,6 +45,19 @@ export const reporteService = {
     }
   },
 
+  downloadReporteSocioeconomico: async () => {
+    try {
+      const response = await api.get('/reportes/socioeconomico', {
+        responseType: 'blob',
+      });
+      const filename = 'reporte_socioeconomico.xlsx';
+      downloadBlob(response.data, filename);
+    } catch (error) {
+      console.error('Error downloading socioeconomic report:', error);
+      throw error;
+    }
+  },
+
   downloadFichaSolicitante: async (cedula: string) => {
     try {
       const response = await api.get(`/reportes/solicitante/${cedula}`, {
