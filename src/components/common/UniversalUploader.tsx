@@ -11,7 +11,7 @@ interface UploadResponse {
 }
 
 interface UniversalUploaderProps {
-    onUploadComplete?: (data: UploadResponse) => void;
+    onUploadComplete?: (data: UploadResponse, originalName: string) => void;
     className?: string;
 }
 
@@ -48,8 +48,8 @@ const UniversalUploader: React.FC<UniversalUploaderProps> = ({ onUploadComplete,
             const data = response.data;
             setAssetData(data);
             setUploadStatus('success');
-            if (onUploadComplete) {
-                onUploadComplete(data);
+            if (onUploadComplete && selectedFile) {
+                onUploadComplete(data, selectedFile.name);
             }
         } catch (error: any) {
             console.error("Upload error:", error);

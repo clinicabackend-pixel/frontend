@@ -34,7 +34,10 @@ import {
   faTrash,
   faFilePdf,
   faFolderOpen,
-  faFileExcel
+  faFileExcel,
+  faFileAlt,
+  faFileWord,
+  faFileImage
 } from '@fortawesome/free-solid-svg-icons';
 import {
   Briefcase,
@@ -710,13 +713,13 @@ const CasoDetalle: React.FC = () => {
                   <h3 className={`text-lg font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Archivos Digitales</h3>
 
                   <UniversalUploader
-                    onUploadComplete={async (data) => {
+                    onUploadComplete={async (data, originalName) => {
                       if (numCaso) {
                         try {
                           await casoService.createPrueba(numCaso, {
                             fecha: new Date().toISOString().split('T')[0],
                             documento: data.url,
-                            titulo: `Archivo Digital (${data.type})`,
+                            titulo: `${originalName} (${data.format})`,
                             observacion: 'Subido desde el detalle del caso',
                             username: user?.username || 'Desconocido'
                           });
@@ -732,27 +735,59 @@ const CasoDetalle: React.FC = () => {
                     {pruebas.length === 0 ? (
                       <p className="text-gray-500 italic">No hay archivos digitales asociados.</p>
                     ) : (
-                      pruebas.map(prueba => (
-                        <div key={prueba.idPrueba} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                          <div className="flex items-center gap-3">
-                            <div className="bg-blue-50 text-blue-600 p-2 rounded">
-                              <FontAwesomeIcon icon={faFilePdf} />
+                      pruebas.map(prueba => {
+                        // Determinar icono basado en el titulo o extension
+                        let fileIcon = faFileAlt;
+                        const lowerTitle = prueba.titulo.toLowerCase();
+                        if (lowerTitle.includes('(pdf)') || lowerTitle.includes('.pdf')) fileIcon = faFilePdf;
+                        else if (lowerTitle.includes('(doc)') || lowerTitle.includes('docx') || lowerTitle.includes('.doc')) fileIcon = faFileWord;
+                        else if (lowerTitle.includes('(xls)') || lowerTitle.includes('xlsx') || lowerTitle.includes('.xls')) fileIcon = faFileExcel;
+                        else if (lowerTitle.includes('(jpg)') || lowerTitle.includes('(png)') || lowerTitle.includes('(jpeg)') || lowerTitle.includes('image')) fileIcon = faFileImage;
+
+                        return (
+                          <div key={prueba.idPrueba} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                            <div className="flex items-center gap-3">
+                              <div className="bg-blue-50 text-blue-600 p-2 rounded">
+                                <FontAwesomeIcon icon={fileIcon} />
+                              </div>
+                              <div>
+                                <p className="font-semibold text-sm text-gray-800">{prueba.titulo}</p>
+                                <p className="text-xs text-gray-500">
+                                  {new Date(prueba.fecha).toLocaleDateString()} - {prueba.observacion}
+                                </p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="font-semibold text-sm text-gray-800">{prueba.titulo}</p>
-                              <p className="text-xs text-gray-500">{new Date(prueba.fecha).toLocaleDateString()}</p>
+                            <div className="flex items-center gap-3">
+                              <a
+                                href={prueba.documento}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                              >
+                                Ver Archivo
+                              </a>
+                              <button
+                                onClick={async () => {
+                                  if (!window.confirm('¿Estás seguro de eliminar este archivo?')) return;
+                                  try {
+                                    if (!numCaso) return;
+                                    await casoService.deletePrueba(numCaso, prueba.idPrueba);
+                                    // Refresh data
+                                    toggleRefresh();
+                                  } catch (err) {
+                                    console.error("Error deleting prueba:", err);
+                                    alert("Error al eliminar el archivo");
+                                  }
+                                }}
+                                className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transition-colors"
+                                title="Eliminar archivo"
+                              >
+                                <FontAwesomeIcon icon={faTrash} />
+                              </button>
                             </div>
                           </div>
-                          <a
-                            href={prueba.documento}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-                          >
-                            Ver Archivo
-                          </a>
-                        </div>
-                      ))
+                        );
+                      })
                     )}
                   </div>
                 </div>
