@@ -272,14 +272,28 @@ const CasoDetalle: React.FC = () => {
   };
 
   // Timeline
-  const handleAddAccion = async () => {
-    setIsAddAccionModalOpen(false);
-    toggleRefresh();
+  const handleAddAccion = async (data: any) => {
+    if (!numCaso) return;
+    try {
+      await casoService.createAccion(numCaso, data);
+      setIsAddAccionModalOpen(false);
+      toggleRefresh();
+    } catch (err: any) {
+      console.error("Error creating action:", err);
+      alert(err.response?.data?.message || 'Error al registrar la acción');
+    }
   };
 
-  const handleAddEncuentro = async () => {
-    setIsAddEncuentroModalOpen(false);
-    toggleRefresh();
+  const handleAddEncuentro = async (data: any) => {
+    if (!numCaso) return;
+    try {
+      await casoService.createEncuentro(numCaso, data);
+      setIsAddEncuentroModalOpen(false);
+      toggleRefresh();
+    } catch (err: any) {
+      console.error("Error creating encounter:", err);
+      alert(err.response?.data?.message || 'Error al registrar el encuentro');
+    }
   };
 
   // Student Unassign

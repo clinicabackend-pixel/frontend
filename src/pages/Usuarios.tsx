@@ -145,11 +145,11 @@ export default function UsuariosPage() {
 
     const handleConfirmToggleStatus = async () => {
         if (!userToDelete) return;
-        
+
         try {
             const nuevoEstatus = userToDelete.estatus === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
             // Actualizar solo el estatus, manteniendo todos los demás campos intactos
-            await usuarioService.updateUsuario(userToDelete.username, { 
+            await usuarioService.updateUsuario(userToDelete.username, {
                 estatus: nuevoEstatus,
                 nombre: userToDelete.nombre,
                 email: userToDelete.email,
@@ -178,11 +178,10 @@ export default function UsuariosPage() {
     const getStatusBadge = (status: string) => {
         const isActive = status === 'ACTIVO';
         return (
-            <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                isActive 
+            <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${isActive
                     ? (isDark ? 'bg-green-300 text-green-900' : 'bg-green-100 text-green-800')
                     : (isDark ? 'bg-gray-300 text-gray-900' : 'bg-red-100 text-red-800')
-            }`}>
+                }`}>
                 {isActive ? 'Activo' : 'Inactivo'}
             </span>
         );
@@ -228,22 +227,20 @@ export default function UsuariosPage() {
                     <div className="flex gap-2 w-full md:w-auto">
                         <button
                             onClick={() => setIsImportModalOpen(true)}
-                            className={`flex items-center justify-center px-4 py-2 border rounded-md transition-colors w-full md:w-auto ${
-                                isDark 
-                                    ? 'border-blue-500 text-blue-400 hover:bg-blue-950/50' 
+                            className={`flex items-center justify-center px-4 py-2 border rounded-md transition-colors w-full md:w-auto ${isDark
+                                    ? 'border-blue-500 text-blue-400 hover:bg-blue-950/50'
                                     : 'border-blue-600 text-blue-600 hover:bg-blue-50'
-                            }`}
+                                }`}
                         >
                             <Upload size={18} className="mr-2" />
                             Importar
                         </button>
                         <button
                             onClick={() => setIsUserModalOpen(true)}
-                            className={`flex items-center justify-center px-4 py-2 rounded-md transition-colors w-full md:w-auto ${
-                                isDark 
-                                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                            className={`flex items-center justify-center px-4 py-2 rounded-md transition-colors w-full md:w-auto ${isDark
+                                    ? 'bg-blue-600 text-white hover:bg-blue-700'
                                     : 'bg-blue-600 text-white hover:bg-blue-700'
-                            }`}
+                                }`}
                         >
                             <Plus size={18} className="mr-2" />
                             Crear usuario
@@ -270,8 +267,8 @@ export default function UsuariosPage() {
                             </thead>
                             <tbody className={`divide-y divide-border ${isDark ? 'bg-[#630000]' : 'bg-white'}`}>
                                 {currentItems.map((user) => (
-                                    <tr 
-                                        key={user.username} 
+                                    <tr
+                                        key={user.username}
                                         className={`transition-colors cursor-pointer ${isDark ? 'hover:bg-red-950/50' : 'hover:bg-gray-50'}`}
                                         onClick={() => navigate(`/usuarios/${user.username}`)}
                                     >
@@ -302,32 +299,29 @@ export default function UsuariosPage() {
                                             <div className="relative" ref={(el) => { menuRefs.current[user.username] = el; }}>
                                                 <button
                                                     onClick={(e) => toggleMenu(user.username, e)}
-                                                    className={`p-2 rounded-md transition-colors ${
-                                                        isDark
+                                                    className={`p-2 rounded-md transition-colors ${isDark
                                                             ? 'text-gray-300 hover:text-white hover:bg-red-950/50'
                                                             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                                                    }`}
+                                                        }`}
                                                     title="Opciones"
                                                 >
                                                     <MoreVertical size={20} />
                                                 </button>
-                                                
-                                                {openMenuId === user.username && (currentUser?.tipo === 'COORDINADOR' || currentUser?.tipo === 'ADMINISTRADOR') && (
-                                                    <div className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg z-10 ${
-                                                        isDark ? 'bg-[#630000] border border-red-800/50' : 'bg-white border border-gray-200'
-                                                    }`}>
+
+                                                {openMenuId === user.username && (currentUser?.tipoUsuario === 'COORDINADOR' || currentUser?.tipoUsuario === 'ADMINISTRADOR') && (
+                                                    <div className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg z-10 ${isDark ? 'bg-[#630000] border border-red-800/50' : 'bg-white border border-gray-200'
+                                                        }`}>
                                                         <div className="py-1">
                                                             <button
                                                                 onClick={(e) => handleDeleteClick(user, e)}
-                                                                className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors ${
-                                                                    user.estatus === 'ACTIVO'
+                                                                className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors ${user.estatus === 'ACTIVO'
                                                                         ? (isDark
                                                                             ? 'text-red-300 hover:bg-red-950/50 hover:text-red-200'
                                                                             : 'text-red-600 hover:bg-red-50 hover:text-red-900')
                                                                         : (isDark
                                                                             ? 'text-green-300 hover:bg-green-950/50 hover:text-green-200'
                                                                             : 'text-green-600 hover:bg-green-50 hover:text-green-900')
-                                                                }`}
+                                                                    }`}
                                                             >
                                                                 {user.estatus === 'ACTIVO' ? (
                                                                     <>
@@ -387,9 +381,8 @@ export default function UsuariosPage() {
             {deleteModalOpen && userToDelete && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
                     <div className="bg-white backdrop-blur-md rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-slide-up-modal">
-                        <div className={`flex items-center justify-between p-4 ${
-                            userToDelete.estatus === 'ACTIVO' ? 'bg-red-900' : 'bg-green-900'
-                        }`}>
+                        <div className={`flex items-center justify-between p-4 ${userToDelete.estatus === 'ACTIVO' ? 'bg-red-900' : 'bg-green-900'
+                            }`}>
                             <h3 className="text-xl font-bold text-white">
                                 {userToDelete.estatus === 'ACTIVO' ? 'Confirmar Desactivación' : 'Confirmar Activación'}
                             </h3>
@@ -410,7 +403,7 @@ export default function UsuariosPage() {
                                 ¿Está seguro de que desea {userToDelete.estatus === 'ACTIVO' ? 'desactivar' : 'activar'} al usuario <strong>{userToDelete.nombre}</strong> ({userToDelete.username})?
                             </p>
                             <p className="text-sm text-gray-500 mb-6">
-                                {userToDelete.estatus === 'ACTIVO' 
+                                {userToDelete.estatus === 'ACTIVO'
                                     ? 'El usuario será desactivado y no podrá acceder al sistema. Esta acción puede revertirse activando el usuario nuevamente.'
                                     : 'El usuario será activado y podrá acceder al sistema nuevamente.'}
                             </p>
@@ -427,11 +420,10 @@ export default function UsuariosPage() {
                                 </button>
                                 <button
                                     onClick={handleConfirmToggleStatus}
-                                    className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors ${
-                                        userToDelete.estatus === 'ACTIVO' 
+                                    className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors ${userToDelete.estatus === 'ACTIVO'
                                             ? 'bg-red-600 hover:bg-red-700'
                                             : 'bg-green-600 hover:bg-green-700'
-                                    }`}
+                                        }`}
                                 >
                                     {userToDelete.estatus === 'ACTIVO' ? 'Desactivar' : 'Activar'}
                                 </button>
