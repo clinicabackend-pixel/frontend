@@ -6,16 +6,13 @@ import {
     faUser,
     faEnvelope,
     faIdCard,
-    faShieldAlt,
-    faCheckCircle,
-    faTimesCircle,
     faEdit,
 } from '@fortawesome/free-solid-svg-icons';
 import MainLayout from '../components/layout/MainLayout';
 import Button from '../components/common/Button';
 import usuarioService from '../services/usuarioService';
 import { useTheme } from '../context/ThemeContext';
-import { useAuth } from '../context/AuthContext';
+// import { useAuth } from '../context/AuthContext'; // No longer used
 import EditUserModal from '../components/users/EditUserModal';
 import type { Usuario } from '../types/usuario';
 import Loader from '../components/common/Loader';
@@ -24,13 +21,13 @@ export default function UsuarioDetalle() {
     const { username } = useParams<{ username: string }>();
     const navigate = useNavigate();
     const { theme } = useTheme();
-    const { user: currentUser } = useAuth();
+    // const { user: currentUser } = useAuth(); // Unused
     const isDark = theme === 'dark';
     const [usuario, setUsuario] = useState<Usuario | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    
+
     // Por ahora el botón está disponible para todos, más adelante se implementará control por roles
     const canEdit = true;
 
@@ -57,11 +54,10 @@ export default function UsuarioDetalle() {
     const getStatusBadge = (status: string) => {
         const isActive = status === 'ACTIVO';
         return (
-            <span className={`px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${
-                isActive 
+            <span className={`px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${isActive
                     ? isDark ? 'bg-green-900/50 text-green-300 border border-green-700' : 'bg-green-100 text-green-800 border border-green-200'
                     : isDark ? 'bg-gray-800 text-gray-300 border border-gray-700' : 'bg-red-100 text-red-800 border border-red-200'
-            }`}>
+                }`}>
                 {isActive ? 'Activo' : 'Inactivo'}
             </span>
         );
