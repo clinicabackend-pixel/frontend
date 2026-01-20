@@ -6,4 +6,5 @@ export interface Usuario {
     username: string;
     estatus: 'ACTIVO' | 'INACTIVO';
     tipoUsuario: 'ESTUDIANTE' | 'PROFESOR' | 'COORDINADOR' | 'ADMINISTRADOR';
+    termino?: string;
 }

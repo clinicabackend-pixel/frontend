@@ -1,6 +1,8 @@
 import api from './api';
 import type { Usuario } from '../types/usuario';
 
+
+
 const usuarioService = {
     getAll: async (estatus?: string): Promise<Usuario[]> => {
         const params = estatus ? { estatus } : undefined;

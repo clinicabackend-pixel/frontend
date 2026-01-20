@@ -294,6 +294,7 @@ export default function UsuariosPage() {
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Usuario</th>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Contacto</th>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Rol</th>
+                                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Semestre</th>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Estatus</th>
                                     <th className="relative px-6 py-3"><span className="sr-only">Ver</span></th>
                                 </tr>
@@ -324,6 +325,9 @@ export default function UsuariosPage() {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             {getRoleBadge(user.tipoUsuario || 'ESTUDIANTE')}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>{user.termino || '-'}</span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             {getStatusBadge(user.estatus || 'INACTIVO')}

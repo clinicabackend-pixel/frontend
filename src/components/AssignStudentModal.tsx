@@ -63,10 +63,10 @@ const AssignStudentModal = ({ isOpen, onClose, numCaso, onAssignSuccess }: Assig
         } else {
             const lowerQuery = searchText.toLowerCase();
             const filtered = students.filter(s =>
-                s.nombre.toLowerCase().includes(lowerQuery) ||
-                (s.apellido && s.apellido.toLowerCase().includes(lowerQuery)) ||
-                s.cedula.toLowerCase().includes(lowerQuery) ||
-                s.username.toLowerCase().includes(lowerQuery)
+                (s.nombre?.toLowerCase() || '').includes(lowerQuery) ||
+                (s.apellido?.toLowerCase() || '').includes(lowerQuery) ||
+                (s.cedula?.toLowerCase() || '').includes(lowerQuery) ||
+                (s.username?.toLowerCase() || '').includes(lowerQuery)
             );
             setFilteredStudents(filtered);
         }
