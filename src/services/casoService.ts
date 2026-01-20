@@ -42,6 +42,10 @@ const casoService = {
         await api.post(`/casos/${id}/pruebas`, data);
     },
 
+    deletePrueba: async (idCaso: string, idPrueba: number): Promise<void> => {
+        await api.delete(`/casos/${idCaso}/pruebas/${idPrueba}`);
+    },
+
     getAll: async (estatus?: string, username?: string, termino?: string): Promise<CasoSummary[]> => {
         const params = new URLSearchParams();
         if (estatus) params.append('estatus', estatus);
@@ -72,15 +76,21 @@ const casoService = {
     // --- Added Missing Methods ---
 
     getTribunales: async (): Promise<Tribunal[]> => {
-        // Assuming endpoint exists, otherwise this will fail at runtime. 
-        // If not, we might need to mock or use a generic 'master-data' endpoint.
-        const response = await api.get<Tribunal[]>('/tribunales');
+        const response = await api.get<Tribunal[]>('/catalogos/tribunales');
         return response.data;
     },
 
     getMaterias: async (): Promise<Materia[]> => {
-        const response = await api.get<Materia[]>('/materias');
-        return response.data;
+        // Map AmbitoLegalResponse to Materia
+        const response = await api.get<any[]>('/catalogos/ambitos-legales');
+        // Assuming backend returns a tree or list. 
+        // If it returns a tree, we might need to flatten it or just pick the top level.
+        // For now, let's assume simple list or map what we can. 
+        // If `AmbitoLegalResponse` has { id: number, nombre: string }, map it.
+        return response.data.map(item => ({
+            idMateria: item.id || item.idAmbito || 0, // Fallback
+            nombreMateria: item.nombre || item.descripcion || ''
+        }));
     },
 
     getSolicitanteByCedula: async (cedula: string): Promise<Solicitante> => {
