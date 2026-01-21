@@ -71,7 +71,7 @@ function Login() {
   };
 
   return (
-    <div className={`relative flex w-screen h-screen overflow-hidden ${isDark ? 'bg-red-900' : 'bg-white'}`}>
+    <div className={`relative flex w-screen h-screen overflow-hidden ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
       {/* Theme Toggle - Bottom Right Corner */}
       <div className="absolute bottom-6 right-6 z-20">
         <button
@@ -92,7 +92,7 @@ function Login() {
         </button>
       </div>
       {/* LEFT SIDE: Authentication Form (40%) */}
-      <div className={`w-full lg:w-[40%] flex flex-col justify-center items-center px-8 md:px-16 lg:px-20 ${isDark ? 'bg-red-900' : 'bg-white'} shadow-xl z-10`}>
+      <div className={`w-full lg:w-[40%] flex flex-col justify-center items-center px-8 md:px-16 lg:px-20 ${isDark ? 'bg-gray-900' : 'bg-white'} shadow-xl z-10`}>
 
         {/* Header Section */}
         <div className="w-full max-w-md mb-10 text-center">
@@ -114,7 +114,7 @@ function Login() {
 
         {/* Error Alert */}
         {error && (
-          <div className={`w-full max-w-md mb-6 px-4 py-3 rounded border ${isDark ? 'bg-red-900/50 border-red-700 text-red-200' : 'bg-red-50 border-red-400 text-red-700'} border-l-4 ${isDark ? 'border-red-700' : 'border-red-900'}`}>
+          <div className={`w-full max-w-md mb-6 px-4 py-3 rounded border ${isDark ? 'bg-gray-900/50 border-red-700 text-red-200' : 'bg-red-50 border-red-400 text-red-700'} border-l-4 ${isDark ? 'border-red-700' : 'border-red-900'}`}>
             <div className="flex">
               <div className="ml-3">
                 <p className={`text-base md:text-lg font-medium ${isDark ? 'text-red-200' : 'text-red-700'}`}>{error}</p>
@@ -138,8 +138,8 @@ function Login() {
                 placeholder="Ingrese su usuario"
                 className={`w-full pl-12 pr-5 py-4 text-lg rounded-lg border-2 text-white placeholder-white focus:outline-none focus:ring-0 transition-all ${
                   isDark 
-                    ? 'bg-red-900/80 border-red-700 focus:border-red-600' 
-                    : 'bg-red-900 border-red-800 focus:border-red-700'
+                    ? 'bg-gray-900/80 border-red-700 focus:border-red-600' 
+                    : 'bg-gray-900 border-red-800 focus:border-red-700'
                 }`}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -159,8 +159,8 @@ function Login() {
                 placeholder="Ingrese su contraseña"
                 className={`w-full pl-12 pr-5 py-4 text-lg rounded-lg border-2 text-white placeholder-white focus:outline-none focus:ring-0 transition-all ${
                   isDark 
-                    ? 'bg-red-900/80 border-red-700 focus:border-red-600' 
-                    : 'bg-red-900 border-red-800 focus:border-red-700'
+                    ? 'bg-gray-900/80 border-red-700 focus:border-red-600' 
+                    : 'bg-gray-900 border-red-800 focus:border-red-700'
                 }`}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

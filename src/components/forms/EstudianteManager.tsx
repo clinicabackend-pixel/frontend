@@ -136,7 +136,7 @@ export default function EstudianteManager({ activeStudents, selectedUsernames, o
                             <div className="p-3 border-t bg-gray-50 flex justify-end">
                                 <button
                                     onClick={handleAddSelected}
-                                    className="flex items-center gap-2 px-4 py-2 bg-red-900 text-white rounded-md hover:bg-red-800 transition-colors shadow-sm text-sm font-medium"
+                                    className="flex items-center gap-2 px-4 py-2 bg-red-900 text-white rounded-md hover:bg-red-950 transition-colors shadow-sm text-sm font-medium"
                                 >
                                     <Plus size={16} />
                                     Agregar {checkedCandidates.length} Seleccionados

@@ -25,16 +25,16 @@ function MainLayout({ title, children, className = '' }: MainLayoutProps) {
 
 
     return (
-        <div className={`flex w-screen h-screen overflow-hidden ${isDark ? 'bg-red-900' : 'bg-gray-50'}`}>
+        <div className={`flex w-screen h-screen overflow-hidden ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
             {/* Sidebar is now a direct child of the flex container (on desktop) */}
             <Sidebar isOpen={isSidebarOpen} onClose={handleCloseSidebar} />
 
             {/* Content Wrapper */}
-            <div className={`flex-1 flex flex-col w-full min-w-0 transition-all duration-300 ${isDark ? 'bg-red-900' : ''}`}>
+            <div className={`flex-1 flex flex-col w-full min-w-0 transition-all duration-300 ${isDark ? 'bg-gray-900' : ''}`}>
                 <Header title={title} onMenuClick={handleMenuClick} />
 
                 <main
-                    className={`flex-1 overflow-y-auto px-4 py-4 md:px-8 md:py-6 lg:px-10 lg:py-8 ${isDark ? 'bg-red-900' : ''} ${className}`}
+                    className={`flex-1 overflow-y-auto px-4 py-4 md:px-8 md:py-6 lg:px-10 lg:py-8 ${isDark ? 'bg-gray-900' : ''} ${className}`}
                 >
                     {children}
                 </main>

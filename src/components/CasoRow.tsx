@@ -30,7 +30,7 @@ export default function CasoRow({ caso, materia, onClick }: CasoRowProps) {
     }, [theme]);
 
     return (
-        <tr className={`transition-colors cursor-pointer ${isDark ? 'hover:bg-red-950/30' : 'hover:bg-gray-50'}`} onClick={onClick}>
+        <tr className={`transition-colors cursor-pointer ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`} onClick={onClick}>
             <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 {caso.numCaso}
             </td>

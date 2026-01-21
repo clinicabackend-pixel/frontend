@@ -247,7 +247,7 @@ export default function UsuariosPage() {
             <div className="w-full mx-auto">
 
                 {/* Controls */}
-                <div className={`p-4 rounded-lg shadow-sm mb-6 border flex flex-col md:flex-row justify-between items-center gap-4 ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
+                <div className={`p-4 rounded-lg shadow-sm mb-6 border flex flex-col md:flex-row justify-between items-center gap-4 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                     <div className="w-full md:w-1/2">
                         <SearchBar
                             value={searchText}
@@ -260,7 +260,7 @@ export default function UsuariosPage() {
                             <button
                                 onClick={() => setIsImportModalOpen(true)}
                                 className={`flex items-center justify-center px-4 py-2 border rounded-md transition-colors w-full md:w-auto ${isDark
-                                    ? 'border-red-700 text-red-300 hover:bg-red-950/50 hover:border-red-600'
+                                    ? 'border-gray-600 text-gray-300 hover:bg-gray-700 hover:border-red-600'
                                     : 'border-red-900 text-red-900 hover:bg-red-50'
                                     }`}
                             >
@@ -270,8 +270,8 @@ export default function UsuariosPage() {
                             <button
                                 onClick={() => setIsUserModalOpen(true)}
                                 className={`flex items-center justify-center px-4 py-2 rounded-md transition-colors w-full md:w-auto ${isDark
-                                    ? 'bg-red-900 text-white hover:bg-red-800'
-                                    : 'bg-red-900 text-white hover:bg-red-800'
+                                    ? 'bg-red-900 text-white hover:bg-red-950'
+                                    : 'bg-red-900 text-white hover:bg-red-950'
                                     }`}
                             >
                                 <Plus size={18} className="mr-2" />
@@ -287,9 +287,9 @@ export default function UsuariosPage() {
                         <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${isDark ? 'border-red-700' : 'border-red-900'}`}></div>
                     </div>
                 ) : (
-                    <div className={`shadow overflow-visible sm:rounded-lg border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
-                        <table className={`min-w-full divide-y ${isDark ? 'divide-red-800/50' : 'divide-gray-200'}`}>
-                            <thead className={isDark ? 'bg-red-950/30' : 'bg-gray-50'}>
+                    <div className={`shadow overflow-visible sm:rounded-lg border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                        <table className={`min-w-full divide-y ${isDark ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                            <thead className={isDark ? 'bg-gray-800/50' : 'bg-gray-50'}>
                                 <tr>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Usuario</th>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Contacto</th>
@@ -299,16 +299,16 @@ export default function UsuariosPage() {
                                     <th className="relative px-6 py-3"><span className="sr-only">Ver</span></th>
                                 </tr>
                             </thead>
-                            <tbody className={`divide-y ${isDark ? 'divide-red-800/50 bg-[#630000]' : 'divide-gray-200 bg-white'}`}>
+                            <tbody className={`divide-y ${isDark ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
                                 {currentItems.map((user) => (
                                     <tr
                                         key={user.username}
-                                        className={`transition-colors cursor-pointer ${isDark ? 'hover:bg-red-950/50' : 'hover:bg-gray-50'}`}
+                                        className={`transition-colors cursor-pointer ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
                                         onClick={() => navigate(`/usuarios/${user.username}`)}
                                     >
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
-                                                <div className={`shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${isDark ? 'bg-red-950/50 text-gray-400' : 'bg-gray-200 text-gray-500'}`}>
+                                                <div className={`shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${isDark ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-500'}`}>
                                                     <User size={20} />
                                                 </div>
                                                 <div className="ml-4">
@@ -337,7 +337,7 @@ export default function UsuariosPage() {
                                                 <button
                                                     onClick={(e) => toggleMenu(user.username, e)}
                                                     className={`p-2 rounded-md transition-colors ${isDark
-                                                        ? 'text-gray-300 hover:text-white hover:bg-red-950/50'
+                                                        ? 'text-gray-300 hover:text-white hover:bg-gray-700'
                                                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                                                         }`}
                                                     title="Opciones"
@@ -353,7 +353,7 @@ export default function UsuariosPage() {
                                                                 onClick={(e) => handleDeleteClick(user, e)}
                                                                 className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors ${user.estatus === 'ACTIVO'
                                                                     ? (isDark
-                                                                        ? 'text-red-300 hover:bg-red-950/50 hover:text-red-200'
+                                                                        ? 'text-red-800 hover:bg-gray-700 hover:text-red-800'
                                                                         : 'text-red-600 hover:bg-red-50 hover:text-red-900')
                                                                     : (isDark
                                                                         ? 'text-green-300 hover:bg-green-950/50 hover:text-green-200'
@@ -376,7 +376,7 @@ export default function UsuariosPage() {
                                                                 <button
                                                                     onClick={(e) => handlePermanentDeleteClick(user, e)}
                                                                     className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors border-t ${isDark
-                                                                        ? 'border-red-800/50 text-red-400 hover:bg-red-950/50 hover:text-red-300'
+                                                                        ? 'border-gray-700 text-red-800 hover:bg-gray-700 hover:text-red-800'
                                                                         : 'border-gray-100 text-red-600 hover:bg-red-50 hover:text-red-800'
                                                                         }`}
                                                                 >
@@ -402,7 +402,7 @@ export default function UsuariosPage() {
                         )}
 
                         {/* Pagination */}
-                        <div className={`px-6 py-4 border-t ${isDark ? 'border-red-800/50' : 'border-gray-200'}`}>
+                        <div className={`px-6 py-4 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
                             <Pagination
                                 currentPage={currentPage}
                                 itemsPerPage={itemsPerPage}
@@ -470,7 +470,7 @@ export default function UsuariosPage() {
                                 <button
                                     onClick={handleConfirmToggleStatus}
                                     className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors ${userToDelete.estatus === 'ACTIVO'
-                                        ? 'bg-red-600 hover:bg-red-700'
+                                        ? 'bg-red-900 hover:bg-red-950'
                                         : 'bg-green-600 hover:bg-green-700'
                                         }`}
                                 >
@@ -522,7 +522,7 @@ export default function UsuariosPage() {
                                 </button>
                                 <button
                                     onClick={handleConfirmPermanentDelete}
-                                    className="px-4 py-2 text-sm font-medium text-white rounded-md transition-colors bg-red-600 hover:bg-red-700"
+                                    className="px-4 py-2 text-sm font-medium text-white rounded-md transition-colors bg-red-900 hover:bg-red-950"
                                 >
                                     Eliminar Definitivamente
                                 </button>

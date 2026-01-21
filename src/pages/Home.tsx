@@ -284,7 +284,7 @@ function Home() {
         </div>
         <button
           onClick={() => navigate('/registro-caso')} // Navigate to RegistroCaso page
-          className="bg-red-900 hover:bg-red-800 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2 font-medium"
+          className="bg-red-900 hover:bg-red-950 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2 font-medium"
         >
           <FontAwesomeIcon icon={faPlus} />
           Crear Nuevo Caso
@@ -297,7 +297,7 @@ function Home() {
         {/* WIDGET A: Resumen de Casos (2 columnas) */}
         <div className="md:col-span-2 lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Card 1 */}
-          <div className={`${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-100'} p-6 rounded-xl shadow-sm border flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow`}>
+          <div className={`${isDark ? 'bg-gray-800 border-gray-700/50' : 'bg-white border-gray-100'} p-6 rounded-xl shadow-sm border flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow`}>
             <div className={`w-12 h-12 ${isDark ? 'bg-red-800/70 text-white' : 'bg-red-50 text-red-900'} rounded-full flex items-center justify-center text-xl mb-3`}>
               <FontAwesomeIcon icon={faBriefcase} />
             </div>
@@ -307,7 +307,7 @@ function Home() {
             <p className={`text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-500'}`}>Mis Casos Activos</p>
           </div>
           {/* Card 2 */}
-          <div className={`${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-100'} p-6 rounded-xl shadow-sm border flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow`}>
+          <div className={`${isDark ? 'bg-gray-800 border-gray-700/50' : 'bg-white border-gray-100'} p-6 rounded-xl shadow-sm border flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow`}>
             <div className={`w-12 h-12 ${isDark ? 'bg-yellow-800/70 text-yellow-100' : 'bg-yellow-50 text-yellow-600'} rounded-full flex items-center justify-center text-xl mb-3`}>
               <FontAwesomeIcon icon={faClock} />
             </div>
@@ -317,7 +317,7 @@ function Home() {
             <p className={`text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-500'}`}>Pendientes Revisión</p>
           </div>
           {/* Card 3 */}
-          <div className={`${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-100'} p-6 rounded-xl shadow-sm border flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow`}>
+          <div className={`${isDark ? 'bg-gray-800 border-gray-700/50' : 'bg-white border-gray-100'} p-6 rounded-xl shadow-sm border flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow`}>
             <div className={`w-12 h-12 ${isDark ? 'bg-green-800/70 text-green-100' : 'bg-green-50 text-green-600'} rounded-full flex items-center justify-center text-xl mb-3`}>
               <FontAwesomeIcon icon={faCheckCircle} />
             </div>
@@ -329,20 +329,20 @@ function Home() {
         </div>
 
         {/* WIDGET B: Accesos Rápidos (1 columna) */}
-        <div className={`${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-100'} p-6 rounded-xl shadow-sm border flex flex-col justify-between`}>
+        <div className={`${isDark ? 'bg-gray-800 border-gray-700/50' : 'bg-white border-gray-100'} p-6 rounded-xl shadow-sm border flex flex-col justify-between`}>
           <h3 className={`text-lg font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-800'}`}>Accesos Rápidos</h3>
           <div className="space-y-2">
             <button 
               onClick={() => navigate('/solicitantes?mode=create')} 
               className={`w-full flex items-center gap-3 p-3 text-left rounded-lg transition-all duration-200 group ${
                 isDark 
-                  ? 'hover:bg-red-800/50 text-white border border-transparent hover:border-red-700/50' 
+                  ? 'hover:bg-red-900/50 text-white border border-transparent hover:border-red-900/50' 
                   : 'hover:bg-red-50 text-gray-700 hover:text-red-900 border border-transparent hover:border-red-100'
               }`}
             >
               <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
                 isDark 
-                  ? 'bg-red-800/70 group-hover:bg-red-800 text-white group-hover:scale-110' 
+                  ? 'bg-red-900/70 group-hover:bg-red-900 text-white group-hover:scale-110' 
                   : 'bg-red-100 group-hover:bg-red-200 text-red-900 group-hover:scale-110'
               }`}>
                 <FontAwesomeIcon icon={faUserPlus} className="text-base" />
@@ -353,13 +353,13 @@ function Home() {
               onClick={() => navigate('/casos')} 
               className={`w-full flex items-center gap-3 p-3 text-left rounded-lg transition-all duration-200 group ${
                 isDark 
-                  ? 'hover:bg-red-800/50 text-white border border-transparent hover:border-red-700/50' 
+                  ? 'hover:bg-red-900/50 text-white border border-transparent hover:border-red-900/50' 
                   : 'hover:bg-red-50 text-gray-700 hover:text-red-900 border border-transparent hover:border-red-100'
               }`}
             >
               <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
                 isDark 
-                  ? 'bg-red-800/70 group-hover:bg-red-800 text-white group-hover:scale-110' 
+                  ? 'bg-red-900/70 group-hover:bg-red-900 text-white group-hover:scale-110' 
                   : 'bg-red-100 group-hover:bg-red-200 text-red-900 group-hover:scale-110'
               }`}>
                 <FontAwesomeIcon icon={faSearch} className="text-base" />
@@ -370,13 +370,13 @@ function Home() {
               onClick={() => navigate('/calendario')} 
               className={`w-full flex items-center gap-3 p-3 text-left rounded-lg transition-all duration-200 group ${
                 isDark 
-                  ? 'hover:bg-red-800/50 text-white border border-transparent hover:border-red-700/50' 
+                  ? 'hover:bg-red-900/50 text-white border border-transparent hover:border-red-900/50' 
                   : 'hover:bg-red-50 text-gray-700 hover:text-red-900 border border-transparent hover:border-red-100'
               }`}
             >
               <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
                 isDark 
-                  ? 'bg-red-800/70 group-hover:bg-red-800 text-white group-hover:scale-110' 
+                  ? 'bg-red-900/70 group-hover:bg-red-900 text-white group-hover:scale-110' 
                   : 'bg-red-100 group-hover:bg-red-200 text-red-900 group-hover:scale-110'
               }`}>
                 <FontAwesomeIcon icon={faCalendarAlt} className="text-base" />
@@ -387,8 +387,8 @@ function Home() {
         </div>
 
         {/* WIDGET C: Agenda / Notificaciones (1 columna - Row Span 2) */}
-        <div className={`md:col-span-1 md:row-span-2 ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-100'} rounded-xl shadow-sm border overflow-hidden flex flex-col h-full`}>
-          <div className={`p-5 border-b ${isDark ? 'border-red-800 bg-red-900/70' : 'border-gray-100 bg-gray-50/50'}`}>
+        <div className={`md:col-span-1 md:row-span-2 ${isDark ? 'bg-gray-800 border-gray-700/50' : 'bg-white border-gray-100'} rounded-xl shadow-sm border overflow-hidden flex flex-col h-full`}>
+          <div className={`p-5 border-b ${isDark ? 'border-gray-700 bg-red-900/70' : 'border-gray-100 bg-gray-50/50'}`}>
             <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>Próximos Vencimientos</h3>
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[500px]">
@@ -417,15 +417,15 @@ function Home() {
               <p className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Todos los expedientes</p>
             </div>
           </div>
-          <div className={`p-3 border-t ${isDark ? 'border-red-800' : 'border-gray-100'} text-center`}>
-            <button className={`text-xs font-semibold transition-colors ${isDark ? 'text-red-300 hover:text-red-200' : 'text-red-900 hover:text-red-700'}`}>
+          <div className={`p-3 border-t ${isDark ? 'border-gray-700' : 'border-gray-100'} text-center`}>
+            <button className={`text-xs font-semibold transition-colors ${isDark ? 'text-white hover:text-gray-200' : 'text-red-900 hover:text-red-700'}`}>
               Ver toda la agenda
             </button>
           </div>
         </div>
 
         {/* WIDGET D: Gráfico de Acciones Semanal */}
-        <div className={`md:col-span-2 lg:col-span-3 ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-100'} p-6 rounded-xl shadow-sm border`}>
+        <div className={`md:col-span-2 lg:col-span-3 ${isDark ? 'bg-gray-800 border-gray-700/50' : 'bg-white border-gray-100'} p-6 rounded-xl shadow-sm border`}>
           <div className="flex justify-between items-center mb-6">
             <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>Acciones de la Última Semana</h3>
           </div>
@@ -434,7 +434,7 @@ function Home() {
           {loadingAcciones ? (
             <div className="flex items-center justify-center h-48">
               <div className="flex flex-col items-center">
-                <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${isDark ? 'border-red-700' : 'border-red-900'} mb-2`}></div>
+                <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${isDark ? 'border-red-900' : 'border-red-900'} mb-2`}></div>
                 <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Cargando acciones...</p>
               </div>
             </div>
@@ -475,14 +475,14 @@ function Home() {
                       <div className={`relative w-full ${isDark ? 'bg-red-800/50' : 'bg-gray-100'} rounded-t-lg overflow-hidden h-40 flex items-end`}>
                         <div
                           style={{ height: `${height}%`, minHeight: count > 0 ? '5px' : '0' }}
-                          className={`w-full ${esHoy ? (isDark ? 'bg-red-600' : 'bg-red-900') : (isDark ? 'bg-red-700/50 group-hover:bg-red-700' : 'bg-red-200 group-hover:bg-red-300')} rounded-t-lg transition-all duration-300`}
+                          className={`w-full ${esHoy ? (isDark ? 'bg-red-600' : 'bg-red-900') : (isDark ? 'bg-red-900/50 group-hover:bg-red-900' : 'bg-red-200 group-hover:bg-red-300')} rounded-t-lg transition-all duration-300`}
                           title={`${fechaCompleta}: ${count} acción${count !== 1 ? 'es' : ''}`}
                         ></div>
                       </div>
                       
                       {/* Etiqueta de fecha */}
                       <div className="flex flex-col items-center mt-1">
-                        <span className={`text-xs font-medium ${esHoy ? (isDark ? 'font-bold text-red-300' : 'font-bold text-red-900') : (isDark ? 'text-gray-300' : 'text-gray-700')}`}>
+                        <span className={`text-xs font-medium ${esHoy ? (isDark ? 'font-bold text-white' : 'font-bold text-red-900') : (isDark ? 'text-white' : 'text-gray-700')}`}>
                           {diaDelMes} {mes}
                         </span>
                       </div>

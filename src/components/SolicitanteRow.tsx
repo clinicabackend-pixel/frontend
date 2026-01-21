@@ -32,11 +32,11 @@ export default function SolicitanteRow({ solicitante, onClick, onEncuestaClick, 
         }
     }, [theme]);
     return (
-        <tr className={`transition-all duration-200 border-b last:border-none hover:shadow-sm ${isDark ? 'hover:bg-red-950/30 border-red-800/50' : 'border-gray-200 hover:bg-white'}`} onClick={onClick}>
+        <tr className={`transition-all duration-200 border-b last:border-none hover:shadow-sm ${isDark ? 'hover:bg-gray-700 border-gray-700' : 'border-gray-200 hover:bg-white'}`} onClick={onClick}>
             <td className="px-6 py-5 whitespace-nowrap">
                 <div className="flex items-center">
                     <div className="shrink-0 h-10 w-10">
-                        <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm shadow-sm ${isDark ? 'bg-red-950/50 text-red-300' : 'bg-red-100 text-red-900'}`}>
+                        <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm shadow-sm ${isDark ? 'bg-gray-700 text-red-800' : 'bg-red-100 text-red-900'}`}>
                             {solicitante.nombre.charAt(0).toUpperCase()}
                         </div>
                     </div>
@@ -68,7 +68,7 @@ export default function SolicitanteRow({ solicitante, onClick, onEncuestaClick, 
                             e.stopPropagation();
                             onEditClick();
                         }}
-                        className={`p-2 rounded-full transition-colors ${isDark ? 'text-gray-300 hover:text-white hover:bg-red-950/50' : 'text-gray-400 hover:text-red-800 hover:bg-red-50'}`}
+                        className={`p-2 rounded-full transition-colors ${isDark ? 'text-gray-300 hover:text-white hover:bg-gray-600' : 'text-gray-400 hover:text-red-800 hover:bg-red-50'}`}
                         title="Ver Detalle"
                     >
                         <FontAwesomeIcon icon={faEye} />

@@ -26,11 +26,11 @@ function Header({ title, onMenuClick }: HeaderProps) {
   };
 
   return (
-        <header className={`relative w-full h-16 ${isDark ? 'bg-red-900 border-red-800' : 'bg-white border-gray-200'} border-b flex items-center justify-between px-3 md:px-6 shadow-sm`}>
+        <header className={`relative w-full h-16 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b flex items-center justify-between px-3 md:px-6 shadow-sm`}>
       {/* Botón de menú (izquierda) */}
       <button
         onClick={handleMenuClick}
-        className={`w-8 h-8 md:hidden flex items-center justify-center rounded transition-colors ${isDark ? 'hover:bg-red-800 text-white' : 'hover:bg-gray-100 text-gray-600'}`}
+        className={`w-8 h-8 md:hidden flex items-center justify-center rounded transition-colors ${isDark ? 'hover:bg-gray-700 text-white' : 'hover:bg-gray-100 text-gray-600'}`}
         aria-label="Menú"
       >
         <FontAwesomeIcon icon={faBars} className="text-xl" />

@@ -35,16 +35,16 @@ const ReportCard = ({ title, description, icon, children, onDownload, loading, f
     }, [theme]);
 
     return (
-        <div className={`rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
-            <div className={`p-6 border-b flex flex-col items-center justify-center text-center gap-3 ${isDark ? 'border-red-800/50 bg-red-900/30' : 'border-gray-100 bg-gray-50/50'}`}>
-                <div className={`p-3 rounded-full ${fileType === 'PDF' ? (isDark ? 'bg-red-900/50 text-red-300' : 'bg-red-50 text-red-900') : (isDark ? 'bg-green-900/50 text-green-300' : 'bg-green-50 text-green-900')}`}>
-                    <FontAwesomeIcon icon={icon} className="text-2xl" />
+        <div className={`rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <div className={`p-6 border-b flex flex-col items-center justify-center text-center gap-3 ${isDark ? 'border-gray-700 bg-gray-800/50' : 'border-gray-100 bg-gray-50/50'}`}>
+                <div className={`p-3 rounded-full ${fileType === 'PDF' ? (isDark ? 'bg-gray-700 text-white' : 'bg-red-50 text-red-900') : (isDark ? 'bg-gray-700 text-white' : 'bg-red-50 text-red-900')}`}>
+                    <FontAwesomeIcon icon={icon} className={`text-2xl ${isDark ? 'text-white' : ''}`} />
                 </div>
                 <h3 className={`font-bold text-xl ${isDark ? 'text-white' : 'text-gray-800'}`}>{title}</h3>
             </div>
             <div className="p-5 flex-1 flex flex-col">
                 <div className="flex justify-between items-start mb-2">
-                    <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider ${fileType === 'PDF' ? (isDark ? 'bg-red-300 text-red-900' : 'bg-red-100 text-red-800') : (isDark ? 'bg-green-300 text-green-900' : 'bg-green-100 text-green-800')}`}>
+                    <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider ${fileType === 'PDF' ? (isDark ? 'bg-red-300 text-red-900' : 'bg-red-100 text-red-800') : (isDark ? 'bg-red-300 text-red-900' : 'bg-red-100 text-red-800')}`}>
                         {fileType}
                     </span>
                 </div>
@@ -52,7 +52,7 @@ const ReportCard = ({ title, description, icon, children, onDownload, loading, f
                 <div className="space-y-4 flex-1 w-full">
                     {children}
                 </div>
-                <div className={`mt-6 pt-4 border-t w-full ${isDark ? 'border-red-800/50' : 'border-gray-50'}`}>
+                <div className={`mt-6 pt-4 border-t w-full ${isDark ? 'border-gray-700' : 'border-gray-50'}`}>
                     <button
                         onClick={onDownload}
                         disabled={loading}
@@ -60,8 +60,8 @@ const ReportCard = ({ title, description, icon, children, onDownload, loading, f
                         ${loading
                                 ? 'bg-gray-400 cursor-not-allowed'
                                 : fileType === 'PDF'
-                                    ? 'bg-red-900 hover:bg-red-800 active:bg-red-950 shadow-sm'
-                                    : 'bg-green-600 hover:bg-green-700 active:bg-green-800 shadow-sm'}`}
+                                    ? 'bg-red-900 hover:bg-red-950 active:bg-red-950 shadow-sm'
+                                    : 'bg-red-900 hover:bg-red-950 active:bg-red-950 shadow-sm'}`}
                     >
                         {loading ? (
                             <>

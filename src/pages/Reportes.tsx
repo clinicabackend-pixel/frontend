@@ -112,7 +112,7 @@ export default function Reportes() {
             <div className="max-w-7xl mx-auto p-6">
                 <div className="mb-8">
                     <h1 className={`text-3xl font-bold flex items-center gap-3 ${isDark ? 'text-white' : 'text-gray-800'}`}>
-                        <FontAwesomeIcon icon={faChartBar} className={isDark ? 'text-red-400' : 'text-red-900'} />
+                        <FontAwesomeIcon icon={faChartBar} className={isDark ? 'text-white' : 'text-red-900'} />
                         Reportes y Estadísticas
                     </h1>
                     <p className={`mt-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -129,54 +129,54 @@ export default function Reportes() {
                     {loadingStats ? (
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                             {[...Array(4)].map((_, i) => (
-                                <div key={i} className={`p-6 rounded-lg shadow h-32 animate-pulse ${isDark ? 'bg-[#630000]' : 'bg-white'}`}></div>
+                                <div key={i} className={`p-6 rounded-lg shadow h-32 animate-pulse ${isDark ? 'bg-gray-800' : 'bg-white'}`}></div>
                             ))}
                         </div>
                     ) : dashboardStats ? (
                         <>
                             {/* KPI Cards */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                                <div className={`p-5 rounded-lg shadow-sm border hover:shadow-md transition-shadow ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-100'}`}>
+                                <div className={`p-5 rounded-lg shadow-sm border hover:shadow-md transition-shadow ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <p className={`text-sm uppercase font-semibold ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Total Casos</p>
                                             <p className={`text-3xl font-bold mt-1 ${isDark ? 'text-white' : 'text-gray-800'}`}>{dashboardStats.totalCasos}</p>
                                         </div>
-                                        <div className={`p-3 rounded-full ${isDark ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-50 text-blue-600'}`}>
-                                            <FontAwesomeIcon icon={faFileAlt} size="lg" />
+                                        <div className={`p-3 rounded-full ${isDark ? 'bg-gray-700 text-white' : 'bg-blue-50 text-blue-600'}`}>
+                                            <FontAwesomeIcon icon={faFileAlt} size="lg" className={isDark ? 'text-white' : ''} />
                                         </div>
                                     </div>
                                 </div>
-                                <div className={`p-5 rounded-lg shadow-sm border hover:shadow-md transition-shadow ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-100'}`}>
+                                <div className={`p-5 rounded-lg shadow-sm border hover:shadow-md transition-shadow ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <p className={`text-sm uppercase font-semibold ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Casos Activos</p>
                                             <p className={`text-3xl font-bold mt-1 ${isDark ? 'text-green-400' : 'text-green-600'}`}>{dashboardStats.casosActivos}</p>
                                         </div>
-                                        <div className={`p-3 rounded-full ${isDark ? 'bg-green-900/50 text-green-300' : 'bg-green-50 text-green-600'}`}>
-                                            <FontAwesomeIcon icon={faChartBar} size="lg" />
+                                        <div className={`p-3 rounded-full ${isDark ? 'bg-gray-700 text-white' : 'bg-green-50 text-green-600'}`}>
+                                            <FontAwesomeIcon icon={faChartBar} size="lg" className={isDark ? 'text-white' : ''} />
                                         </div>
                                     </div>
                                 </div>
-                                <div className={`p-5 rounded-lg shadow-sm border hover:shadow-md transition-shadow ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-100'}`}>
+                                <div className={`p-5 rounded-lg shadow-sm border hover:shadow-md transition-shadow ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <p className={`text-sm uppercase font-semibold ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Casos Cerrados</p>
                                             <p className={`text-3xl font-bold mt-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{dashboardStats.casosCerrados}</p>
                                         </div>
-                                        <div className={`p-3 rounded-full ${isDark ? 'bg-gray-800/50 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
-                                            <FontAwesomeIcon icon={faHistory} size="lg" />
+                                        <div className={`p-3 rounded-full ${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-600'}`}>
+                                            <FontAwesomeIcon icon={faHistory} size="lg" className={isDark ? 'text-white' : ''} />
                                         </div>
                                     </div>
                                 </div>
-                                <div className={`p-5 rounded-lg shadow-sm border hover:shadow-md transition-shadow ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-100'}`}>
+                                <div className={`p-5 rounded-lg shadow-sm border hover:shadow-md transition-shadow ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <p className={`text-sm uppercase font-semibold ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Solicitantes</p>
                                             <p className={`text-3xl font-bold mt-1 ${isDark ? 'text-red-400' : 'text-red-900'}`}>{dashboardStats.totalSolicitantes}</p>
                                         </div>
-                                        <div className={`p-3 rounded-full ${isDark ? 'bg-red-900/50 text-red-300' : 'bg-red-50 text-red-900'}`}>
-                                            <FontAwesomeIcon icon={faUser} size="lg" />
+                                        <div className={`p-3 rounded-full ${isDark ? 'bg-gray-700 text-white' : 'bg-red-50 text-red-900'}`}>
+                                            <FontAwesomeIcon icon={faUser} size="lg" className={isDark ? 'text-white' : ''} />
                                         </div>
                                     </div>
                                 </div>
@@ -185,7 +185,7 @@ export default function Reportes() {
                             {/* Charts Section */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 {/* Materia Distribution */}
-                                <div className={`p-6 rounded-lg shadow-sm border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-100'}`}>
+                                <div className={`p-6 rounded-lg shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
                                     <h3 className={`text-lg font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-800'}`}>Distribución por Materia</h3>
                                     <div className="space-y-4">
                                         {Object.entries(dashboardStats.distribucionMateria).map(([materia, count]) => {
@@ -198,7 +198,7 @@ export default function Reportes() {
                                                     </div>
                                                     <div className={`w-full rounded-full h-2.5 ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`}>
                                                         <div
-                                                            className={`h-2.5 rounded-full ${isDark ? 'bg-red-700' : 'bg-red-900'}`}
+                                                            className={`h-2.5 rounded-full ${isDark ? 'bg-red-900' : 'bg-red-900'}`}
                                                             style={{ width: `${percentage}%` }}
                                                         ></div>
                                                     </div>
@@ -212,7 +212,7 @@ export default function Reportes() {
                                 </div>
 
                                 {/* Vulnerability Indicator */}
-                                <div className={`p-6 rounded-lg shadow-sm border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-100'}`}>
+                                <div className={`p-6 rounded-lg shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
                                     <h3 className={`text-lg font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-800'}`}>Índice de Vulnerabilidad (Estimado)</h3>
                                     <div className="flex flex-col items-center justify-center h-48">
                                         <div className="relative w-40 h-40">
@@ -246,7 +246,7 @@ export default function Reportes() {
                             </div>
                         </>
                     ) : (
-                        <div className={`p-4 rounded-md ${isDark ? 'bg-red-900/50 text-red-200 border border-red-800/50' : 'bg-red-50 text-red-700'}`}>
+                        <div className={`p-4 rounded-md ${isDark ? 'bg-gray-800/50 text-red-200 border border-gray-700' : 'bg-red-50 text-red-700'}`}>
                             No se pudieron cargar los indicadores.
                         </div>
                     )}
@@ -255,7 +255,7 @@ export default function Reportes() {
                 {notification && (
                     <div className={`mb-6 p-4 rounded-lg border-l-4 ${notification.type === 'success'
                         ? (isDark ? 'bg-green-900/50 border-green-500 text-green-200' : 'bg-green-50 border-green-500 text-green-700')
-                        : (isDark ? 'bg-red-900/50 border-red-500 text-red-200' : 'bg-red-50 border-red-500 text-red-700')
+                        : (isDark ? 'bg-gray-800/50 border-red-500 text-red-200' : 'bg-red-50 border-red-500 text-red-700')
                         }`} role="alert">
                         <p className="font-medium">{notification.message}</p>
                     </div>
@@ -283,7 +283,7 @@ export default function Reportes() {
                                 value={cedulaSolicitante}
                                 onChange={(e) => setCedulaSolicitante(e.target.value)}
                                 className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 focus:border-transparent outline-none transition-shadow ${isDark
-                                    ? 'bg-red-900/50 border-red-800/50 text-white placeholder-gray-400'
+                                    ? 'bg-gray-800/50 border-gray-700 text-white placeholder-gray-400'
                                     : 'border-gray-300'
                                     }`}
                                 placeholder="Ej: V-12345678"
@@ -313,7 +313,7 @@ export default function Reportes() {
                                         value={historialInicio}
                                         onChange={(e) => setHistorialInicio(e.target.value)}
                                         className={`w-full h-10 px-2 border rounded-md focus:ring-red-900 outline-none text-sm ${isDark
-                                            ? 'bg-red-900/50 border-red-800/50 text-white'
+                                            ? 'bg-gray-800/50 border-gray-700 text-white'
                                             : 'border-gray-300'
                                             }`}
                                     />
@@ -325,7 +325,7 @@ export default function Reportes() {
                                         value={historialFin}
                                         onChange={(e) => setHistorialFin(e.target.value)}
                                         className={`w-full h-10 px-2 border rounded-md focus:ring-red-900 outline-none text-sm ${isDark
-                                            ? 'bg-red-900/50 border-red-800/50 text-white'
+                                            ? 'bg-gray-800/50 border-gray-700 text-white'
                                             : 'border-gray-300'
                                             }`}
                                     />
@@ -338,7 +338,7 @@ export default function Reportes() {
                                     value={historialUsuario}
                                     onChange={(e) => setHistorialUsuario(e.target.value)}
                                     className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${isDark
-                                        ? 'bg-red-900/50 border-red-800/50 text-white placeholder-gray-400'
+                                        ? 'bg-gray-800/50 border-gray-700 text-white placeholder-gray-400'
                                         : 'border-gray-300'
                                         }`}
                                     placeholder="Ej: jperez"
@@ -366,7 +366,7 @@ export default function Reportes() {
                                 value={casoId}
                                 onChange={(e) => setCasoId(e.target.value)}
                                 className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${isDark
-                                    ? 'bg-red-900/50 border-red-800/50 text-white placeholder-gray-400'
+                                    ? 'bg-gray-800/50 border-gray-700 text-white placeholder-gray-400'
                                     : 'border-gray-300'
                                     }`}
                                 placeholder="Ej: C-2024-001"
@@ -390,7 +390,7 @@ export default function Reportes() {
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
                                 className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${isDark
-                                    ? 'bg-red-900/50 border-red-800/50 text-white'
+                                    ? 'bg-gray-800/50 border-gray-700 text-white'
                                     : 'border-gray-300 bg-white'
                                     }`}
                                 style={isDark ? { backgroundColor: '#ffffff', color: '#111827' } : {}}
@@ -425,7 +425,7 @@ export default function Reportes() {
                                     value={resumenSemestre}
                                     onChange={(e) => setResumenSemestre(e.target.value)}
                                     className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${isDark
-                                        ? 'bg-red-900/50 border-red-800/50 text-white placeholder-gray-400'
+                                        ? 'bg-gray-800/50 border-gray-700 text-white placeholder-gray-400'
                                         : 'border-gray-300'
                                         }`}
                                     placeholder="Ej: 2024-1"
@@ -438,7 +438,7 @@ export default function Reportes() {
                                     onChange={(e) => setResumenTipo(Number(e.target.value))}
                                     disabled={loadingMaterias}
                                     className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${isDark
-                                        ? 'bg-red-900/50 border-red-800/50 text-white'
+                                        ? 'bg-gray-800/50 border-gray-700 text-white'
                                         : 'border-gray-300 bg-white'
                                         } ${loadingMaterias ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     style={isDark ? { backgroundColor: '#ffffff', color: '#111827' } : {}}
@@ -473,7 +473,7 @@ export default function Reportes() {
                     >
                         <button
                             onClick={() => window.location.href = '/reportes/memoria-cuenta'}
-                            className={`w-full py-2 px-4 rounded-md font-semibold text-white transition-colors ${isDark ? 'bg-red-700 hover:bg-red-600' : 'bg-red-900 hover:bg-red-800'
+                            className={`w-full py-2 px-4 rounded-md font-semibold text-white transition-colors ${isDark ? 'bg-red-900 hover:bg-red-950' : 'bg-red-900 hover:bg-red-950'
                                 }`}
                         >
                             Ir al Generador

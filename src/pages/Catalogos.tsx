@@ -369,10 +369,10 @@ export function Catalogos() {
             <div className="max-w-7xl mx-auto w-full flex flex-col md:flex-row gap-6 animate-fade-in-up">
 
                 {/* Sidebar / Tabs */}
-                <div className={`w-full md:w-64 rounded-lg shadow-sm border h-fit ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
-                    <div className={`p-4 border-b rounded-t-lg ${isDark ? 'border-red-800/50 bg-red-950/30' : 'border-gray-100 bg-gray-50'}`}>
+                <div className={`w-full md:w-64 rounded-lg shadow-sm border h-fit ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                    <div className={`p-4 border-b rounded-t-lg ${isDark ? 'border-gray-700 bg-gray-800/50' : 'border-gray-100 bg-gray-50'}`}>
                         <h2 className={`font-semibold flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>
-                            <FontAwesomeIcon icon={faTags} className={isDark ? 'text-red-400' : 'text-red-900'} />
+                            <FontAwesomeIcon icon={faTags} className={isDark ? 'text-white' : 'text-red-900'} />
                             Catálogos
                         </h2>
                     </div>
@@ -384,13 +384,13 @@ export function Catalogos() {
                                 className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors mb-1
                                     ${activeTab === tab.id
                                         ? isDark
-                                            ? 'bg-red-800/50 text-white border border-red-700 shadow-xs'
+                                            ? 'bg-gray-700 text-white border border-gray-700 shadow-xs'
                                             : 'bg-red-50 text-red-900 border border-red-100 shadow-xs'
                                         : isDark
-                                            ? 'text-gray-300 hover:bg-red-800/50 hover:text-white'
+                                            ? 'text-white hover:bg-gray-700 hover:text-white'
                                             : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
                             >
-                                <FontAwesomeIcon icon={tab.icon} className={`w-5 ${activeTab === tab.id ? (isDark ? 'text-red-400' : 'text-red-700') : (isDark ? 'text-gray-400' : 'text-gray-400')}`} />
+                                <FontAwesomeIcon icon={tab.icon} className={`w-5 ${activeTab === tab.id ? (isDark ? 'text-white' : 'text-red-700') : (isDark ? 'text-white' : 'text-gray-400')}`} />
                                 {tab.label}
                             </button>
                         ))}
@@ -398,8 +398,8 @@ export function Catalogos() {
                 </div>
 
                 {/* Main Content Area */}
-                <div className={`flex-1 rounded-lg shadow-sm border min-h-[500px] flex flex-col ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
-                    <div className={`p-6 border-b flex justify-between items-center ${isDark ? 'border-red-800/50' : 'border-gray-100'}`}>
+                <div className={`flex-1 rounded-lg shadow-sm border min-h-[500px] flex flex-col ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                    <div className={`p-6 border-b flex justify-between items-center ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
                         <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>
                             {tabs.find(t => t.id === activeTab)?.label}
                         </h2>
@@ -424,8 +424,8 @@ export function Catalogos() {
                                 {activeTab === 'VIVIENDA' ? (
                                     <div className="space-y-6">
                                         {housingData.map(type => (
-                                            <div key={type.id} className={`border rounded-lg overflow-hidden ${isDark ? 'border-red-800/50' : 'border-gray-200'}`}>
-                                                <div className={`px-4 py-3 border-b flex justify-between items-center ${isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-200'}`}>
+                                            <div key={type.id} className={`border rounded-lg overflow-hidden ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+                                                <div className={`px-4 py-3 border-b flex justify-between items-center ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
                                                     <div className="flex items-center gap-2">
                                                         <FontAwesomeIcon icon={faLayerGroup} className={isDark ? 'text-gray-400' : 'text-gray-400'} />
                                                         <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>{type.nombre}</h3>
@@ -443,9 +443,9 @@ export function Catalogos() {
                                                         Agregar Categoría
                                                     </Button>
                                                 </div>
-                                                <ul className={isDark ? 'divide-y divide-red-800/50' : 'divide-y divide-gray-200'}>
+                                                <ul className={isDark ? 'divide-y divide-gray-700' : 'divide-y divide-gray-200'}>
                                                     {type.categorias.length > 0 ? type.categorias.map(cat => (
-                                                        <li key={cat.id} className={`px-4 py-3 flex justify-between items-center transition-colors ${isDark ? 'hover:bg-red-950/30' : 'hover:bg-gray-50'}`}>
+                                                        <li key={cat.id} className={`px-4 py-3 flex justify-between items-center transition-colors ${isDark ? 'hover:bg-gray-800/50' : 'hover:bg-gray-50'}`}>
                                                             <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{cat.descripcion}</span>
                                                             <StatusToggle
                                                                 isActive={cat.estatus === 'ACTIVO'}
@@ -461,7 +461,7 @@ export function Catalogos() {
                                     </div>
                                     // ...existing Housing code...
                                 ) : activeTab === 'AMBITO_LEGAL' ? (
-                                    <div className={`p-4 rounded-lg border overflow-x-auto ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
+                                    <div className={`p-4 rounded-lg border overflow-x-auto ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                                         <div className="flex justify-between mb-4">
                                             <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>Jerarquía del Sistema Legal</h3>
                                             <Button
@@ -489,9 +489,9 @@ export function Catalogos() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className={`rounded-lg border overflow-hidden ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
-                                        <table className={`min-w-full ${isDark ? 'divide-y divide-red-800/50' : 'divide-y divide-gray-200'}`}>
-                                            <thead className={isDark ? 'bg-red-950/30' : 'bg-gray-50'}>
+                                    <div className={`rounded-lg border overflow-hidden ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                        <table className={`min-w-full ${isDark ? 'divide-y divide-gray-700' : 'divide-y divide-gray-200'}`}>
+                                            <thead className={isDark ? 'bg-gray-800/50' : 'bg-gray-50'}>
                                                 <tr>
                                                     {activeTab === 'SEMESTRE' ? (
                                                         <>
@@ -523,9 +523,9 @@ export function Catalogos() {
                                                     )}
                                                 </tr>
                                             </thead>
-                                            <tbody className={isDark ? 'bg-[#630000] divide-y divide-red-800/50' : 'bg-white divide-y divide-gray-200'}>
+                                            <tbody className={isDark ? 'bg-gray-800 divide-y divide-gray-700' : 'bg-white divide-y divide-gray-200'}>
                                                 {items.length > 0 ? items.map((item) => (
-                                                    <tr key={item.id || item.termino} className={isDark ? 'hover:bg-red-950/30' : 'hover:bg-gray-50'}>
+                                                    <tr key={item.id || item.termino} className={isDark ? 'hover:bg-gray-800/50' : 'hover:bg-gray-50'}>
                                                         {activeTab === 'SEMESTRE' ? (
                                                             <>
                                                                 <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>{item.termino}</td>
@@ -616,6 +616,7 @@ export function Catalogos() {
                                 value={tribunalForm.nombre}
                                 onChange={(e) => setTribunalForm({ ...tribunalForm, nombre: e.target.value })}
                                 placeholder="Ej. Tribunal Primero de Municipio"
+                                isDark={isDark}
                             />
                             <div className="grid grid-cols-2 gap-4">
                                 <CustomInput
@@ -624,6 +625,7 @@ export function Catalogos() {
                                     value={tribunalForm.materia}
                                     onChange={(e) => setTribunalForm({ ...tribunalForm, materia: e.target.value })}
                                     placeholder="Ej. Civil, Penal"
+                                    isDark={isDark}
                                 />
                                 <CustomInput
                                     name="instancia"
@@ -631,6 +633,7 @@ export function Catalogos() {
                                     value={tribunalForm.instancia}
                                     onChange={(e) => setTribunalForm({ ...tribunalForm, instancia: e.target.value })}
                                     placeholder="Ej. Primera Instancia"
+                                    isDark={isDark}
                                 />
                             </div>
                             <CustomInput
@@ -639,6 +642,7 @@ export function Catalogos() {
                                 value={tribunalForm.ubicacion}
                                 onChange={(e) => setTribunalForm({ ...tribunalForm, ubicacion: e.target.value })}
                                 placeholder="Ej. Palacio de Justicia, Piso 2"
+                                isDark={isDark}
                             />
                         </>
                     ) : activeTab === 'SEMESTRE' ? (
@@ -650,6 +654,7 @@ export function Catalogos() {
                                     value={semestreForm.termino}
                                     onChange={(e) => setSemestreForm({ ...semestreForm, termino: e.target.value })}
                                     placeholder="Ej. 2024-01"
+                                    isDark={isDark}
                                 />
                                 <CustomInput
                                     name="nombre"
@@ -657,6 +662,7 @@ export function Catalogos() {
                                     value={semestreForm.nombre}
                                     onChange={(e) => setSemestreForm({ ...semestreForm, nombre: e.target.value })}
                                     placeholder="Ej. Primer Semestre 2024"
+                                    isDark={isDark}
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
@@ -665,7 +671,7 @@ export function Catalogos() {
                                     <input
                                         type="date"
                                         className={`w-full px-3 py-2 rounded-md border focus:ring-2 focus:ring-red-500 focus:outline-none transition-colors ${isDark
-                                            ? 'bg-red-950/30 border-red-800/50 text-white placeholder-gray-500'
+                                            ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
                                             : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
                                             }`}
                                         value={semestreForm.fechaInicio}
@@ -677,7 +683,7 @@ export function Catalogos() {
                                     <input
                                         type="date"
                                         className={`w-full px-3 py-2 rounded-md border focus:ring-2 focus:ring-red-500 focus:outline-none transition-colors ${isDark
-                                            ? 'bg-red-950/30 border-red-800/50 text-white placeholder-gray-500'
+                                            ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
                                             : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
                                             }`}
                                         value={semestreForm.fechaFin}
@@ -694,6 +700,7 @@ export function Catalogos() {
                                 value={centroForm.nombre}
                                 onChange={(e) => setCentroForm({ ...centroForm, nombre: e.target.value })}
                                 placeholder="Ej. Sede Principal"
+                                isDark={isDark}
                             />
                             <CustomInput
                                 name="abreviatura"
@@ -701,6 +708,7 @@ export function Catalogos() {
                                 value={centroForm.abreviatura}
                                 onChange={(e) => setCentroForm({ ...centroForm, abreviatura: e.target.value })}
                                 placeholder="Ej. SP"
+                                isDark={isDark}
                             />
                             <div className="space-y-3">
                                 <h4 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Ubicación Geográfica</h4>
@@ -750,6 +758,7 @@ export function Catalogos() {
                             value={newItemName}
                             onChange={(e) => setNewItemName(e.target.value)}
                             placeholder="Ej. Nuevo Registro"
+                            isDark={isDark}
                         />
                     )}
                     <div className="flex justify-end gap-3 mt-6">

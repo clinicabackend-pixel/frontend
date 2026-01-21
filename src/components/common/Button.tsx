@@ -26,11 +26,11 @@ const Button = ({
     const baseStyles = "inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
 
     const variants = {
-        primary: "bg-red-900 text-white hover:bg-red-800 focus:ring-red-900 border border-transparent shadow-sm",
+        primary: "bg-red-900 text-white hover:bg-red-950 focus:ring-red-900 border border-transparent shadow-sm",
         secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500 border border-transparent",
         outline: "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-red-900",
         ghost: isDark 
-            ? "bg-transparent text-gray-200 hover:bg-red-800/50 hover:text-white focus:ring-gray-500" 
+            ? "bg-transparent text-gray-200 hover:bg-red-900/50 hover:text-white focus:ring-gray-500" 
             : "bg-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus:ring-gray-500",
         danger: "bg-white text-red-900 border border-red-200 hover:bg-red-50 focus:ring-red-900",
         link: "text-red-900 hover:underline px-0 py-0 h-auto font-medium"

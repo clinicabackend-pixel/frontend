@@ -254,7 +254,7 @@ const AssignStudentModal = ({ isOpen, onClose, numCaso, onAssignSuccess }: Assig
                     <button
                         onClick={handleAssign}
                         disabled={selectedStudents.length === 0 || assigning}
-                        className="px-5 py-2.5 rounded-lg bg-red-900 text-white font-medium text-sm shadow-md hover:bg-red-800 hover:shadow-lg transition-all focus:outline-none disabled:opacity-50 disabled:shadow-none translate-y-0 active:translate-y-0.5"
+                        className="px-5 py-2.5 rounded-lg bg-red-900 text-white font-medium text-sm shadow-md hover:bg-red-950 hover:shadow-lg transition-all focus:outline-none disabled:opacity-50 disabled:shadow-none translate-y-0 active:translate-y-0.5"
                     >
                         {assigning ? (
                             <span className="flex items-center gap-2">

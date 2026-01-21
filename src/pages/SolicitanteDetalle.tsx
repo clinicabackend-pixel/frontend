@@ -85,7 +85,7 @@ export function SolicitanteDetalle() {
             <MainLayout title="Cargando...">
                 <div className="flex items-center justify-center h-screen">
                     <div className="flex flex-col items-center">
-                        <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${isDark ? 'border-red-700' : 'border-red-900'} mb-4`}></div>
+                        <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${isDark ? 'border-red-900' : 'border-red-900'} mb-4`}></div>
                         <p className={isDark ? 'text-white' : 'text-black'}>Cargando información del solicitante...</p>
                     </div>
                 </div>
@@ -97,7 +97,7 @@ export function SolicitanteDetalle() {
         return (
             <MainLayout title="DETALLE DEL SOLICITANTE">
                 <div className="flex flex-col items-center justify-center h-full gap-4">
-                    <p className={`text-xl font-semibold ${isDark ? 'text-red-300' : 'text-red-600'}`}>{error || 'Solicitante no encontrado'}</p>
+                    <p className={`text-xl font-semibold ${isDark ? 'text-red-800' : 'text-red-600'}`}>{error || 'Solicitante no encontrado'}</p>
                     <Button onClick={() => navigate('/solicitantes')} variant="primary">Volver a la lista</Button>
                 </div>
             </MainLayout>
@@ -171,7 +171,7 @@ export function SolicitanteDetalle() {
                             {/* Informacion Personal */}
                             <section>
                                 <h3 className={`flex items-center gap-2 text-lg font-bold mb-4 border-b pb-2 ${isDark ? 'text-white border-red-800/50' : 'text-gray-800 border-gray-200'}`}>
-                                    <FontAwesomeIcon icon={faUser} className={isDark ? 'text-red-300' : 'text-red-900'} />
+                                    <FontAwesomeIcon icon={faUser} className={isDark ? 'text-red-800' : 'text-red-900'} />
                                     Informaci&oacute;n Personal
                                 </h3>
                                 <dl className="grid grid-cols-1 gap-y-3 text-sm">
@@ -204,7 +204,7 @@ export function SolicitanteDetalle() {
                             {/* Contacto */}
                             <section>
                                 <h3 className={`flex items-center gap-2 text-lg font-bold mb-4 border-b pb-2 ${isDark ? 'text-white border-red-800/50' : 'text-gray-800 border-gray-200'}`}>
-                                    <FontAwesomeIcon icon={faPhone} className={isDark ? 'text-red-300' : 'text-red-900'} />
+                                    <FontAwesomeIcon icon={faPhone} className={isDark ? 'text-red-800' : 'text-red-900'} />
                                     Contacto
                                 </h3>
                                 <dl className="grid grid-cols-1 gap-y-3 text-sm">
@@ -241,7 +241,7 @@ export function SolicitanteDetalle() {
                             {/* Laboral */}
                             <section>
                                 <h3 className={`flex items-center gap-2 text-lg font-bold mb-4 border-b pb-2 ${isDark ? 'text-white border-red-800/50' : 'text-gray-800 border-gray-200'}`}>
-                                    <FontAwesomeIcon icon={faBriefcase} className={isDark ? 'text-red-300' : 'text-red-900'} />
+                                    <FontAwesomeIcon icon={faBriefcase} className={isDark ? 'text-red-800' : 'text-red-900'} />
                                     Informaci&oacute;n Laboral
                                 </h3>
                                 <dl className="grid grid-cols-1 gap-y-3 text-sm">
@@ -265,7 +265,7 @@ export function SolicitanteDetalle() {
                         <div className={`border-t ${isDark ? 'border-red-800/50' : 'border-gray-100'} p-8`}>
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className={`flex items-center gap-2 text-xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>
-                                    <FontAwesomeIcon icon={faFileAlt} className={isDark ? 'text-red-300' : 'text-red-900'} />
+                                    <FontAwesomeIcon icon={faFileAlt} className={isDark ? 'text-red-800' : 'text-red-900'} />
                                     Encuesta Socioecon&oacute;mica
                                 </h3>
                                 <Button
@@ -388,13 +388,13 @@ export function SolicitanteDetalle() {
                         {/* Listado de Casos */}
                         <div className={`${isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-200'} p-8 border-t`}>
                             <h3 className={`text-xl font-bold mb-6 flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
-                                <FontAwesomeIcon icon={faBriefcase} className={isDark ? 'text-red-300' : 'text-red-900'} />
+                                <FontAwesomeIcon icon={faBriefcase} className={isDark ? 'text-red-800' : 'text-red-900'} />
                                 Historial de Casos
                             </h3>
 
                             {/* Casos como Solicitante */}
                             <div className="mb-8">
-                                <h4 className={`font-semibold text-lg mb-4 border-l-4 pl-3 ${isDark ? 'text-red-300 border-red-700' : 'text-red-800 border-red-800'}`}>
+                                <h4 className={`font-semibold text-lg mb-4 border-l-4 pl-3 ${isDark ? 'text-red-800 border-red-900' : 'text-red-800 border-red-800'}`}>
                                     Como Solicitante (Titular)
                                 </h4>
                                 {casosTitular.length > 0 ? (
@@ -412,7 +412,7 @@ export function SolicitanteDetalle() {
                                             <tbody className={`${isDark ? 'bg-[#630000] divide-red-800/50' : 'bg-white divide-gray-200'} divide-y`}>
                                                 {casosTitular.map((caso) => (
                                                     <tr key={caso.numCaso} className={`cursor-pointer ${isDark ? 'hover:bg-red-950/50' : 'hover:bg-gray-50'}`} onClick={() => navigate(`/casos/${caso.numCaso}`)}>
-                                                        <td className={`px-4 py-3 whitespace-nowrap text-sm font-medium ${isDark ? 'text-red-300' : 'text-red-900'}`}>{caso.numCaso}</td>
+                                                        <td className={`px-4 py-3 whitespace-nowrap text-sm font-medium ${isDark ? 'text-red-800' : 'text-red-900'}`}>{caso.numCaso}</td>
                                                         <td className={`px-4 py-3 whitespace-nowrap text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>{caso.fechaRecepcion}</td>
                                                         <td className={`px-4 py-3 text-sm max-w-xs truncate ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>{caso.sintesis}</td>
                                                         <td className={`px-4 py-3 text-sm max-w-xs truncate ${isDark ? 'text-gray-300' : 'text-gray-500'}`} title={caso.legalHierarchy}>{caso.legalHierarchy || 'N/A'}</td>
@@ -451,7 +451,7 @@ export function SolicitanteDetalle() {
                                             <tbody className={`${isDark ? 'bg-[#630000] divide-red-800/50' : 'bg-white divide-gray-200'} divide-y`}>
                                                 {casosBeneficiario.map((caso) => (
                                                     <tr key={caso.numCaso} className={`cursor-pointer ${isDark ? 'hover:bg-red-950/50' : 'hover:bg-gray-50'}`} onClick={() => navigate(`/casos/${caso.numCaso}`)}>
-                                                        <td className={`px-4 py-3 whitespace-nowrap text-sm font-medium ${isDark ? 'text-red-300' : 'text-red-900'}`}>{caso.numCaso}</td>
+                                                        <td className={`px-4 py-3 whitespace-nowrap text-sm font-medium ${isDark ? 'text-red-800' : 'text-red-900'}`}>{caso.numCaso}</td>
                                                         <td className={`px-4 py-3 whitespace-nowrap text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>{caso.fechaRecepcion}</td>
                                                         <td className={`px-4 py-3 text-sm max-w-xs truncate ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>{caso.sintesis}</td>
                                                         <td className={`px-4 py-3 text-sm max-w-xs truncate ${isDark ? 'text-gray-300' : 'text-gray-500'}`} title={caso.legalHierarchy}>{caso.legalHierarchy || 'N/A'}</td>

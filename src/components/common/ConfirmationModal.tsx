@@ -64,7 +64,7 @@ const ConfirmationModal = ({
 
     const getConfirmBtnClass = () => {
         switch (variant) {
-            case 'danger': return 'bg-red-900 hover:bg-red-800 focus:ring-red-900';
+            case 'danger': return 'bg-red-900 hover:bg-red-950 focus:ring-red-900';
             case 'warning': return 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-600';
             default: return 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-600';
         }

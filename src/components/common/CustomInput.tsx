@@ -37,7 +37,7 @@ export default function CustomInput({
     pattern,
     title,
     className = '',
-
+    isDark = false,
 }: CustomInputProps) {
     const handleIncrement = () => {
         if (disabled) return;
@@ -87,7 +87,7 @@ export default function CustomInput({
                     relative flex items-center w-full border rounded-full px-4 py-2 shadow-sm
                     focus-within:ring-2 focus-within:ring-red-900 focus-within:border-transparent
                     transition-all duration-200
-                    bg-white border-gray-300 ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-100' : 'hover:border-red-900'}
+                    ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'} ${disabled ? 'opacity-50 cursor-not-allowed' : isDark ? 'hover:border-red-900' : 'hover:border-red-900'}
                 `}>
                     <input
                         type={type}
@@ -163,7 +163,7 @@ export default function CustomInput({
                         w-full px-4 h-11 border rounded-lg shadow-sm
                         outline-none transition-all duration-200
                         focus:ring-2 focus:ring-red-900 focus:border-transparent
-                        bg-white border-gray-300 placeholder-gray-400 text-gray-900 hover:border-red-900 ${disabled ? 'bg-gray-100 cursor-not-allowed opacity-50' : ''}
+                        ${isDark ? 'bg-gray-800 border-gray-700 placeholder-gray-400 text-white hover:border-red-900' : 'bg-white border-gray-300 placeholder-gray-400 text-gray-900 hover:border-red-900'} ${disabled ? 'cursor-not-allowed opacity-50' : ''}
                     `}
                 />
             )}

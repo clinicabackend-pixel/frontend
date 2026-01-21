@@ -74,12 +74,13 @@ export default function AgendaPage() {
             <div className="w-full mx-auto">
 
                 {/* Controls */}
-                <div className={`p-4 rounded-lg shadow-sm mb-6 border flex flex-col md:flex-row justify-between items-center gap-4 ${darkMode ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
+                <div className={`p-4 rounded-lg shadow-sm mb-6 border flex flex-col md:flex-row justify-between items-center gap-4 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                     <div className="w-full md:w-1/2">
                         <SearchBar
                             value={searchText}
                             onChange={setSearchText}
                             placeholder="Buscar estudiante..."
+                            isDark={darkMode}
                         />
                     </div>
                 </div>
@@ -87,12 +88,12 @@ export default function AgendaPage() {
                 {/* Content */}
                 {loading ? (
                     <div className="flex justify-center items-center h-64">
-                        <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${darkMode ? 'border-red-700' : 'border-red-900'}`}></div>
+                        <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${darkMode ? 'border-red-900' : 'border-red-900'}`}></div>
                     </div>
                 ) : (
-                    <div className={`shadow overflow-hidden sm:rounded-lg border ${darkMode ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
-                        <table className={`min-w-full divide-y ${darkMode ? 'divide-red-800/50' : 'divide-gray-200'}`}>
-                            <thead className={darkMode ? 'bg-red-950/30' : 'bg-gray-50'}>
+                    <div className={`shadow overflow-hidden sm:rounded-lg border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                        <table className={`min-w-full divide-y ${darkMode ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                            <thead className={darkMode ? 'bg-gray-800/50' : 'bg-gray-50'}>
                                 <tr>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-500'}`}>Estudiante</th>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-500'}`}>Cédula</th>
@@ -100,16 +101,16 @@ export default function AgendaPage() {
                                     <th className="relative px-6 py-3"><span className="sr-only">Ver</span></th>
                                 </tr>
                             </thead>
-                            <tbody className={`divide-y ${darkMode ? 'divide-red-800/50 bg-[#630000]' : 'divide-gray-200 bg-white'}`}>
+                            <tbody className={`divide-y ${darkMode ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
                                 {currentItems.map((est) => (
                                     <tr 
                                         key={est.username} 
                                         onClick={() => navigate(`/casos?username=${est.username}`)}
-                                        className={`transition-colors cursor-pointer ${darkMode ? 'hover:bg-red-950/50' : 'hover:bg-gray-50'}`}
+                                        className={`transition-colors cursor-pointer ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
                                     >
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
-                                                <div className={`shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${darkMode ? 'bg-red-950/50 text-gray-400' : 'bg-gray-200 text-gray-500'}`}>
+                                                <div className={`shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${darkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-500'}`}>
                                                     <User size={20} />
                                                 </div>
                                                 <div className="ml-4">
@@ -151,7 +152,7 @@ export default function AgendaPage() {
                         )}
 
                         {/* Pagination */}
-                        <div className={`px-6 py-4 border-t ${darkMode ? 'border-red-800/50' : 'border-gray-200'}`}>
+                        <div className={`px-6 py-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                             <Pagination
                                 currentPage={currentPage}
                                 itemsPerPage={itemsPerPage}

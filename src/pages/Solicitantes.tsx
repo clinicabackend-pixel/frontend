@@ -184,7 +184,7 @@ function Solicitantes() {
                         >
                             Volver a la lista
                         </Button>
-                        <div className={`${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'} backdrop-blur-md border rounded-lg shadow-xl p-6 md:p-8`}>
+                        <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} backdrop-blur-md border rounded-lg shadow-xl p-6 md:p-8`}>
                             <h2 className={`text-3xl font-bold mb-8 text-center ${isDark ? 'text-white' : 'text-gray-800'}`}>Nuevo Solicitante</h2>
                             <SolicitanteForm onSuccess={handleSuccess} formMode='create' />
                         </div>
@@ -193,7 +193,7 @@ function Solicitantes() {
                     // LISTA DE SOLICITANTES
                     <>
                         {/* Toolbar */}
-                        <div className={`flex flex-col md:flex-row justify-between items-center gap-4 mb-8 p-4 rounded-xl shadow-sm border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
+                        <div className={`flex flex-col md:flex-row justify-between items-center gap-4 mb-8 p-4 rounded-xl shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                             {/* Buscador y Switch */}
                             <div className="flex flex-col xl:flex-row items-center gap-6 flex-1 min-w-0">
                                 <div className="w-full xl:w-96">
@@ -244,7 +244,7 @@ function Solicitantes() {
                                 variant="primary"
                                 onClick={() => setShowForm(true)}
                                 icon={faPlus}
-                                className="w-full md:w-auto shadow-sm bg-red-900 hover:bg-red-800 text-white border-transparent"
+                                className="w-full md:w-auto shadow-sm bg-red-900 hover:bg-red-950 text-white border-transparent"
                             >
                                 Nuevo Solicitante
                             </Button>
@@ -256,7 +256,7 @@ function Solicitantes() {
                         ) : (
                             <>
                                 {filteredSolicitantes.length === 0 ? (
-                                    <div className={`text-center py-20 rounded-2xl border-2 border-dashed ${isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-200'}`}>
+                                    <div className={`text-center py-20 rounded-2xl border-2 border-dashed ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
                                         <p className={`text-lg font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>No se encontraron solicitantes.</p>
                                         {searchText && (
                                             <Button
@@ -282,10 +282,10 @@ function Solicitantes() {
                                                 ))}
                                             </div>
                                         ) : (
-                                            <div className={`rounded-2xl shadow-sm border overflow-hidden ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-100'}`}>
+                                            <div className={`rounded-2xl shadow-sm border overflow-hidden ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
                                                 <table className="min-w-full">
                                                     <thead>
-                                                        <tr className={`border-b ${isDark ? 'border-red-800/50 bg-red-950/30' : 'border-gray-200 bg-gray-50'}`}>
+                                                        <tr className={`border-b ${isDark ? 'border-gray-700 bg-gray-800/50' : 'border-gray-200 bg-gray-50'}`}>
                                                             <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Solicitante</th>
                                                             <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Cédula</th>
                                                             <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Contacto</th>
@@ -293,7 +293,7 @@ function Solicitantes() {
                                                             <th className={`px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Acciones</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody className={`divide-y ${isDark ? 'divide-red-800/50 bg-[#630000]' : 'divide-gray-200 bg-white'}`}>
+                                                    <tbody className={`divide-y ${isDark ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
                                                         {currentItems.map((sol) => (
                                                             <SolicitanteRow
                                                                 key={sol.cedula}

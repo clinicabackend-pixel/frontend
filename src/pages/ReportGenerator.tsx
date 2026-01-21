@@ -136,7 +136,7 @@ const ReportGenerator: React.FC = () => {
                         <PDFDownloadLink
                             document={<ReportePDF data={pdfData} charts={chartImages} anio={new Date().getFullYear()} />}
                             fileName={`memoria_y_cuenta_${new Date().getFullYear()}.pdf`}
-                            className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold flex items-center gap-2"
+                            className="px-6 py-2 bg-red-900 hover:bg-red-950 text-white rounded-lg font-semibold flex items-center gap-2"
                         >
                             {({ loading }) => (loading ? 'Generando Documento...' : <><FontAwesomeIcon icon={faFilePdf} /> Descargar PDF</>)}
                         </PDFDownloadLink>

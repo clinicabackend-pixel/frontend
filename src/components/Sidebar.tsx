@@ -46,10 +46,10 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-3 px-3 py-3 font-medium rounded-lg transition-all duration-300 group relative ${isActive
       ? isDark
-        ? 'bg-red-800/50 text-white'
+        ? 'bg-red-900/30 text-white border-l-2 border-red-900'
         : 'bg-red-50 text-red-900'
       : isDark
-        ? 'text-white hover:bg-red-800/50'
+        ? 'text-white hover:bg-gray-700 hover:border-l-2 hover:border-red-900/50'
         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
     } ${isCollapsed ? 'justify-center text-2xl' : 'text-base'}`;
 
@@ -79,7 +79,7 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Sidebar Container */}
       <aside
         className={`fixed md:static inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out shadow-sm group
-              ${isDark ? 'bg-red-900 border-red-800' : 'bg-white border-gray-200'}
+              ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}
           border-r
           ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
           ${isCollapsed ? 'w-20' : 'w-64'}
@@ -88,7 +88,7 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="flex flex-col h-full relative">
 
           {/* Header / Logo */}
-          <div className={`h-16 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between px-6'} ${isDark ? 'border-red-800' : 'border-gray-100'} border-b transition-all duration-300`}>
+          <div className={`h-16 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between px-6'} ${isDark ? 'border-gray-700' : 'border-gray-100'} border-b transition-all duration-300`}>
 
             {/* Desktop Toggle (Collapsed: Icon is the button) */}
             {isCollapsed ? (
@@ -226,11 +226,11 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
           </div>
 
           {/* Footer / Logout */}
-          <div className={`p-4 ${isCollapsed ? 'border-t-0' : 'border-t'} ${isDark ? 'border-red-800' : 'border-gray-100'}`}>
+          <div className={`p-4 ${isCollapsed ? 'border-t-0' : 'border-t'} ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
             <button
               onClick={handleLogout}
               className={`flex items-center gap-3 w-full px-3 py-3 font-medium rounded-lg transition-colors group relative ${isCollapsed ? 'justify-center text-2xl' : 'text-base'} ${isDark
-                ? 'text-white hover:bg-red-800/50'
+                ? 'text-white hover:bg-gray-700 hover:text-red-400'
                 : 'text-gray-600 hover:text-red-700 hover:bg-red-50'
                 }`}
             >

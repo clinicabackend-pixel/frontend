@@ -19,7 +19,7 @@ const SearchBar = ({ value, onChange, placeholder = "Buscar...", className = "",
                 type="text"
                 className={`block w-full h-10 pl-10 pr-3 py-2 border rounded-lg sm:text-sm transition-all ${
                     isDark
-                        ? 'bg-red-950/50 border-red-800/50 text-white placeholder-gray-400 focus:bg-red-950/70 focus:ring-1 focus:ring-red-900 focus:border-red-900'
+                        ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:bg-gray-800 focus:ring-1 focus:ring-red-900 focus:border-red-900'
                         : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-400 focus:bg-white focus:ring-1 focus:ring-red-900 focus:border-red-900'
                 }`}
                 placeholder={placeholder}

@@ -396,12 +396,12 @@ function CasoDetalle() {
         <Header title="Error" onMenuClick={handleMenuClick} />
         <div className="flex flex-1 items-center justify-center">
           <div className={`text-center p-8 rounded-lg shadow-md border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
-            <p className={`text-xl font-semibold mb-4 ${isDark ? 'text-red-300' : 'text-red-600'}`}>
+            <p className={`text-xl font-semibold mb-4 ${isDark ? 'text-red-800' : 'text-red-600'}`}>
               {error || 'Caso no encontrado'}
             </p>
             <button
               onClick={() => navigate('/casos')}
-              className="px-6 py-2 bg-red-900 text-white rounded hover:bg-red-800 transition-colors"
+              className="px-6 py-2 bg-red-900 text-white rounded hover:bg-red-950 transition-colors"
             >
               Volver a la lista
             </button>
@@ -458,7 +458,7 @@ function CasoDetalle() {
                         }
                       }
                     }}
-                    className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors flex items-center gap-2 text-sm"
+                    className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-950 font-medium transition-colors flex items-center gap-2 text-sm"
                     title="Eliminar Caso Permanentemente"
                   >
                     <FontAwesomeIcon icon={faTrash} />
@@ -536,7 +536,7 @@ function CasoDetalle() {
                 </div>
                 <div className="text-right">
                   <div
-                    className={`text-lg font-semibold text-right ${isDark ? 'text-red-400' : 'text-red-900'
+                    className={`text-lg font-semibold text-right ${isDark ? 'text-red-800' : 'text-red-900'
                       }`}
                   >
                     {materiaNombre}
@@ -694,10 +694,10 @@ function CasoDetalle() {
                                 py-4 px-1 border-b-2 font-medium text-sm capitalize transition-colors
                                 ${activeTab === tab.id
                         ? isDark
-                          ? 'border-red-600 text-red-400'
+                          ? 'border-red-600 text-red-800'
                           : 'border-red-900 text-red-900'
                         : isDark
-                          ? 'border-transparent text-gray-300 hover:text-white hover:border-red-700'
+                          ? 'border-transparent text-gray-300 hover:text-white hover:border-red-900'
                           : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                       }
                             `}
@@ -725,7 +725,7 @@ function CasoDetalle() {
                     <button
                       onClick={openEditModal}
                       className={`px-3 py-1 text-sm font-medium border rounded-md transition-colors ${isDark
-                        ? 'text-red-400 border-red-600 hover:bg-red-950'
+                        ? 'text-red-800 border-red-600 hover:bg-red-950'
                         : 'text-red-900 border-red-900 hover:bg-red-50'
                         }`}
                     >
@@ -858,7 +858,7 @@ function CasoDetalle() {
                                 <button
                                   onClick={() => handleEditBeneficiario(ben.cedula)}
                                   className={`transition-colors ${isDark
-                                    ? 'text-gray-400 hover:text-red-400'
+                                    ? 'text-gray-400 hover:text-red-800'
                                     : 'text-gray-400 hover:text-red-900'
                                     }`}
                                   title="Editar información del beneficiario"
@@ -1011,8 +1011,8 @@ function CasoDetalle() {
                               },
                               inicio: {
                                 bgColor: isDark ? 'bg-red-700' : 'bg-red-900',
-                                borderColor: isDark ? 'border-red-700' : 'border-red-200',
-                                textColor: isDark ? 'text-red-400' : 'text-red-900',
+                                borderColor: isDark ? 'border-red-900' : 'border-red-200',
+                                textColor: isDark ? 'text-red-800' : 'text-red-900',
                                 badgeBg: isDark ? 'bg-gray-300' : 'bg-gray-100',
                                 badgeText: isDark ? 'text-gray-900' : 'text-gray-800',
                                 label: 'Inicio del Caso',
@@ -1154,7 +1154,7 @@ function CasoDetalle() {
                             {canAssign && (
                               <button
                                 onClick={() => setUnassignData({ isOpen: true, username: asig.username, termino: asig.termino, nombre: asig.nombre })}
-                                className={`transition-colors ${isDark ? 'text-gray-400 hover:text-red-400' : 'text-gray-400 hover:text-red-600'}`}
+                                className={`transition-colors ${isDark ? 'text-gray-400 hover:text-red-800' : 'text-gray-400 hover:text-red-600'}`}
                               >
                                 <FontAwesomeIcon icon={faTrash} />
                               </button>
@@ -1190,7 +1190,7 @@ function CasoDetalle() {
                     <ul className="space-y-4">
                       {documentos.map((doc, idx) => (
                         <li key={idx} className={`p-4 rounded-lg border flex gap-4 ${isDark ? 'border-red-800/50 bg-red-950/30' : 'border-gray-200 bg-gray-50'}`}>
-                          <div className={`p-3 rounded-lg h-fit ${isDark ? 'bg-red-900/50 text-red-300' : 'bg-red-100 text-red-700'}`}>
+                          <div className={`p-3 rounded-lg h-fit ${isDark ? 'bg-red-900/50 text-red-800' : 'bg-red-100 text-red-700'}`}>
                             <FontAwesomeIcon icon={faFolderOpen} size="lg" />
                           </div>
                           <div className="flex-1">
@@ -1305,7 +1305,7 @@ function CasoDetalle() {
                         >
                           <div className="flex items-start gap-3">
                             <div
-                              className={`p-2 rounded-lg ${isDark ? 'bg-red-900/50 text-red-400' : 'bg-red-50 text-red-700'
+                              className={`p-2 rounded-lg ${isDark ? 'bg-red-900/50 text-red-800' : 'bg-red-50 text-red-700'
                                 }`}
                             >
                               <svg

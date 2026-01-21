@@ -168,7 +168,7 @@ function CasosPage() {
     <MainLayout title="GESTIÓN DE CASOS">
       <div className="w-full mx-auto">
         {/* Controles de Filtros y Búsqueda */}
-        <div className={`${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'} p-3 rounded-lg shadow-sm mb-6 border`}>
+        <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-3 rounded-lg shadow-sm mb-6 border`}>
           <div className="flex flex-col lg:flex-row gap-3 justify-between items-stretch lg:items-center">
             {/* Buscador de Texto */}
             <div className="w-full lg:w-64 xl:w-80">
@@ -249,14 +249,14 @@ function CasosPage() {
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="flex flex-col items-center">
-              <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${isDark ? 'border-red-700' : 'border-red-900'} mb-4`}></div>
+              <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${isDark ? 'border-red-600' : 'border-red-900'} mb-4`}></div>
               <p className={isDark ? 'text-white' : 'text-black'}>Cargando casos...</p>
             </div>
           </div>
         ) : (
           <>
             {casosOrdenados.length === 0 ? (
-              <div className={`text-center py-16 ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-300'} rounded-lg border border-dashed`}>
+              <div className={`text-center py-16 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'} rounded-lg border border-dashed`}>
                 <p className={`${isDark ? 'text-gray-300' : 'text-gray-500'} text-lg`}>
                   No se encontraron casos con los criterios seleccionados.
                 </p>
@@ -277,9 +277,9 @@ function CasosPage() {
             ) : (
               <>
                 {viewMode === 'list' ? (
-                  <div className={`${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'} shadow overflow-hidden sm:rounded-lg border`}>
-                    <table className={`min-w-full divide-y ${isDark ? 'divide-red-800/50' : 'divide-gray-200'}`}>
-                      <thead className={isDark ? 'bg-red-950/30' : 'bg-gray-50'}>
+                  <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow overflow-hidden sm:rounded-lg border`}>
+                    <table className={`min-w-full divide-y ${isDark ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                      <thead className={isDark ? 'bg-gray-800/50' : 'bg-gray-50'}>
                         <tr>
                           <th
                             scope="col"
@@ -316,7 +316,7 @@ function CasosPage() {
                           </th>
                         </tr>
                       </thead>
-                      <tbody className={`divide-y ${isDark ? 'divide-red-800/50 bg-[#630000]' : 'divide-gray-200 bg-white'}`}>
+                      <tbody className={`divide-y ${isDark ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
                         {casosActuales.map((caso) => (
                           <CasoRow
                             key={caso.numCaso}

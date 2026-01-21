@@ -83,12 +83,12 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
     <>
       <div
         onClick={onClick}
-        className={`group cursor-pointer relative shadow-md hover:shadow-xl transition-all duration-300 h-[360px] w-full flex flex-col rounded-lg overflow-hidden border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'
+        className={`group cursor-pointer relative shadow-md hover:shadow-xl transition-all duration-300 h-[360px] w-full flex flex-col rounded-lg overflow-hidden border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
           }`}
       >
         {/* 1. Left Vertical Red Bar */}
         <div
-          className={`absolute left-0 top-0 bottom-0 w-3 group-hover:w-4 transition-all duration-300 ${isDark ? 'bg-red-700' : 'bg-red-900'
+          className={`absolute left-0 top-0 bottom-0 w-3 group-hover:w-4 transition-all duration-300 ${isDark ? 'bg-red-900' : 'bg-red-900'
             }`}
         ></div>
 
@@ -103,7 +103,7 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
             <div className="flex flex-col items-end">
               <span
                 className={`font-bold text-lg tracking-wide group-hover:scale-110 origin-right transition-all duration-300 ${isDark
-                  ? 'text-white group-hover:text-red-500'
+                  ? 'text-white group-hover:text-red-800'
                   : 'text-gray-900 group-hover:text-red-900'
                   }`}
               >
@@ -140,7 +140,7 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
           {/* Requirements: Materia (Ambito Legal) below name */}
           <div className="mb-3 flex items-center">
             <p
-              className={`text-xs font-semibold uppercase tracking-wide line-clamp-1 ${isDark ? 'text-red-300' : 'text-red-700'
+              className={`text-xs font-semibold uppercase tracking-wide line-clamp-1 ${isDark ? 'text-red-800' : 'text-red-700'
                 }`}
             >
               {materia}
@@ -149,7 +149,7 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
 
           {/* 4. Body: Synthesis */}
           <div className="flex-1 overflow-hidden relative flex flex-col justify-start py-2">
-            <div className={`mb-2 px-2 py-1.5 rounded-md ${isDark ? 'bg-red-950/30 border border-red-800/30' : 'bg-gray-50 border border-gray-100'}`}>
+            <div className={`mb-2 px-2 py-1.5 rounded-md ${isDark ? 'bg-gray-700/50 border border-red-900/30' : 'bg-gray-50 border border-gray-100'}`}>
               <p className={`text-xs font-semibold uppercase tracking-wide mb-1 ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
                 Síntesis
               </p>
@@ -166,7 +166,7 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
 
           {/* Footer: Metadata */}
           <div
-            className={`text-xs font-medium flex justify-between items-end border-t pt-2 mt-auto ${isDark ? 'text-gray-200 border-red-800/50' : 'text-gray-400 border-gray-100'
+            className={`text-xs font-medium flex justify-between items-end border-t pt-2 mt-auto ${isDark ? 'text-gray-200 border-gray-700' : 'text-gray-400 border-gray-100'
               }`}
           >
             <div>
