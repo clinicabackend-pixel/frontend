@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { X, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
@@ -18,6 +19,9 @@ const Toast: React.FC<ToastProps> = ({
     onClose,
     duration = 3000
 }) => {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
     useEffect(() => {
         if (isVisible && duration > 0) {
             const timer = setTimeout(() => {
@@ -39,11 +43,20 @@ const Toast: React.FC<ToastProps> = ({
     };
 
     const getStyles = () => {
-        switch (type) {
-            case 'success': return 'bg-green-100 border-green-500 text-green-800';
-            case 'error': return 'bg-red-100 border-red-500 text-red-800';
-            case 'warning': return 'bg-yellow-100 border-yellow-500 text-yellow-800';
-            default: return 'bg-blue-100 border-blue-500 text-blue-800';
+        if (isDark) {
+            switch (type) {
+                case 'success': return 'bg-green-900/80 border-green-700 text-green-100';
+                case 'error': return 'bg-red-900/80 border-red-700 text-red-100';
+                case 'warning': return 'bg-yellow-900/80 border-yellow-700 text-yellow-100';
+                default: return 'bg-blue-900/80 border-blue-700 text-blue-100';
+            }
+        } else {
+            switch (type) {
+                case 'success': return 'bg-green-100 border-green-500 text-green-800';
+                case 'error': return 'bg-red-100 border-red-500 text-red-800';
+                case 'warning': return 'bg-yellow-100 border-yellow-500 text-yellow-800';
+                default: return 'bg-blue-100 border-blue-500 text-blue-800';
+            }
         }
     };
 
@@ -57,7 +70,7 @@ const Toast: React.FC<ToastProps> = ({
             </div>
             <button
                 type="button"
-                className="ml-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 p-1.5 inline-flex h-8 w-8 hover:bg-black/10 transition-colors"
+                className={`ml-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 p-1.5 inline-flex h-8 w-8 transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-black/10'}`}
                 onClick={onClose}
                 aria-label="Close"
             >

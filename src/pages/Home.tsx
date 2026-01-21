@@ -23,8 +23,8 @@ function Home() {
   const [pendientesRevision, setPendientesRevision] = useState<number>(0);
   const [cerradosEsteMes, setCerradosEsteMes] = useState<number>(0);
   const [loadingStats, setLoadingStats] = useState<boolean>(true);
-  const [accionesSemana, setAccionesSemana] = useState<{ fecha: Date; count: number }[]>([]);
-  const [loadingAcciones, setLoadingAcciones] = useState<boolean>(true);
+  const [citasSemana, setCitasSemana] = useState<{ fecha: Date; count: number }[]>([]);
+  const [loadingCitas, setLoadingCitas] = useState<boolean>(true);
   const [isDark, setIsDark] = useState(() => {
     if (theme === 'dark') return true;
     if (theme === 'light') return false;
@@ -120,42 +120,49 @@ function Home() {
     loadCaseStats();
   }, [username, user]); // Agregar 'user' a las dependencias para que se ejecute cuando cambie
 
-  // Cargar acciones de la última semana
+  // Cargar citas agendadas de los próximos 7 días
   useEffect(() => {
     if (!user && !username) {
       return;
     }
 
-    const loadAccionesSemana = async () => {
-      setLoadingAcciones(true);
+    const loadCitasSemana = async () => {
+      setLoadingCitas(true);
       try {
         const puedeVerTodosLosCasos = user?.tipo === 'COORDINADOR' || user?.tipo === 'ADMINISTRADOR' || user?.tipo === 'PROFESOR';
         const currentUsername = user?.username || username;
         const userFilter = (currentUsername && !puedeVerTodosLosCasos) ? currentUsername : undefined;
 
         if (!currentUsername && !puedeVerTodosLosCasos) {
-          setLoadingAcciones(false);
-          setAccionesSemana([]);
+          setLoadingCitas(false);
+          setCitasSemana([]);
           return;
         }
 
-        // Calcular fechas de la última semana (últimos 7 días)
+        // Calcular fechas de los próximos 7 días (desde hoy hasta 7 días adelante)
         const ahora = new Date();
+        ahora.setHours(0, 0, 0, 0); // Normalizar a inicio del día
         const fechasSemana: Date[] = [];
-        const accionesPorDia: { fecha: Date; count: number }[] = [];
+        const citasPorDia: { fecha: Date; count: number }[] = [];
 
-        // Inicializar array con los últimos 7 días
-        for (let i = 6; i >= 0; i--) {
+        // Inicializar array con los próximos 7 días (incluyendo hoy)
+        for (let i = 0; i < 7; i++) {
           const fecha = new Date(ahora);
-          fecha.setDate(ahora.getDate() - i);
+          fecha.setDate(ahora.getDate() + i);
           fecha.setHours(0, 0, 0, 0);
           fechasSemana.push(fecha);
-          accionesPorDia.push({ fecha, count: 0 });
+          citasPorDia.push({ fecha, count: 0 });
         }
+
+        // Calcular rango de fechas para filtrar encuentros
+        const fechaInicio = new Date(ahora);
+        fechaInicio.setHours(0, 0, 0, 0);
+        const fechaFin = new Date(ahora);
+        fechaFin.setDate(ahora.getDate() + 6);
+        fechaFin.setHours(23, 59, 59, 999);
 
         // Obtener todos los casos del usuario
         const todosCasos = await casoService.getAll(undefined, userFilter, undefined);
-
 
         // Función auxiliar para comparar fechas por día (ignorando horas)
         const esMismoDia = (fecha1: Date, fecha2: Date): boolean => {
@@ -164,27 +171,14 @@ function Home() {
                  fecha1.getDate() === fecha2.getDate();
         };
 
-        // Obtener acciones y encuentros de todos los casos (procesar en lotes)
-        const eventosConFecha: { fecha: string; tipo: 'accion' | 'encuentro' }[] = [];
-        // Reducir límite de casos para mejorar rendimiento
-        const casosLimite = todosCasos.slice(0, 50); // Reducir a 50 casos para mejorar velocidad
-        const tamanoLote = 20; // Aumentar tamaño de lote para menos peticiones
+        // Función para verificar si una fecha está en el rango de los próximos 7 días
+        const estaEnRango = (fecha: Date): boolean => {
+          return fecha >= fechaInicio && fecha <= fechaFin;
+        };
 
-        // Calcular la fecha de hace 7 días para filtrar casos recientes
-        const fechaLimite = new Date(ahora);
-        fechaLimite.setDate(ahora.getDate() - 10); // Buscar casos de los últimos 10 días
-
-        // Filtrar casos recientes primero
-        const casosRecientes = casosLimite.filter(caso => {
-          if (!caso.fechaRecepcion) return false;
-          const fechaCaso = new Date(caso.fechaRecepcion);
-          return fechaCaso >= fechaLimite;
-        });
-
-        // Si hay muchos casos recientes, limitar aún más
-        const casosAProcesar = casosRecientes.length > 0 
-          ? casosRecientes.slice(0, 30) 
-          : casosLimite.slice(0, 30);
+        // Obtener encuentros de todos los casos (procesar en lotes)
+        const tamanoLote = 20;
+        const casosAProcesar = todosCasos.slice(0, 100); // Procesar hasta 100 casos
 
         for (let i = 0; i < casosAProcesar.length; i += tamanoLote) {
           const lote = casosAProcesar.slice(i, i + tamanoLote);
@@ -192,81 +186,66 @@ function Home() {
           const promesas = lote.map(async (caso) => {
             try {
               const casoDetalle = await casoService.getById(caso.numCaso);
-              return {
-                acciones: casoDetalle.acciones || [],
-                encuentros: casoDetalle.encuentros || []
-              };
+              return casoDetalle.encuentros || [];
             } catch (error) {
-              return { acciones: [], encuentros: [] };
+              return [];
             }
           });
           
           const resultados = await Promise.all(promesas);
-          resultados.forEach(({ acciones, encuentros }) => {
-            // Agregar acciones - usar fechaRegistro (fecha que el usuario seleccionó para la acción)
-            acciones.forEach((accion: any) => {
-              // Usar fechaRegistro como fecha principal de la acción (seleccionada por el usuario)
-              if (accion.fechaRegistro) {
-                eventosConFecha.push({
-                  fecha: accion.fechaRegistro,
-                  tipo: 'accion'
-                });
-              }
-            });
-            
-            // Agregar encuentros (citas) con su fecha de atención
+          resultados.forEach((encuentros) => {
+            // Procesar encuentros: contar fechaAtencion y fechaProxima si están en los próximos 7 días
             encuentros.forEach((encuentro: any) => {
+              // Función helper para procesar una fecha
+              const procesarFecha = (fechaString: string) => {
+                if (!fechaString) return;
+                
+                let fechaEncuentro: Date | null = null;
+                const partes = fechaString.split('-');
+                if (partes.length === 3) {
+                  const año = parseInt(partes[0], 10);
+                  const mes = parseInt(partes[1], 10) - 1;
+                  const dia = parseInt(partes[2], 10);
+                  fechaEncuentro = new Date(año, mes, dia);
+                } else {
+                  fechaEncuentro = new Date(fechaString);
+                }
+                
+                if (fechaEncuentro && !isNaN(fechaEncuentro.getTime()) && estaEnRango(fechaEncuentro)) {
+                  // Buscar el día correspondiente en la semana
+                  const indiceDia = citasPorDia.findIndex(item => 
+                    esMismoDia(item.fecha, fechaEncuentro!)
+                  );
+                  
+                  if (indiceDia >= 0) {
+                    citasPorDia[indiceDia].count++;
+                  }
+                }
+              };
+              
+              // Contar fechaAtencion si está en los próximos 7 días
               if (encuentro.fechaAtencion) {
-                eventosConFecha.push({
-                  fecha: encuentro.fechaAtencion,
-                  tipo: 'encuentro'
-                });
+                procesarFecha(encuentro.fechaAtencion);
+              }
+              
+              // Contar fechaProxima si está en los próximos 7 días (citas programadas)
+              if (encuentro.fechaProxima) {
+                procesarFecha(encuentro.fechaProxima);
               }
             });
           });
         }
 
-        // Agrupar eventos por día de la última semana
-        eventosConFecha.forEach(evento => {
-          if (evento.fecha) {
-            // Parsear la fecha como fecha local (no UTC) para evitar problemas de zona horaria
-            let fechaEvento: Date | null = null;
-            
-            // Parsear la fecha (siempre es string según el tipo)
-            const partes = evento.fecha.split('-');
-            if (partes.length === 3) {
-              const año = parseInt(partes[0], 10);
-              const mes = parseInt(partes[1], 10) - 1; // Los meses son 0-indexados
-              const dia = parseInt(partes[2], 10);
-              fechaEvento = new Date(año, mes, dia);
-            } else {
-              fechaEvento = new Date(evento.fecha);
-            }
-            
-            if (!fechaEvento || isNaN(fechaEvento.getTime())) {
-              return; // Ignorar fechas inválidas
-            }
-            
-            // Buscar el día correspondiente en la semana
-            const indiceDia = accionesPorDia.findIndex(item => 
-              esMismoDia(item.fecha, fechaEvento!)
-            );
-            
-            if (indiceDia >= 0) {
-              accionesPorDia[indiceDia].count++;
-            }
-          }
-        });
-
-        setAccionesSemana(accionesPorDia);
+        setCitasSemana(citasPorDia);
       } catch (error) {
-        setAccionesSemana([]);
+        console.error('Error cargando citas:', error);
+        setCitasSemana([]);
       } finally {
-        setLoadingAcciones(false);
+        setLoadingCitas(false);
       }
     };
 
-    loadAccionesSemana();
+    loadCitasSemana();
   }, [username, user]);
 
   return (
@@ -424,31 +403,31 @@ function Home() {
           </div>
         </div>
 
-        {/* WIDGET D: Gráfico de Acciones Semanal */}
+        {/* WIDGET D: Gráfico de Citas Agendadas - Próximos 7 Días */}
         <div className={`md:col-span-2 lg:col-span-3 ${isDark ? 'bg-gray-800 border-gray-700/50' : 'bg-white border-gray-100'} p-6 rounded-xl shadow-sm border`}>
           <div className="flex justify-between items-center mb-6">
-            <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>Acciones de la Última Semana</h3>
+            <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>Citas Agendadas - Próximos 7 Días</h3>
           </div>
 
           {/* Gráfico de Barras */}
-          {loadingAcciones ? (
+          {loadingCitas ? (
             <div className="flex items-center justify-center h-48">
               <div className="flex flex-col items-center">
                 <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${isDark ? 'border-red-900' : 'border-red-900'} mb-2`}></div>
-                <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Cargando acciones...</p>
+                <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Cargando citas...</p>
               </div>
             </div>
-          ) : accionesSemana.length === 0 ? (
+          ) : citasSemana.length === 0 ? (
             <div className="flex items-center justify-center h-48">
-              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>No hay acciones registradas en la última semana</p>
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>No hay citas agendadas para los próximos 7 días</p>
             </div>
           ) : (
             <div className="w-full">
               <div className="w-full h-48 flex items-end justify-between px-4 gap-2">
-                {accionesSemana.map((item, i) => {
+                {citasSemana.map((item, i) => {
                   const { fecha, count } = item;
-                  const maxAcciones = Math.max(...accionesSemana.map(a => a.count), 1);
-                  const height = maxAcciones > 0 ? (count / maxAcciones) * 100 : 0;
+                  const maxCitas = Math.max(...citasSemana.map(c => c.count), 1);
+                  const height = maxCitas > 0 ? (count / maxCitas) * 100 : 0;
                   
                   // Formatear fecha: día y mes
                   const diaDelMes = fecha.getDate();
@@ -462,21 +441,38 @@ function Home() {
                   
                   // Detectar si es hoy
                   const ahora = new Date();
+                  ahora.setHours(0, 0, 0, 0);
                   const esHoy = fecha.toDateString() === ahora.toDateString();
+                  
+                  // Determinar si es el día con más citas
+                  const esMaximo = count === maxCitas && count > 0;
                   
                   return (
                     <div key={i} className="flex flex-col items-center gap-2 w-full group cursor-pointer">
-                      {/* Número de acciones encima de la barra */}
+                      {/* Número de citas encima de la barra */}
                       <div className={`text-xs font-semibold ${count > 0 ? (isDark ? 'text-white' : 'text-gray-900') : (isDark ? 'text-gray-600' : 'text-gray-400')}`}>
                         {count}
                       </div>
                       
                       {/* Contenedor de la barra */}
-                      <div className={`relative w-full ${isDark ? 'bg-red-800/50' : 'bg-gray-100'} rounded-t-lg overflow-hidden h-40 flex items-end`}>
+                      <div className={`relative w-full ${isDark ? 'bg-gray-700/30' : 'bg-gray-100'} rounded-t-lg overflow-hidden h-40 flex items-end`}>
                         <div
-                          style={{ height: `${height}%`, minHeight: count > 0 ? '5px' : '0' }}
-                          className={`w-full ${esHoy ? (isDark ? 'bg-red-600' : 'bg-red-900') : (isDark ? 'bg-red-900/50 group-hover:bg-red-900' : 'bg-red-200 group-hover:bg-red-300')} rounded-t-lg transition-all duration-300`}
-                          title={`${fechaCompleta}: ${count} acción${count !== 1 ? 'es' : ''}`}
+                          style={{ 
+                            height: `${height}%`, 
+                            minHeight: count > 0 ? '20px' : '0' 
+                          }}
+                          className={`w-full rounded-t-lg transition-all duration-300 ${
+                            count > 0
+                              ? esMaximo
+                                ? esHoy
+                                  ? isDark ? 'bg-red-500' : 'bg-red-700'
+                                  : isDark ? 'bg-red-600' : 'bg-red-800'
+                                : esHoy
+                                  ? isDark ? 'bg-red-700/80' : 'bg-red-600'
+                                  : isDark ? 'bg-red-800/70 group-hover:bg-red-800' : 'bg-red-400 group-hover:bg-red-500'
+                              : ''
+                          }`}
+                          title={`${fechaCompleta}: ${count} cita${count !== 1 ? 's' : ''}`}
                         ></div>
                       </div>
                       

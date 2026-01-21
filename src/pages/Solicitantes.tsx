@@ -76,7 +76,7 @@ function Solicitantes() {
 
     const handleSuccess = (data: any) => {
         console.log('Registro exitoso:', data);
-        alert('Solicitante registrado exitosamente');
+        // El modal de confirmación ya se muestra desde SolicitanteForm
         setShowForm(false);
     };
 
@@ -107,7 +107,10 @@ function Solicitantes() {
     const filteredSolicitantes = solicitantes.filter(s => {
         if (!searchText) return true;
         const term = searchText.toLowerCase();
-        const nombreCompleto = `${s.nombre} ${s.apellido || ''}`.toLowerCase();
+        // Si apellido existe y es diferente de nombre, concatenar. Si no, usar solo nombre
+        const nombreCompleto = (s.apellido && s.apellido.trim() && s.apellido !== s.nombre
+            ? `${s.nombre} ${s.apellido}`
+            : s.nombre || '').toLowerCase();
         return nombreCompleto.includes(term) || s.cedula.includes(term);
     });
 

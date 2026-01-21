@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import casoService from '../services/casoService';
@@ -17,7 +18,7 @@ import AssignSupervisorModal from '../components/AssignSupervisorModal';
 import AddDocumentoModal from '../components/modals/AddDocumentoModal';
 import ConfirmationModal from '../components/common/ConfirmationModal';
 import UniversalUploader from '../components/common/UniversalUploader';
-import { Plus, Search, UserPlus, Pencil } from 'lucide-react';
+import { Plus, Search, UserPlus, Pencil, CheckCircle, XCircle } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileExcel, faTrash, faFolderOpen, faFilePdf, faFileAlt, faFileWord, faFileImage } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '../context/ThemeContext';
@@ -34,6 +35,18 @@ import type { Tribunal } from '../types/catalogo';
 
 import type { SolicitanteResponse } from '../types/solicitante';
 import { getFullAmbitoPath } from '../utils/ambitoUtils';
+
+// Función helper para parsear fechas en formato YYYY-MM-DD como fechas locales (no UTC)
+const parseLocalDate = (dateString: string): Date => {
+  const partes = dateString.split('-');
+  if (partes.length === 3) {
+    const año = parseInt(partes[0], 10);
+    const mes = parseInt(partes[1], 10) - 1; // Los meses son 0-indexados
+    const dia = parseInt(partes[2], 10);
+    return new Date(año, mes, dia);
+  }
+  return new Date(dateString);
+};
 
 function CasoDetalle() {
   const { numCaso } = useParams<{ numCaso: string }>();
@@ -96,6 +109,26 @@ function CasoDetalle() {
 
   // Document/Folio State (para pestaña Folios)
   const [isAddDocModalOpen, setIsAddDocModalOpen] = useState(false);
+
+  // Modal de confirmación state
+  const [confirmationModal, setConfirmationModal] = useState<{
+    isOpen: boolean;
+    success: boolean;
+    message: string;
+  }>({
+    isOpen: false,
+    success: false,
+    message: '',
+  });
+
+  // Funciones para el modal de confirmación
+  const showConfirmationModal = (success: boolean, message: string) => {
+    setConfirmationModal({ isOpen: true, success, message });
+  };
+
+  const closeConfirmationModal = () => {
+    setConfirmationModal({ isOpen: false, success: false, message: '' });
+  };
 
   // Actualizar isDark cuando cambia el theme
   useEffect(() => {
@@ -167,7 +200,10 @@ function CasoDetalle() {
             const sol = await solicitanteService.getByCedula(detalle.caso.cedula);
             setSolicitante(sol);
             // Usamos 'apellido' opcionalmente o solo nombre
-            const nombreCompleto = `${sol.nombre} ${sol.apellido || ''}`.trim();
+            // Si apellido existe y es diferente de nombre, concatenar. Si no, usar solo nombre
+            const nombreCompleto = sol.apellido && sol.apellido.trim() && sol.apellido !== sol.nombre
+                ? `${sol.nombre} ${sol.apellido}`.trim()
+                : sol.nombre || '';
             setNombreSolicitante(nombreCompleto || detalle.caso.cedula);
           } catch (err) {
             console.warn('No se pudo cargar info del solicitante', err);
@@ -230,7 +266,7 @@ function CasoDetalle() {
       setIsEditModalOpen(false);
     } catch (err) {
       console.error('Error updating caso', err);
-      alert('Error al actualizar el caso');
+      showConfirmationModal(false, 'Error al actualizar el caso');
     }
   };
 
@@ -255,7 +291,7 @@ function CasoDetalle() {
       await handleRefresh();
     } catch (err) {
       console.error('Error unassigning student:', err);
-      alert('Error al desasignar el estudiante.');
+      showConfirmationModal(false, 'Error al desasignar el estudiante.');
     } finally {
       setUnassignLoading(false);
     }
@@ -301,7 +337,7 @@ function CasoDetalle() {
       setIsEditBeneficiarioModalOpen(true);
     } catch (e) {
       console.error('Error cargando beneficiario', e);
-      alert('No se pudo cargar la información del beneficiario');
+      showConfirmationModal(false, 'No se pudo cargar la información del beneficiario');
     } finally {
       setLoading(false);
     }
@@ -392,7 +428,7 @@ function CasoDetalle() {
       setCasoDetalle(updated);
     } catch (err) {
       console.error('Error adding accion', err);
-      alert('Error al registrar la acción');
+      showConfirmationModal(false, 'Error al registrar la acción');
     }
   };
 
@@ -405,7 +441,7 @@ function CasoDetalle() {
       setCasoDetalle(updated);
     } catch (err) {
       console.error('Error adding encuentro', err);
-      alert('Error al registrar el encuentro');
+      showConfirmationModal(false, 'Error al registrar el encuentro');
     }
   };
 
@@ -483,7 +519,7 @@ function CasoDetalle() {
                           }
                         } catch (e) {
                           console.error(e);
-                          alert('Error al eliminar el caso');
+                          showConfirmationModal(false, 'Error al eliminar el caso');
                         }
                       }
                     }}
@@ -517,18 +553,24 @@ function CasoDetalle() {
                         await handleRefresh();
                       } catch (err) {
                         console.error(err);
-                        alert('Error al cambiar el estatus');
+                        showConfirmationModal(false, 'Error al cambiar el estatus');
                       }
                     }}
-                    className={`px-4 py-1.5 rounded-full text-sm font-semibold border outline-none cursor-pointer ${caso.estatus === 'ABIERTO'
-                      ? isDark ? 'bg-green-900/50 text-green-300 border-green-700' : 'bg-green-100 text-green-800 border-green-200'
-                      : isDark ? 'bg-gray-800 text-white border-gray-700' : 'bg-gray-100 text-gray-800 border-gray-200'
-                      }`}
+                    className={`px-4 py-1.5 rounded text-sm font-semibold border outline-none cursor-pointer bg-white text-gray-900 border-gray-300`}
+                    style={{
+                      color: caso.estatus === 'ABIERTO' 
+                        ? '#16a34a' // green-600
+                        : caso.estatus === 'EN TRÁMITE'
+                        ? '#2563eb' // blue-600
+                        : caso.estatus === 'EN PAUSA'
+                        ? '#ca8a04' // yellow-600
+                        : '#6b7280' // gray-500
+                    }}
                   >
-                    <option value="ABIERTO">ABIERTO</option>
-                    <option value="EN TRÁMITE">EN TRÁMITE</option>
-                    <option value="EN PAUSA">EN PAUSA</option>
-                    <option value="CERRADO">CERRADO</option>
+                    <option value="ABIERTO" style={{ backgroundColor: '#ffffff', color: '#16a34a' }}>ABIERTO</option>
+                    <option value="EN TRÁMITE" style={{ backgroundColor: '#ffffff', color: '#2563eb' }}>EN TRÁMITE</option>
+                    <option value="EN PAUSA" style={{ backgroundColor: '#ffffff', color: '#ca8a04' }}>EN PAUSA</option>
+                    <option value="CERRADO" style={{ backgroundColor: '#ffffff', color: '#6b7280' }}>CERRADO</option>
                   </select>
                 ) : (
                   <span
@@ -933,7 +975,7 @@ function CasoDetalle() {
                     // Combinar todas las actividades en un solo array
                     const timeline: Array<{
                       id: string;
-                      type: 'accion' | 'encuentro' | 'inicio';
+                      type: 'accion' | 'encuentro' | 'cita-programada' | 'inicio';
                       fecha: Date;
                       titulo: string;
                       descripcion?: string;
@@ -946,6 +988,7 @@ function CasoDetalle() {
                       idEncuentro?: number;
                       fechaAtencion?: string;
                       fechaProxima?: string;
+                      encuentroOriginal?: number; // ID del encuentro original si es una cita programada
                     }> = [];
 
                     // Agregar acciones
@@ -954,7 +997,7 @@ function CasoDetalle() {
                         timeline.push({
                           id: `accion-${acc.idAccion}`,
                           type: 'accion',
-                          fecha: new Date(acc.fechaRegistro),
+                          fecha: parseLocalDate(acc.fechaRegistro),
                           titulo: acc.titulo,
                           descripcion: acc.descripcion,
                           // Datos adicionales de la acción
@@ -968,10 +1011,11 @@ function CasoDetalle() {
                     // Agregar encuentros
                     if (encuentros && encuentros.length > 0) {
                       encuentros.forEach((enc) => {
+                        // Agregar el encuentro realizado
                         timeline.push({
                           id: `encuentro-${enc.idEncuentro}`,
                           type: 'encuentro',
-                          fecha: new Date(enc.fechaAtencion),
+                          fecha: parseLocalDate(enc.fechaAtencion),
                           titulo: enc.orientacion,
                           observacion: enc.observacion,
                           // Datos adicionales del encuentro
@@ -979,6 +1023,22 @@ function CasoDetalle() {
                           fechaAtencion: enc.fechaAtencion,
                           fechaProxima: enc.fechaProxima,
                         });
+                        
+                        // Si tiene fecha próxima, crear un evento separado para la cita programada
+                        if (enc.fechaProxima) {
+                          timeline.push({
+                            id: `cita-programada-${enc.idEncuentro}`,
+                            type: 'cita-programada',
+                            fecha: parseLocalDate(enc.fechaProxima),
+                            titulo: `Cita Programada: ${enc.orientacion}`,
+                            observacion: `Cita programada como seguimiento del encuentro del ${parseLocalDate(enc.fechaAtencion).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}`,
+                            // Datos adicionales
+                            idEncuentro: enc.idEncuentro,
+                            fechaAtencion: enc.fechaProxima, // Usar fechaProxima como fechaAtencion para el dashboard
+                            fechaProxima: undefined,
+                            encuentroOriginal: enc.idEncuentro,
+                          });
+                        }
                       });
                     }
 
@@ -1021,7 +1081,7 @@ function CasoDetalle() {
                             const isLast = index === timeline.length - 1;
 
                             // Colores y estilos según tipo
-                            const typeStyles = {
+                            const typeStyles: Record<string, any> = {
                               accion: {
                                 bgColor: isDark ? 'bg-gray-800' : 'bg-red-900',
                                 borderColor: isDark ? 'border-green-700' : 'border-green-200',
@@ -1037,6 +1097,14 @@ function CasoDetalle() {
                                 badgeBg: isDark ? 'bg-blue-300' : 'bg-blue-100',
                                 badgeText: isDark ? 'text-blue-900' : 'text-blue-800',
                                 label: 'Encuentro / Cita',
+                              },
+                              'cita-programada': {
+                                bgColor: isDark ? 'bg-gray-800' : 'bg-red-900',
+                                borderColor: isDark ? 'border-purple-700' : 'border-purple-200',
+                                textColor: isDark ? 'text-purple-400' : 'text-purple-700',
+                                badgeBg: isDark ? 'bg-purple-300' : 'bg-purple-100',
+                                badgeText: isDark ? 'text-purple-900' : 'text-purple-800',
+                                label: 'Cita Programada',
                               },
                               inicio: {
                                 bgColor: isDark ? 'bg-gray-800' : 'bg-red-900',
@@ -1095,21 +1163,6 @@ function CasoDetalle() {
                                     <h4 className={`font-bold text-lg ${style.textColor} inline`}>
                                       {evento.titulo}
                                     </h4>
-                                    {/* Badge para cita próxima programada */}
-                                    {evento.type === 'encuentro' && evento.fechaProxima && (
-                                      <span
-                                        className={`ml-3 text-xs font-semibold px-2 py-1 rounded-full border ${isDark
-                                          ? 'text-blue-300 bg-blue-900/50 border-blue-700'
-                                          : 'text-blue-700 bg-blue-50 border-blue-200'
-                                          }`}
-                                      >
-                                        📅 Próxima:{' '}
-                                        {new Date(evento.fechaProxima).toLocaleDateString('es-ES', {
-                                          day: 'numeric',
-                                          month: 'short',
-                                        })}
-                                      </span>
-                                    )}
                                   </div>
 
                                   {/* Descripción */}
@@ -1509,7 +1562,8 @@ function CasoDetalle() {
                           handleEditBeneficiarioSuccess();
                         } catch (err) {
                           console.error('Error updating relationship', err);
-                          alert(
+                          showConfirmationModal(
+                            false,
                             'Datos personales guardados, pero hubo un error actualizando la relación con el caso.'
                           );
                         }
@@ -1779,6 +1833,8 @@ function CasoDetalle() {
                     ? 'bg-green-50 text-green-700'
                     : selectedEvento.type === 'encuentro'
                       ? 'bg-blue-50 text-blue-700'
+                      : selectedEvento.type === 'cita-programada'
+                      ? 'bg-purple-50 text-purple-700'
                       : 'bg-red-50 text-red-900'
                     }`}
                 >
@@ -1786,6 +1842,8 @@ function CasoDetalle() {
                     ? 'Acción Legal'
                     : selectedEvento.type === 'encuentro'
                       ? 'Encuentro / Cita'
+                      : selectedEvento.type === 'cita-programada'
+                      ? 'Cita Programada'
                       : 'Inicio del Caso'}
                 </span>
               </div>
@@ -1858,7 +1916,7 @@ function CasoDetalle() {
                     {selectedEvento.fechaEjecucion ? (
                       <p className="text-sm font-medium text-green-700 bg-green-50 px-3 py-2 rounded inline-block">
                         Ejecutada el{' '}
-                        {new Date(selectedEvento.fechaEjecucion).toLocaleDateString('es-ES')}
+                        {selectedEvento.fechaEjecucion ? parseLocalDate(selectedEvento.fechaEjecucion).toLocaleDateString('es-ES') : 'N/A'}
                       </p>
                     ) : (
                       <p className="text-sm font-medium text-orange-700 bg-orange-50 px-3 py-2 rounded inline-block">
@@ -1869,7 +1927,7 @@ function CasoDetalle() {
                 </>
               )}
 
-              {selectedEvento.type === 'encuentro' && (
+              {(selectedEvento.type === 'encuentro' || selectedEvento.type === 'cita-programada') && (
                 <>
                   <div>
                     <p className="text-xs text-gray-500 uppercase font-semibold mb-1">
@@ -1898,21 +1956,34 @@ function CasoDetalle() {
                       Fecha de Atención
                     </p>
                     <p className="text-sm font-medium text-gray-900">
-                      {new Date(selectedEvento.fechaAtencion).toLocaleDateString('es-ES', {
+                      {parseLocalDate(selectedEvento.fechaAtencion).toLocaleDateString('es-ES', {
                         day: 'numeric',
                         month: 'long',
                         year: 'numeric',
                       })}
                     </p>
                   </div>
-                  {selectedEvento.fechaProxima && (
+                  {selectedEvento.type === 'cita-programada' && selectedEvento.fechaAtencion && (
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase font-semibold mb-1">
+                        Fecha de la Cita Programada
+                      </p>
+                      <p className="text-sm font-medium text-purple-700 bg-purple-50 px-3 py-2 rounded inline-block">
+                        {parseLocalDate(selectedEvento.fechaAtencion).toLocaleDateString('es-ES', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        })}
+                      </p>
+                    </div>
+                  )}
+                  {selectedEvento.type === 'encuentro' && selectedEvento.fechaProxima && (
                     <div>
                       <p className="text-xs text-gray-500 uppercase font-semibold mb-1">
                         Próxima Cita Programada
                       </p>
                       <p className="text-sm font-medium text-blue-700 bg-blue-50 px-3 py-2 rounded inline-block">
-                        {' '}
-                        {new Date(selectedEvento.fechaProxima).toLocaleDateString('es-ES', {
+                        {parseLocalDate(selectedEvento.fechaProxima).toLocaleDateString('es-ES', {
                           day: 'numeric',
                           month: 'long',
                           year: 'numeric',
@@ -1949,6 +2020,52 @@ function CasoDetalle() {
           />
         )
       }
+
+      {/* Modal de confirmación */}
+      {confirmationModal.isOpen && createPortal(
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+          <div className={`relative w-full max-w-md rounded-xl shadow-2xl overflow-hidden animate-slide-up-modal ${
+            isDark ? 'bg-gray-800' : 'bg-white'
+          }`}>
+            <div className={`p-6 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+              <div className="flex flex-col items-center text-center">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
+                  confirmationModal.success 
+                    ? (isDark ? 'bg-green-900/30' : 'bg-green-100')
+                    : (isDark ? 'bg-red-900/30' : 'bg-red-100')
+                }`}>
+                  {confirmationModal.success ? (
+                    <CheckCircle className={`w-10 h-10 ${isDark ? 'text-green-400' : 'text-green-600'}`} />
+                  ) : (
+                    <XCircle className={`w-10 h-10 ${isDark ? 'text-red-400' : 'text-red-600'}`} />
+                  )}
+                </div>
+                <h3 className={`text-xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  {confirmationModal.success ? '¡Éxito!' : 'Error'}
+                </h3>
+                <p className={`mb-6 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                  {confirmationModal.message}
+                </p>
+                <button
+                  onClick={closeConfirmationModal}
+                  className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+                    confirmationModal.success
+                      ? isDark 
+                        ? 'bg-green-900 hover:bg-green-950 text-white'
+                        : 'bg-green-600 hover:bg-green-700 text-white'
+                      : isDark
+                        ? 'bg-red-900 hover:bg-red-950 text-white'
+                        : 'bg-red-600 hover:bg-red-700 text-white'
+                  }`}
+                >
+                  Aceptar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div >
   );
 }

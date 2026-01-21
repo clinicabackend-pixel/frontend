@@ -251,7 +251,11 @@ function RegistroCaso() {
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-800 text-lg">Solicitante Verificado</h3>
-                  <p className="text-green-700 font-semibold text-lg">{solicitante.nombre} {solicitante.apellido}</p>
+                  <p className="text-green-700 font-semibold text-lg">
+                    {solicitante.apellido && solicitante.apellido.trim() && solicitante.apellido !== solicitante.nombre
+                      ? `${solicitante.nombre} ${solicitante.apellido}`
+                      : solicitante.nombre}
+                  </p>
                   <p className="text-gray-500 text-sm">C.I. {solicitante.cedula}</p>
                 </div>
               </div>

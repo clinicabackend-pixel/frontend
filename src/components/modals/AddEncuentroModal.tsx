@@ -133,7 +133,6 @@ export default function AddEncuentroModal({
             value={fechaAtencion}
             onChange={setFechaAtencion}
             required
-            max={new Date().toISOString().split('T')[0]} // Max today
           />
         </div>
 

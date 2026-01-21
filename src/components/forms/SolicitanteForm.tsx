@@ -9,6 +9,8 @@ import catalogoService from '../../services/catalogoService';
 import CustomSelect from '../common/CustomSelect';
 import CustomDatePicker from '../common/CustomDatePicker';
 import CustomInput from '../common/CustomInput';
+import { CheckCircle, XCircle } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 const initialFormData: SolicitanteRequest = {
     nombre: '',
@@ -46,6 +48,14 @@ export default function SolicitanteForm({
     formMode = 'view',
     allowEditCedula = false
 }: SolicitanteFormProps) {
+    // Calcular fechas límite para fecha de nacimiento
+    const today = new Date();
+    const maxDate = today.toISOString().split('T')[0]; // Fecha máxima: hoy
+    
+    const minDateObj = new Date(today);
+    minDateObj.setFullYear(today.getFullYear() - 100); // 100 años atrás
+    const minDate = minDateObj.toISOString().split('T')[0]; // Fecha mínima: 100 años atrás
+
     const [formData, setFormData] = useState<SolicitanteRequest>({
         ...initialFormData,
         ...initialData,
@@ -59,6 +69,21 @@ export default function SolicitanteForm({
         (!initialData?.cedula && formMode !== 'view')
     );
     const [saving, setSaving] = useState(false);
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
+    // Modal de confirmación state
+    const [confirmationModal, setConfirmationModal] = useState<{
+        isOpen: boolean;
+        success: boolean;
+        message: string;
+        result?: any;
+    }>({
+        isOpen: false,
+        success: false,
+        message: '',
+        result: null
+    });
 
     // Estados para catálogos de ubicación (siguen siendo dinámicos)
     const [estados, setEstados] = useState<Estado[]>([]);
@@ -163,6 +188,13 @@ export default function SolicitanteForm({
         return /^\d*$/.test(value);
     };
 
+    // Validación para formato de email válido
+    const validateEmail = (value: string): boolean => {
+        if (!value) return true; // Permitir campo vacío si no es requerido
+        const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+        return emailRegex.test(value);
+    };
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         // e.target can be from CustomInput which uses similar event structure
         const { name, value } = e.target;
@@ -173,8 +205,8 @@ export default function SolicitanteForm({
         // Campos numéricos (enteros positivos sin decimales)
         const numericFields: string[] = [];
 
-        // Campos que solo aceptan dígitos (como cédula)
-        const digitOnlyFields = ['cedula'];
+        // Campos que solo aceptan dígitos (como cédula y teléfonos)
+        const digitOnlyFields = ['cedula', 'telfCasa', 'telfCelular'];
 
         // Validar campos de solo texto
         if (textOnlyFields.includes(name) && !validateTextOnly(value)) {
@@ -191,6 +223,9 @@ export default function SolicitanteForm({
             return; // No actualizar si contiene caracteres no numéricos
         }
 
+        // No validar email mientras se escribe, solo al enviar el formulario
+        // Esto permite escribir libremente caracteres válidos como puntos, @, etc.
+
         setFormData((prev) => ({
             ...prev,
             [name]: value,
@@ -199,8 +234,44 @@ export default function SolicitanteForm({
 
 
 
+    const showConfirmationModal = (success: boolean, message: string, result?: any) => {
+        setConfirmationModal({ isOpen: true, success, message, result });
+    };
+
+    const closeConfirmationModal = () => {
+        setConfirmationModal({ isOpen: false, success: false, message: '', result: null });
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        // Validar email antes de enviar
+        if (formData.email && !validateEmail(formData.email)) {
+            showConfirmationModal(false, 'Por favor, ingrese un correo electrónico válido (ejemplo: usuario@dominio.com)');
+            return;
+        }
+
+        // Validar fecha de nacimiento antes de enviar
+        if (formData.fechaNacimiento) {
+            const fechaNac = new Date(formData.fechaNacimiento);
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            
+            const fechaMin = new Date(hoy);
+            fechaMin.setFullYear(hoy.getFullYear() - 100);
+            fechaMin.setHours(0, 0, 0, 0);
+
+            if (fechaNac > hoy) {
+                showConfirmationModal(false, 'La fecha de nacimiento no puede ser posterior a la fecha actual');
+                return;
+            }
+            
+            if (fechaNac < fechaMin) {
+                showConfirmationModal(false, 'La fecha de nacimiento no puede ser anterior a 100 años desde la fecha actual');
+                return;
+            }
+        }
+
         setSaving(true);
         try {
             // Sanitize payload: convert 0 or empty string to undefined
@@ -222,18 +293,16 @@ export default function SolicitanteForm({
                 result = await solicitanteService.update(initialData.cedula, payload);
                 console.log('Solicitante actualizado:', result);
                 setIsEditing(false); // Go back to read-only after save
-                alert('Solicitante actualizado exitosamente');
+                const finalData = (typeof result === 'object' && result !== null) ? result : payload;
+                showConfirmationModal(true, 'Solicitante actualizado exitosamente', finalData);
+                // No llamar onSuccess aquí, se llamará cuando el usuario cierre el modal exitoso
             } else {
                 // Create new
                 result = await solicitanteService.create(payload);
                 console.log('Solicitante registrado:', result);
-            }
-
-            if (onSuccess) {
-                // If backend returns a simple string (message), return our payload so the UI has the data.
-                // If it returns an object (the saved entity), use that.
                 const finalData = (typeof result === 'object' && result !== null) ? result : payload;
-                onSuccess(finalData);
+                showConfirmationModal(true, 'Solicitante registrado exitosamente', finalData);
+                // No llamar onSuccess aquí, se llamará cuando el usuario cierre el modal exitoso
             }
         } catch (error: any) {
             console.error('Error al registrar/actualizar solicitante:', error);
@@ -248,9 +317,9 @@ export default function SolicitanteForm({
                 const duplicateData = data.data || data;
                 setDuplicateError(duplicateData);
             } else if (status === 409) {
-                alert(data?.message || 'Ya existe un solicitante con esa cédula.');
+                showConfirmationModal(false, data?.message || 'Ya existe un solicitante con esa cédula.');
             } else {
-                alert('Error al registrar el solicitante. Por favor verifique los datos.');
+                showConfirmationModal(false, 'Error al registrar el solicitante. Por favor verifique los datos.');
             }
         } finally {
             setSaving(false);
@@ -261,6 +330,7 @@ export default function SolicitanteForm({
     const isStrict = !simplifiedMode;
 
     return (
+        <>
         <form onSubmit={handleSubmit} className={isModal ? "p-6 md:p-8" : "bg-white rounded-lg shadow-lg p-6 md:p-8 relative"}>
             {/* Datos personales */}
             <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
@@ -365,6 +435,8 @@ export default function SolicitanteForm({
                             label={<span>Fecha nacimiento {isStrict && <span className="text-red-500">*</span>}</span>}
                             value={formData.fechaNacimiento}
                             onChange={(val) => setFormData(prev => ({ ...prev, fechaNacimiento: val }))}
+                            min={minDate}
+                            max={maxDate}
                             required={isStrict}
                             disabled={!isEditing}
                         />
@@ -453,8 +525,9 @@ export default function SolicitanteForm({
                                 name="email"
                                 value={formData.email}
                                 onChange={handleInputChange}
-                                pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
-                                title="Ingrese un correo electrónico válido"
+                                pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+                                title="Ingrese un correo electrónico válido (ejemplo: usuario@dominio.com)"
+                                required
                                 disabled={!isEditing}
                             />
                         </div>
@@ -579,6 +652,59 @@ export default function SolicitanteForm({
                 </div>,
                 document.body
             )}
+
         </form>
+        
+        {/* Modal de confirmación */}
+        {confirmationModal.isOpen && createPortal(
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+                <div className={`relative w-full max-w-md rounded-xl shadow-2xl overflow-hidden animate-slide-up-modal ${
+                    isDark ? 'bg-gray-800' : 'bg-white'
+                }`}>
+                    <div className={`p-6 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+                        <div className="flex flex-col items-center text-center">
+                            <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
+                                confirmationModal.success 
+                                    ? (isDark ? 'bg-green-900/30' : 'bg-green-100')
+                                    : (isDark ? 'bg-red-900/30' : 'bg-red-100')
+                            }`}>
+                                {confirmationModal.success ? (
+                                    <CheckCircle className={`w-10 h-10 ${isDark ? 'text-green-400' : 'text-green-600'}`} />
+                                ) : (
+                                    <XCircle className={`w-10 h-10 ${isDark ? 'text-red-400' : 'text-red-600'}`} />
+                                )}
+                            </div>
+                            <h3 className={`text-xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                {confirmationModal.success ? '¡Éxito!' : 'Error'}
+                            </h3>
+                            <p className={`mb-6 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                                {confirmationModal.message}
+                            </p>
+                            <button
+                                onClick={() => {
+                                    closeConfirmationModal();
+                                    if (confirmationModal.success && onSuccess && confirmationModal.result) {
+                                        onSuccess(confirmationModal.result);
+                                    }
+                                }}
+                                className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+                                    confirmationModal.success
+                                        ? isDark 
+                                            ? 'bg-green-900 hover:bg-green-950 text-white'
+                                            : 'bg-green-600 hover:bg-green-700 text-white'
+                                        : isDark
+                                            ? 'bg-red-900 hover:bg-red-950 text-white'
+                                            : 'bg-red-600 hover:bg-red-700 text-white'
+                                }`}
+                            >
+                                Aceptar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>,
+            document.body
+        )}
+        </>
     );
 }

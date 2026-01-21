@@ -13,7 +13,10 @@ interface SolicitanteCardProps {
 function SolicitanteCard({ solicitante, onClick, onEncuestaClick }: SolicitanteCardProps) {
     const { theme } = useTheme();
     const [isDark, setIsDark] = useState(false);
-    const nombreCompleto = `${solicitante.nombre} ${solicitante.apellido || ''}`.trim();
+    // Si apellido existe y es diferente de nombre, concatenar. Si no, usar solo nombre
+    const nombreCompleto = solicitante.apellido && solicitante.apellido.trim() && solicitante.apellido !== solicitante.nombre
+        ? `${solicitante.nombre} ${solicitante.apellido}`.trim()
+        : solicitante.nombre || '';
 
     useEffect(() => {
         if (theme === 'dark') {

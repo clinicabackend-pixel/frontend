@@ -77,7 +77,7 @@ export function SolicitanteDetalle() {
     const handleEditSuccess = () => {
         setIsEditing(false);
         if (id) loadSolicitante(id);
-        alert('Solicitante actualizado exitosamente');
+        // El modal de confirmación ya se muestra desde SolicitanteForm
     };
 
     if (loading) {
@@ -144,7 +144,11 @@ export function SolicitanteDetalle() {
                             </div>
                             <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                                 <div>
-                                    <h1 className="text-3xl font-bold tracking-tight">{solicitante.nombre} {solicitante.apellido}</h1>
+                                    <h1 className="text-3xl font-bold tracking-tight">
+                                        {solicitante.apellido && solicitante.apellido.trim() && solicitante.apellido !== solicitante.nombre
+                                            ? `${solicitante.nombre} ${solicitante.apellido}`
+                                            : solicitante.nombre}
+                                    </h1>
                                     <div className="flex items-center gap-3 mt-2 text-red-100">
                                         <FontAwesomeIcon icon={faAddressCard} />
                                         <span className="text-lg font-medium">{solicitante.cedula}</span>

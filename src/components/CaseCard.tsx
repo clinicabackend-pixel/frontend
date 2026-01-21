@@ -149,12 +149,7 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
 
           {/* 4. Body: Synthesis */}
           <div className="flex-1 overflow-hidden relative flex flex-col justify-start py-2">
-            <div className={`mb-2 px-2 py-1.5 rounded-md ${isDark ? 'bg-gray-700/50 border border-red-900/30' : 'bg-gray-50 border border-gray-100'}`}>
-              <p className={`text-xs font-semibold uppercase tracking-wide mb-1 ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
-                Síntesis
-              </p>
-            </div>
-            <div className="px-2 flex-1 overflow-hidden">
+            <div className={`flex-1 px-2 py-1.5 rounded-md overflow-hidden ${isDark ? 'bg-gray-700/50 border border-red-900/30' : 'bg-gray-50 border border-gray-100'}`}>
               <p
                 className={`text-sm leading-relaxed line-clamp-4 ${isDark ? 'text-gray-200' : 'text-gray-700'
                   }`}

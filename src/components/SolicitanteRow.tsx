@@ -36,12 +36,16 @@ export default function SolicitanteRow({ solicitante, onClick, onEncuestaClick, 
             <td className="px-6 py-5 whitespace-nowrap">
                 <div className="flex items-center">
                     <div className="shrink-0 h-10 w-10">
-                        <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm shadow-sm ${isDark ? 'bg-gray-700 text-red-800' : 'bg-red-100 text-red-900'}`}>
+                        <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm shadow-sm ${isDark ? 'bg-gray-700 text-white' : 'bg-red-100 text-red-900'}`}>
                             {solicitante.nombre.charAt(0).toUpperCase()}
                         </div>
                     </div>
                     <div className="ml-4">
-                        <div className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{solicitante.nombre} {solicitante.apellido || ''}</div>
+                        <div className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+                            {solicitante.apellido && solicitante.apellido.trim() && solicitante.apellido !== solicitante.nombre
+                                ? `${solicitante.nombre} ${solicitante.apellido}`
+                                : solicitante.nombre}
+                        </div>
                         <div className={`text-xs mt-0.5 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{solicitante.trabaja ? 'Trabaja' : 'No trabaja'}</div>
                     </div>
                 </div>
