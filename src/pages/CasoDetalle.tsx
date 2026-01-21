@@ -395,8 +395,8 @@ function CasoDetalle() {
       <div className={`flex h-screen w-screen flex-col ${isDark ? 'bg-red-900' : 'bg-gray-50'}`}>
         <Header title="Error" onMenuClick={handleMenuClick} />
         <div className="flex flex-1 items-center justify-center">
-          <div className={`text-center p-8 rounded-lg shadow-md border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
-            <p className={`text-xl font-semibold mb-4 ${isDark ? 'text-red-800' : 'text-red-600'}`}>
+          <div className={`text-center p-8 rounded-lg shadow-md border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <p className={`text-xl font-semibold mb-4 ${isDark ? 'text-white' : 'text-red-600'}`}>
               {error || 'Caso no encontrado'}
             </p>
             <button

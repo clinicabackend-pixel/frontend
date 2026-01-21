@@ -97,7 +97,7 @@ export function SolicitanteDetalle() {
         return (
             <MainLayout title="DETALLE DEL SOLICITANTE">
                 <div className="flex flex-col items-center justify-center h-full gap-4">
-                    <p className={`text-xl font-semibold ${isDark ? 'text-red-800' : 'text-red-600'}`}>{error || 'Solicitante no encontrado'}</p>
+                    <p className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-red-600'}`}>{error || 'Solicitante no encontrado'}</p>
                     <Button onClick={() => navigate('/solicitantes')} variant="primary">Volver a la lista</Button>
                 </div>
             </MainLayout>
