@@ -1172,33 +1172,6 @@ function CasoDetalle() {
                     )}
                   </div>
 
-                  {!asignados || asignados.length === 0 ? (
-                    <p className={`text-center py-8 ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>No hay estudiantes asignados.</p>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {asignados.map((asig, idx) => (
-                        <div key={`${asig.username}-${idx}`} className={`p-4 rounded-lg border ${isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-200'}`}>
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h4 className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{asig.nombre}</h4>
-                              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} font-mono`}>{asig.username}</p>
-                            </div>
-                            {canAssign && (
-                              <button
-                                onClick={() => setUnassignData({ isOpen: true, username: asig.username, termino: asig.termino, nombre: asig.nombre })}
-                                className={`transition-colors ${isDark ? 'text-gray-400 hover:text-red-800' : 'text-gray-400 hover:text-red-600'}`}
-                              >
-                                <FontAwesomeIcon icon={faTrash} />
-                              </button>
-                            )}
-                          </div>
-                          <div className="mt-3">
-                            <span className={`text-xs px-2 py-1 rounded-full ${isDark ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-100 text-blue-800'}`}>
-                              {asig.termino}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
                   <hr className={`${isDark ? 'border-gray-700' : 'border-gray-200'}`} />
 
                   {/* Section: Students */}
