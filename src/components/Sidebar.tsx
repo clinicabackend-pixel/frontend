@@ -100,19 +100,18 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <FontAwesomeIcon icon={faScaleBalanced} />
               </button>
             ) : (
-              <div className="flex items-center justify-between w-full">
+              <button
+                onClick={toggleSidebar}
+                className="hidden md:flex items-center justify-between w-full cursor-pointer hover:scale-105 transition-transform duration-200"
+                title="Contraer"
+              >
                 <h1 className={`text-xl font-serif font-bold tracking-wide truncate ${isDark ? 'text-white' : 'text-red-900'}`}>
                   Clínica Jurídica
                 </h1>
-                {/* Desktop Toggle (Expanded: Icon on right) */}
-                <button
-                  onClick={toggleSidebar}
-                  className={`hidden md:flex hover:scale-110 transition-transform duration-200 focus:outline-none ml-2 ${isDark ? 'text-white' : 'text-red-900'}`}
-                  title="Contraer"
-                >
+                <div className={`hover:scale-110 transition-transform duration-200 ml-2 ${isDark ? 'text-white' : 'text-red-900'}`}>
                   <FontAwesomeIcon icon={faScaleBalanced} />
-                </button>
-              </div>
+                </div>
+              </button>
             )}
 
             {/* Mobile Logo Fallback (if needed) or just Close Button */}

@@ -346,29 +346,29 @@ export default function UsuariosPage() {
                                                 </button>
 
                                                 {openMenuId === user.username && (currentUser?.tipoUsuario === 'COORDINADOR' || currentUser?.tipoUsuario === 'ADMINISTRADOR') && (
-                                                    <div className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg z-50 ${isDark ? 'bg-[#630000] border border-red-800/50' : 'bg-white border border-gray-200'
+                                                    <div className={`absolute right-0 mt-2 w-56 rounded-md shadow-lg z-50 overflow-hidden ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
                                                         }`}>
                                                         <div className="py-1">
                                                             <button
                                                                 onClick={(e) => handleDeleteClick(user, e)}
                                                                 className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors ${user.estatus === 'ACTIVO'
                                                                     ? (isDark
-                                                                        ? 'text-red-800 hover:bg-gray-700 hover:text-red-800'
+                                                                        ? 'text-white hover:bg-gray-700'
                                                                         : 'text-red-600 hover:bg-red-50 hover:text-red-900')
                                                                     : (isDark
-                                                                        ? 'text-green-300 hover:bg-green-950/50 hover:text-green-200'
+                                                                        ? 'text-white hover:bg-gray-700'
                                                                         : 'text-green-600 hover:bg-green-50 hover:text-green-900')
                                                                     }`}
                                                             >
                                                                 {user.estatus === 'ACTIVO' ? (
                                                                     <>
-                                                                        <Trash2 size={16} />
-                                                                        Desactivar Usuario
+                                                                        <Trash2 size={16} className="flex-shrink-0" />
+                                                                        <span className="truncate">Desactivar Usuario</span>
                                                                     </>
                                                                 ) : (
                                                                     <>
-                                                                        <CheckCircle size={16} />
-                                                                        Activar Usuario
+                                                                        <CheckCircle size={16} className="flex-shrink-0" />
+                                                                        <span className="truncate">Activar Usuario</span>
                                                                     </>
                                                                 )}
                                                             </button>
@@ -376,12 +376,12 @@ export default function UsuariosPage() {
                                                                 <button
                                                                     onClick={(e) => handlePermanentDeleteClick(user, e)}
                                                                     className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors border-t ${isDark
-                                                                        ? 'border-gray-700 text-red-800 hover:bg-gray-700 hover:text-red-800'
+                                                                        ? 'border-gray-700 text-white hover:bg-gray-700'
                                                                         : 'border-gray-100 text-red-600 hover:bg-red-50 hover:text-red-800'
                                                                         }`}
                                                                 >
-                                                                    <Trash2 size={16} />
-                                                                    Eliminar Permanentemente
+                                                                    <Trash2 size={16} className="flex-shrink-0" />
+                                                                    <span className="truncate">Eliminar Usuario</span>
                                                                 </button>
                                                             )}
                                                         </div>
