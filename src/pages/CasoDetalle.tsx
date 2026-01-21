@@ -13,6 +13,7 @@ import AddAccionModal from '../components/modals/AddAccionModal';
 import AddEncuentroModal from '../components/modals/AddEncuentroModal';
 import SolicitanteForm from '../components/forms/SolicitanteForm';
 import AssignStudentModal from '../components/AssignStudentModal';
+import AssignSupervisorModal from '../components/AssignSupervisorModal';
 import AddDocumentoModal from '../components/modals/AddDocumentoModal';
 import ConfirmationModal from '../components/common/ConfirmationModal';
 import UniversalUploader from '../components/common/UniversalUploader';
@@ -75,6 +76,7 @@ function CasoDetalle() {
 
   // Student Assignment State (para pestaña Responsables)
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [isAssignSupervisorModalOpen, setIsAssignSupervisorModalOpen] = useState(false);
   const [unassignData, setUnassignData] = useState<{ isOpen: boolean; username: string; termino: string; nombre: string }>({
     isOpen: false,
     username: '',
@@ -412,7 +414,9 @@ function CasoDetalle() {
   }
 
   const { caso, beneficiarios, acciones, encuentros, documentos } = casoDetalle;
+
   const asignados = casoDetalle.asignados || [];
+  const supervisores = casoDetalle.supervisores || [];
   const pruebas = casoDetalle.pruebas || [];
 
   return (
@@ -492,8 +496,8 @@ function CasoDetalle() {
                       }
                     }}
                     className={`px-4 py-1.5 rounded-full text-sm font-semibold border outline-none cursor-pointer ${caso.estatus === 'ABIERTO'
-                        ? isDark ? 'bg-green-900/50 text-green-300 border-green-700' : 'bg-green-100 text-green-800 border-green-200'
-                        : isDark ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-gray-100 text-gray-800 border-gray-200'
+                      ? isDark ? 'bg-green-900/50 text-green-300 border-green-700' : 'bg-green-100 text-green-800 border-green-200'
+                      : isDark ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-gray-100 text-gray-800 border-gray-200'
                       }`}
                   >
                     <option value="ABIERTO">ABIERTO</option>
@@ -1130,45 +1134,87 @@ function CasoDetalle() {
 
               {/* RESPONSABLES TAB */}
               {activeTab === 'responsables' && (
-                <div className="p-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Responsables Asignados</h3>
-                    {canAssign && (
-                      <Button size="sm" variant="primary" onClick={() => setIsAssignModalOpen(true)}>
-                        <Plus size={16} className="mr-2" /> Asignar Estudiante
-                      </Button>
+                <div className="p-6 space-y-8">
+                  {/* Section: Supervisors */}
+                  <div>
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Supervisores (Profesores)</h3>
+                      {canAssign && (
+                        <Button size="sm" variant="primary" onClick={() => setIsAssignSupervisorModalOpen(true)} className="bg-blue-900 border-blue-900 hover:bg-blue-800">
+                          <Plus size={16} className="mr-2" /> Asignar Supervisor
+                        </Button>
+                      )}
+                    </div>
+
+                    {!supervisores || supervisores.length === 0 ? (
+                      <p className={`text-center py-4 border border-dashed rounded-lg ${isDark ? 'text-gray-400 border-gray-700' : 'text-gray-500 border-gray-200'}`}>
+                        No hay supervisores asignados.
+                      </p>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {supervisores.map((sup, idx) => (
+                          <div key={`${sup.username}-${idx}`} className={`p-4 rounded-lg border ${isDark ? 'bg-blue-900/20 border-blue-800/50' : 'bg-blue-50 border-blue-100'}`}>
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h4 className={`font-bold ${isDark ? 'text-white' : 'text-blue-900'}`}>{sup.nombre}</h4>
+                                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-blue-700'} font-mono`}>{sup.username}</p>
+                              </div>
+                              {/* Remove Supervisor logic could continue here if needed */}
+                            </div>
+                            <div className="mt-2">
+                              <span className={`text-xs px-2 py-1 rounded-full ${isDark ? 'bg-blue-800 text-blue-200' : 'bg-white text-blue-800 border border-blue-200'}`}>
+                                {sup.termino}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
 
-                  {!asignados || asignados.length === 0 ? (
-                    <p className={`text-center py-8 ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>No hay estudiantes asignados.</p>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {asignados.map((asig, idx) => (
-                        <div key={`${asig.username}-${idx}`} className={`p-4 rounded-lg border ${isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-200'}`}>
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h4 className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{asig.nombre}</h4>
-                              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} font-mono`}>{asig.username}</p>
-                            </div>
-                            {canAssign && (
-                              <button
-                                onClick={() => setUnassignData({ isOpen: true, username: asig.username, termino: asig.termino, nombre: asig.nombre })}
-                                className={`transition-colors ${isDark ? 'text-gray-400 hover:text-red-400' : 'text-gray-400 hover:text-red-600'}`}
-                              >
-                                <FontAwesomeIcon icon={faTrash} />
-                              </button>
-                            )}
-                          </div>
-                          <div className="mt-3">
-                            <span className={`text-xs px-2 py-1 rounded-full ${isDark ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-100 text-blue-800'}`}>
-                              {asig.termino}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
+                  <hr className={`${isDark ? 'border-gray-700' : 'border-gray-200'}`} />
+
+                  {/* Section: Students */}
+                  <div>
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Estudiantes Asignados</h3>
+                      {canAssign && (
+                        <Button size="sm" variant="primary" onClick={() => setIsAssignModalOpen(true)}>
+                          <Plus size={16} className="mr-2" /> Asignar Estudiante
+                        </Button>
+                      )}
                     </div>
-                  )}
+
+                    {!asignados || asignados.length === 0 ? (
+                      <p className={`text-center py-8 ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>No hay estudiantes asignados.</p>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {asignados.map((asig, idx) => (
+                          <div key={`${asig.username}-${idx}`} className={`p-4 rounded-lg border ${isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-200'}`}>
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h4 className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{asig.nombre}</h4>
+                                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} font-mono`}>{asig.username}</p>
+                              </div>
+                              {canAssign && (
+                                <button
+                                  onClick={() => setUnassignData({ isOpen: true, username: asig.username, termino: asig.termino, nombre: asig.nombre })}
+                                  className={`transition-colors ${isDark ? 'text-gray-400 hover:text-red-400' : 'text-gray-400 hover:text-red-600'}`}
+                                >
+                                  <FontAwesomeIcon icon={faTrash} />
+                                </button>
+                              )}
+                            </div>
+                            <div className="mt-3">
+                              <span className={`text-xs px-2 py-1 rounded-full ${isDark ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-100 text-blue-800'}`}>
+                                {asig.termino}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -1843,6 +1889,15 @@ function CasoDetalle() {
           </div>
         )}
       </Modal>
+      {/* Assign Supervisor Modal */}
+      {numCaso && (
+        <AssignSupervisorModal
+          isOpen={isAssignSupervisorModalOpen}
+          onClose={() => setIsAssignSupervisorModalOpen(false)}
+          numCaso={numCaso}
+          onAssignSuccess={handleRefresh}
+        />
+      )}
     </div>
   );
 }
