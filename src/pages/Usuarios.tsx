@@ -287,7 +287,7 @@ export default function UsuariosPage() {
                         <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${isDark ? 'border-red-700' : 'border-red-900'}`}></div>
                     </div>
                 ) : (
-                    <div className={`shadow overflow-hidden sm:rounded-lg border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
+                    <div className={`shadow overflow-visible sm:rounded-lg border ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'}`}>
                         <table className={`min-w-full divide-y ${isDark ? 'divide-red-800/50' : 'divide-gray-200'}`}>
                             <thead className={isDark ? 'bg-red-950/30' : 'bg-gray-50'}>
                                 <tr>
@@ -346,7 +346,7 @@ export default function UsuariosPage() {
                                                 </button>
 
                                                 {openMenuId === user.username && (currentUser?.tipoUsuario === 'COORDINADOR' || currentUser?.tipoUsuario === 'ADMINISTRADOR') && (
-                                                    <div className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg z-10 ${isDark ? 'bg-[#630000] border border-red-800/50' : 'bg-white border border-gray-200'
+                                                    <div className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg z-50 ${isDark ? 'bg-[#630000] border border-red-800/50' : 'bg-white border border-gray-200'
                                                         }`}>
                                                         <div className="py-1">
                                                             <button

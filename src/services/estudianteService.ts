@@ -18,6 +18,11 @@ const estudianteService = {
         if (conCasos) params.conCasos = true;
         const response = await api.get('/estudiantes', { params });
         return response.data;
+    },
+
+    getAllStudents: async (): Promise<EstudianteInfo[]> => {
+        const response = await api.get('/estudiantes');
+        return response.data;
     }
 };
 

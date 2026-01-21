@@ -45,12 +45,12 @@ const AssignStudentModal = ({ isOpen, onClose, numCaso, onAssignSuccess }: Assig
     const loadStudents = async () => {
         setLoading(true);
         try {
-            const data = await estudianteService.getActiveStudents();
+            const data = await estudianteService.getAllStudents();
             setStudents(data);
             setFilteredStudents(data);
         } catch (err) {
             console.error("Error loading students", err);
-            setError("No se pudieron cargar los estudiantes activos.");
+            setError("No se pudieron cargar los estudiantes.");
         } finally {
             setLoading(false);
         }
@@ -73,8 +73,11 @@ const AssignStudentModal = ({ isOpen, onClose, numCaso, onAssignSuccess }: Assig
     }, [searchText, students]);
 
     const toggleStudent = (student: EstudianteInfo) => {
-        if (selectedStudents.find(s => s.username === student.username)) {
-            setSelectedStudents(selectedStudents.filter(s => s.username !== student.username));
+        // Unique ID based on username + termino (since same student can be in multiple terms)
+        const isSelected = selectedStudents.some(s => s.username === student.username && s.termino === student.termino);
+
+        if (isSelected) {
+            setSelectedStudents(selectedStudents.filter(s => !(s.username === student.username && s.termino === student.termino)));
         } else {
             setSelectedStudents([...selectedStudents, student]);
         }
@@ -98,7 +101,7 @@ const AssignStudentModal = ({ isOpen, onClose, numCaso, onAssignSuccess }: Assig
             console.error("Error assigning students", err);
             const msg = err.response?.data || "";
             if (typeof msg === 'string' && (msg.includes("Llave duplicada") || msg.includes("duplicate key") || msg.includes("casos_asignados_pkey"))) {
-                setError("Uno o más estudiantes seleccionados ya están asignados a este caso en el período actual.");
+                setError("Uno o más estudiantes seleccionados ya están asignados a este caso en el período indicado.");
             } else {
                 setError(typeof msg === 'string' ? msg : "Ocurrió un error al asignar los estudiantes.");
             }
@@ -193,10 +196,11 @@ const AssignStudentModal = ({ isOpen, onClose, numCaso, onAssignSuccess }: Assig
                         ) : (
                             <ul className="divide-y divide-gray-100">
                                 {filteredStudents.map((student) => {
-                                    const isSelected = selectedStudents.some(s => s.username === student.username);
+                                    // Identify strictly by username AND termino
+                                    const isSelected = selectedStudents.some(s => s.username === student.username && s.termino === student.termino);
                                     return (
                                         <li
-                                            key={student.username}
+                                            key={`${student.username}-${student.termino}`}
                                             onClick={() => toggleStudent(student)}
                                             className="group p-3 cursor-pointer transition-all hover:bg-gray-50 flex items-center justify-between"
                                         >
@@ -215,9 +219,16 @@ const AssignStudentModal = ({ isOpen, onClose, numCaso, onAssignSuccess }: Assig
 
                                                 {/* Text Info */}
                                                 <div>
-                                                    <p className={`text-sm font-bold transition-colors ${isSelected ? 'text-red-900' : 'text-gray-800'}`}>
-                                                        {student.nombre} {student.apellido || ''}
-                                                    </p>
+                                                    <div className="flex items-center gap-2">
+                                                        <p className={`text-sm font-bold transition-colors ${isSelected ? 'text-red-900' : 'text-gray-800'}`}>
+                                                            {student.nombre} {student.apellido || ''}
+                                                        </p>
+                                                        {student.termino && (
+                                                            <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
+                                                                {student.termino}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                     <p className="text-xs text-gray-400 font-mono mt-0.5">
                                                         {student.cedula}
                                                     </p>
