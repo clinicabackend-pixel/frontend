@@ -74,6 +74,10 @@ const casoService = {
         await api.delete(`/casos/${id}/asignacion/estudiante/${username}/termino/${termino}`);
     },
 
+    unassignSupervisor: async (id: string, username: string, termino: string): Promise<void> => {
+        await api.delete(`/casos/${id}/supervision/profesor/${username}/termino/${termino}`);
+    },
+
     // --- Added Missing Methods ---
 
     getTribunales: async (): Promise<Tribunal[]> => {

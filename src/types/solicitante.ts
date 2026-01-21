@@ -2,17 +2,17 @@ export interface SolicitanteRequest {
     cedula: string;
     nombre: string;
     sexo: string;
-    idEstadoCivil: number;
+    estadoCivil: string;
     fechaNacimiento: string; // LocalDate in Java, string (ISO) in JS
     concubinato: boolean;
     nacionalidad: string;
-    idCondicion?: number;
-    idCondicionActividad?: number;
+    condicionLaboral?: string;
+    condicionActividad?: string;
     telfCasa: string;
     telfCelular: string;
     email: string;
     idParroquia: number;
-    idNivel?: number;
+    nivelEducativo?: string;
 }
 
 export interface SolicitanteResponse {
@@ -23,21 +23,15 @@ export interface SolicitanteResponse {
     fechaNacimiento: string;
     concubinato: boolean;
     nacionalidad: string;
-    trabaja: boolean;
-    condicionTrabajo: string;
+    condicionLaboral?: string;
+    condicionActividad?: string;
     telfCasa: string;
     telfCelular: string;
     email: string;
-    idEstadoCivil?: number;
     idParroquia?: number;
-    idMunicipio?: number;
-    idEstado?: number;
-    idCondicion?: number;
-    idCondicionActividad?: number;
-    idNivel?: number;
-    apellido?: string; // Adding as optional if backend sends it, otherwise update backend DTO
+    nivelEducativo?: string;
+    apellido?: string;
     nombreParroquia?: string;
     nombreMunicipio?: string;
     nombreEstado?: string;
-    nombreNivel?: string;
 }

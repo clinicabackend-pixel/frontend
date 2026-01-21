@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faUserTie, faSearch } from '@fortawesome/free-solid-svg-icons';
 import profesorService, { type ProfesorInfo } from '../services/profesorService';
 import casoService from '../services/casoService';
+import { useAuth } from '../context/AuthContext';
 
 interface AssignSupervisorModalProps {
     isOpen: boolean;
@@ -12,6 +13,7 @@ interface AssignSupervisorModalProps {
 }
 
 const AssignSupervisorModal = ({ isOpen, onClose, numCaso, onAssignSuccess }: AssignSupervisorModalProps) => {
+    const { user } = useAuth(); // Get current user
     const [isVisible, setIsVisible] = useState(false);
     const [profesors, setProfesors] = useState<ProfesorInfo[]>([]);
     const [filteredProfesors, setFilteredProfesors] = useState<ProfesorInfo[]>([]);
@@ -48,11 +50,18 @@ const AssignSupervisorModal = ({ isOpen, onClose, numCaso, onAssignSuccess }: As
     };
 
     useEffect(() => {
+        let currentList = profesors;
+
+        // Si es PROFESOR, solo puede asignarse a sí mismo
+        if (user?.tipoUsuario === 'PROFESOR') {
+            currentList = currentList.filter(p => p.username === user.username);
+        }
+
         if (!searchText) {
-            setFilteredProfesors(profesors);
+            setFilteredProfesors(currentList);
         } else {
             const lower = searchText.toLowerCase();
-            const filtered = profesors.filter(p =>
+            const filtered = currentList.filter(p =>
                 (p.nombre?.toLowerCase() || '').includes(lower) ||
                 (p.apellido?.toLowerCase() || '').includes(lower) ||
                 (p.cedula?.toLowerCase() || '').includes(lower) ||
@@ -60,7 +69,7 @@ const AssignSupervisorModal = ({ isOpen, onClose, numCaso, onAssignSuccess }: As
             );
             setFilteredProfesors(filtered);
         }
-    }, [searchText, profesors]);
+    }, [searchText, profesors, user]);
 
     const handleAssign = async () => {
         if (!selectedProfesor || !selectedProfesor.termino) return;

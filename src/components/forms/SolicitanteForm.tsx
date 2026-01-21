@@ -14,14 +14,17 @@ const initialFormData: SolicitanteRequest = {
     nombre: '',
     cedula: '',
     sexo: '',
-    idEstadoCivil: 0,
+    estadoCivil: '',
     fechaNacimiento: '',
     concubinato: false,
-    nacionalidad: '',
+    nacionalidad: 'Venezolano',
     telfCasa: '',
     telfCelular: '',
     email: '',
     idParroquia: 0,
+    nivelEducativo: '',
+    condicionLaboral: '',
+    condicionActividad: ''
 };
 
 interface SolicitanteFormProps {
@@ -57,12 +60,28 @@ export default function SolicitanteForm({
     );
     const [saving, setSaving] = useState(false);
 
-    // Estados para catálogos de ubicación
+    // Estados para catálogos de ubicación (siguen siendo dinámicos)
     const [estados, setEstados] = useState<Estado[]>([]);
     const [municipios, setMunicipios] = useState<Municipio[]>([]);
     const [parroquias, setParroquias] = useState<Parroquia[]>([]);
-    const [estadosCiviles, setEstadosCiviles] = useState<EstadoCivil[]>([]);
-    const [nivelesEducativos, setNivelesEducativos] = useState<NivelEducativoResponse[]>([]);
+
+    // Static Options
+    const ESTADO_CIVIL_OPTIONS = [
+        { value: 'Soltero(a)', label: 'Soltero(a)' },
+        { value: 'Casado(a)', label: 'Casado(a)' },
+        { value: 'Divorciado(a)', label: 'Divorciado(a)' },
+        { value: 'Viudo(a)', label: 'Viudo(a)' },
+        { value: 'Concubino(a)', label: 'Concubino(a)' }
+    ];
+
+    const NIVEL_EDUCATIVO_OPTIONS = [
+        { value: 'Primaria', label: 'Primaria' },
+        { value: 'Bachillerato', label: 'Bachillerato' },
+        { value: 'Técnico Superior', label: 'Técnico Superior' },
+        { value: 'Universitario', label: 'Universitario' },
+        { value: 'Postgrado', label: 'Postgrado' },
+        { value: 'Sin Instrucción', label: 'Sin Instrucción' }
+    ];
 
     const [selectedEstado, setSelectedEstado] = useState<number>(0);
     const [selectedMunicipio, setSelectedMunicipio] = useState<number>(0);
@@ -71,31 +90,21 @@ export default function SolicitanteForm({
     // Duplicate Error State for Modal
     const [duplicateError, setDuplicateError] = useState<any>(null);
 
-    // Cargar Catálogos al montar (Preloading)
+    // Cargar Catálogos de Ubicación al montar
     useEffect(() => {
         const loadCatalogos = async () => {
             try {
-                const [
-                    estadosData,
-                    municipiosData,
-                    parroquiasData,
-                    estadosCivilesData,
-                    nivelesEducativosData
-                ] = await Promise.all([
+                const [estadosData, municipiosData, parroquiasData] = await Promise.all([
                     catalogoService.getEstados(),
                     catalogoService.getAllMunicipios(),
-                    catalogoService.getAllParroquias(),
-                    catalogoService.getEstadosCiviles(),
-                    catalogoService.getNivelesEducativos()
+                    catalogoService.getAllParroquias()
                 ]);
 
                 setEstados(estadosData);
                 setMunicipios(municipiosData);
                 setParroquias(parroquiasData);
-                setEstadosCiviles(estadosCivilesData);
-                setNivelesEducativos(nivelesEducativosData);
             } catch (error) {
-                console.error("Error al cargar catálogos", error);
+                console.error("Error al cargar catálogos de ubicación", error);
             }
         };
 
@@ -337,14 +346,17 @@ export default function SolicitanteForm({
 
                     {/* Estado civil */}
                     <div>
-                        <CustomSelect
-                            label="Estado civil"
-                            value={formData.idEstadoCivil}
-                            options={estadosCiviles.map(ec => ({ value: ec.idEstadoCivil, label: ec.nombreEstadoCivil }))}
-                            onChange={(val) => setFormData(prev => ({ ...prev, idEstadoCivil: Number(val) }))}
-                            required={isStrict}
-                            disabled={!isEditing}
-                        />
+                        {/* Estado civil */}
+                        <div>
+                            <CustomSelect
+                                label="Estado civil"
+                                value={formData.estadoCivil || ''}
+                                options={ESTADO_CIVIL_OPTIONS}
+                                onChange={(val) => setFormData(prev => ({ ...prev, estadoCivil: String(val) }))}
+                                required={isStrict}
+                                disabled={!isEditing}
+                            />
+                        </div>
                     </div>
 
                     {/* Fecha nacimiento */}
@@ -396,11 +408,9 @@ export default function SolicitanteForm({
                     <div>
                         <CustomSelect
                             label="Nivel Educativo (Opcional)"
-                            value={formData.idNivel || ''}
-                            options={nivelesEducativos
-                                .filter(n => n.estatus === 'ACTIVO')
-                                .map(n => ({ value: n.id, label: n.nombre }))}
-                            onChange={(val) => setFormData(prev => ({ ...prev, idNivel: Number(val) }))}
+                            value={formData.nivelEducativo || ''}
+                            options={NIVEL_EDUCATIVO_OPTIONS}
+                            onChange={(val) => setFormData(prev => ({ ...prev, nivelEducativo: String(val) }))}
                             disabled={!isEditing}
                         />
                     </div>
@@ -443,7 +453,7 @@ export default function SolicitanteForm({
                                 name="email"
                                 value={formData.email}
                                 onChange={handleInputChange}
-                                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                                pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
                                 title="Ingrese un correo electrónico válido"
                                 disabled={!isEditing}
                             />

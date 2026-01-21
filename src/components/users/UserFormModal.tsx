@@ -55,16 +55,12 @@ export default function UserFormModal({ isOpen, onClose, onSuccess }: UserFormMo
         setError('');
 
         try {
-            // Adapt formData to backend expectations if needed.
-            // Backend Usuario: username, cedula (idUsuario?), nombre, email, status, tipo, contrasena
-            // Frontend type Usuario: username, idUsuario (cedula), nombre, email, estatus, tipoUsuario
-
             const payload: any = {
                 ...formData,
-                cedula: formData.idUsuario, // Map idUsuario to cedula for backend if needed, or keep consistent
+                cedula: formData.idUsuario,
                 status: formData.estatus,
                 tipo: formData.tipoUsuario,
-                termino: formData.termino || undefined // Include semester if present
+                termino: formData.termino || undefined
             };
 
             await usuarioService.createUsuario(payload);
@@ -78,7 +74,8 @@ export default function UserFormModal({ isOpen, onClose, onSuccess }: UserFormMo
                 tipoUsuario: 'ESTUDIANTE',
                 estatus: 'ACTIVO',
                 termino: '',
-                sexo: ''
+                sexo: '',
+                contrasena: ''
             });
         } catch (err) {
             console.error('Error creating user:', err);
@@ -166,8 +163,6 @@ export default function UserFormModal({ isOpen, onClose, onSuccess }: UserFormMo
                                         <option value="FEMENINO">Femenino</option>
                                     </select>
                                 </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Estatus</label>
                                     <select name="estatus" value={formData.estatus} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
@@ -177,7 +172,7 @@ export default function UserFormModal({ isOpen, onClose, onSuccess }: UserFormMo
                                 </div>
                             </div>
                             {showSemester && (
-                                <div>
+                                <div className="mt-4">
                                     <label className="block text-sm font-medium text-gray-700">Semestre</label>
                                     <select
                                         name="termino"
@@ -198,27 +193,27 @@ export default function UserFormModal({ isOpen, onClose, onSuccess }: UserFormMo
                                     </p>
                                 </div>
                             )}
-                        </div>
 
-                        <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 mt-6">
-                            <button
-                                type="button"
-                                onClick={onClose}
-                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                            >
-                                {loading ? 'Guardando...' : 'Guardar Usuario'}
-                            </button>
+                            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 mt-6">
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                                >
+                                    {loading ? 'Guardando...' : 'Guardar Usuario'}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </form >
-            </div >
-        </div >
+                </form>
+            </div>
+        </div>
     );
 }

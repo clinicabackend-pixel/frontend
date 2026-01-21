@@ -85,6 +85,15 @@ function CasoDetalle() {
   });
   const [unassignLoading, setUnassignLoading] = useState(false);
 
+  // Supervisor Unassignment State
+  const [unassignSupervisorData, setUnassignSupervisorData] = useState<{ isOpen: boolean; username: string; termino: string; nombre: string }>({
+    isOpen: false,
+    username: '',
+    termino: '',
+    nombre: ''
+  });
+  const [unassignSupervisorLoading, setUnassignSupervisorLoading] = useState(false);
+
   // Document/Folio State (para pestaña Folios)
   const [isAddDocModalOpen, setIsAddDocModalOpen] = useState(false);
 
@@ -249,6 +258,22 @@ function CasoDetalle() {
       alert('Error al desasignar el estudiante.');
     } finally {
       setUnassignLoading(false);
+    }
+  };
+
+  // Handler para desasignar supervisor
+  const handleUnassignSupervisorConfirm = async () => {
+    if (!numCaso) return;
+    setUnassignSupervisorLoading(true);
+    try {
+      await casoService.unassignSupervisor(numCaso, unassignSupervisorData.username, unassignSupervisorData.termino);
+      setUnassignSupervisorData(prev => ({ ...prev, isOpen: false }));
+      await handleRefresh();
+    } catch (err) {
+      console.error('Error unassigning supervisor:', err);
+      // alert('Error al desasignar el supervisor. Asegúrate de que tienes permiso.'); // We can improve this with a toast notification later
+    } finally {
+      setUnassignSupervisorLoading(false);
     }
   };
 
@@ -1159,7 +1184,15 @@ function CasoDetalle() {
                                 <h4 className={`font-bold ${isDark ? 'text-white' : 'text-blue-900'}`}>{sup.nombre}</h4>
                                 <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-blue-700'} font-mono`}>{sup.username}</p>
                               </div>
-                              {/* Remove Supervisor logic could continue here if needed */}
+                              {canAssign && (
+                                <button
+                                  onClick={() => setUnassignSupervisorData({ isOpen: true, username: sup.username, termino: sup.termino, nombre: sup.nombre })}
+                                  className={`transition-colors ${isDark ? 'text-gray-400 hover:text-red-400' : 'text-gray-400 hover:text-red-600'}`}
+                                  title="Desasignar Supervisor"
+                                >
+                                  <FontAwesomeIcon icon={faTrash} />
+                                </button>
+                              )}
                             </div>
                             <div className="mt-2">
                               <span className={`text-xs px-2 py-1 rounded-full ${isDark ? 'bg-blue-800 text-blue-200' : 'bg-white text-blue-800 border border-blue-200'}`}>
@@ -1405,12 +1438,13 @@ function CasoDetalle() {
             </div>
           </div>
         </main>
-      </div>
+      </div >
 
       {/* EDIT BENEFICIARIO MODAL */}
-      <Modal
+      < Modal
         isOpen={isEditBeneficiarioModalOpen}
-        onClose={() => setIsEditBeneficiarioModalOpen(false)}
+        onClose={() => setIsEditBeneficiarioModalOpen(false)
+        }
         title={`Editar Información de Beneficiario${editingBeneficiario ? `: ${editingBeneficiario.nombre}` : ''}`}
       >
         <div className="p-0">
@@ -1486,7 +1520,7 @@ function CasoDetalle() {
             )}
           </div>
         </div>
-      </Modal>
+      </Modal >
 
       <AddAccionModal
         isOpen={isAddAccionModalOpen}
@@ -1528,6 +1562,17 @@ function CasoDetalle() {
         confirmText="Sí, Desasignar"
         variant="danger"
         isLoading={unassignLoading}
+      />
+
+      <ConfirmationModal
+        isOpen={unassignSupervisorData.isOpen}
+        onClose={() => setUnassignSupervisorData(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={handleUnassignSupervisorConfirm}
+        title="Desasignar Supervisor"
+        message={`¿Seguro que desea remover al supervisor ${unassignSupervisorData.nombre} del caso?`}
+        confirmText="Sí, Desasignar"
+        variant="danger"
+        isLoading={unassignSupervisorLoading}
       />
 
       {/* EDIT MODAL */}
@@ -1890,15 +1935,17 @@ function CasoDetalle() {
         )}
       </Modal>
       {/* Assign Supervisor Modal */}
-      {numCaso && (
-        <AssignSupervisorModal
-          isOpen={isAssignSupervisorModalOpen}
-          onClose={() => setIsAssignSupervisorModalOpen(false)}
-          numCaso={numCaso}
-          onAssignSuccess={handleRefresh}
-        />
-      )}
-    </div>
+      {
+        numCaso && (
+          <AssignSupervisorModal
+            isOpen={isAssignSupervisorModalOpen}
+            onClose={() => setIsAssignSupervisorModalOpen(false)}
+            numCaso={numCaso}
+            onAssignSuccess={handleRefresh}
+          />
+        )
+      }
+    </div >
   );
 }
 

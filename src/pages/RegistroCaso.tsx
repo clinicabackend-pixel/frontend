@@ -34,6 +34,7 @@ function RegistroCaso() {
   const [solicitante, setSolicitante] = useState<any | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Success Modal State
   const [createdCase, setCreatedCase] = useState<CasoDetalleResponse | null>(null);
@@ -131,6 +132,10 @@ function RegistroCaso() {
 
   const handleRegistroCaso = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Prevent double submission
+    if (isSubmitting) return;
+
     if (!solicitante) {
       showNotification('Debe seleccionar un solicitante', 'error');
       return;
@@ -140,6 +145,8 @@ function RegistroCaso() {
       showNotification('Complete los campos obligatorios (*)', 'error');
       return;
     }
+
+    setIsSubmitting(true);
 
     try {
       const casoData: CasoCreateRequest = {
@@ -168,6 +175,8 @@ function RegistroCaso() {
       console.error('Error al registrar caso:', error);
       const msg = error.response?.data?.message || "Error al registrar el caso";
       showNotification(msg, "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

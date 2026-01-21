@@ -124,9 +124,9 @@ export default function CustomSelect({
                     style={{ backgroundColor: '#ffffff' }}
                 >
                     <ul className="max-h-60 overflow-y-auto py-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100" style={{ backgroundColor: '#ffffff' }}>
-                        {options.map((option) => (
+                        {options.map((option, index) => (
                             <li
-                                key={option.value}
+                                key={`${option.value}-${index}`}
                                 onClick={() => handleSelect(option.value)}
                                 className={`
                                     px-4 py-2 cursor-pointer transition-colors duration-150
