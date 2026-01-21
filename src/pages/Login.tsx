@@ -85,9 +85,9 @@ function Login() {
           type="button"
         >
           {isDark ? (
-            <Sun className="h-6 w-6" />
-          ) : (
             <Moon className="h-6 w-6" />
+          ) : (
+            <Sun className="h-6 w-6" />
           )}
         </button>
       </div>

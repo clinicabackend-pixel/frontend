@@ -121,8 +121,9 @@ export default function CustomSelect({
                         ? 'bottom-full mb-1'
                         : 'top-full mt-1'
                         }`}
+                    style={{ backgroundColor: '#ffffff' }}
                 >
-                    <ul className="max-h-60 overflow-y-auto py-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                    <ul className="max-h-60 overflow-y-auto py-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100" style={{ backgroundColor: '#ffffff' }}>
                         {options.map((option) => (
                             <li
                                 key={option.value}
@@ -131,12 +132,16 @@ export default function CustomSelect({
                                     px-4 py-2 cursor-pointer transition-colors duration-150
                                     ${option.value === value ? 'bg-red-50 text-red-900 font-medium' : 'text-gray-900 hover:bg-gray-50'}
                                 `}
+                                style={{
+                                    backgroundColor: option.value === value ? '#fef2f2' : '#ffffff',
+                                    color: option.value === value ? '#991b1b' : '#111827'
+                                }}
                             >
                                 {option.label}
                             </li>
                         ))}
                         {options.length === 0 && (
-                            <li className="px-4 py-2 text-gray-500 italic">No hay opciones disponibles</li>
+                            <li className="px-4 py-2 text-gray-500 italic" style={{ backgroundColor: '#ffffff', color: '#6b7280' }}>No hay opciones disponibles</li>
                         )}
                     </ul>
                 </div>

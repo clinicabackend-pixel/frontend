@@ -393,12 +393,13 @@ export default function Reportes() {
                                     ? 'bg-red-900/50 border-red-800/50 text-white'
                                     : 'border-gray-300 bg-white'
                                     }`}
+                                style={isDark ? { backgroundColor: '#ffffff', color: '#111827' } : {}}
                             >
-                                <option value="ABIERTO">Abierto</option>
-                                <option value="CERRADO">Cerrado</option>
-                                <option value="PENDIENTE">Pendiente</option>
-                                <option value="EN_PROCESO">En Proceso</option>
-                                <option value="ARCHIVO">Archivo</option>
+                                <option value="ABIERTO" style={{ backgroundColor: '#ffffff', color: '#111827' }}>Abierto</option>
+                                <option value="CERRADO" style={{ backgroundColor: '#ffffff', color: '#111827' }}>Cerrado</option>
+                                <option value="PENDIENTE" style={{ backgroundColor: '#ffffff', color: '#111827' }}>Pendiente</option>
+                                <option value="EN_PROCESO" style={{ backgroundColor: '#ffffff', color: '#111827' }}>En Proceso</option>
+                                <option value="ARCHIVO" style={{ backgroundColor: '#ffffff', color: '#111827' }}>Archivo</option>
                             </select>
                         </div>
                     </ReportCard>
@@ -440,10 +441,11 @@ export default function Reportes() {
                                         ? 'bg-red-900/50 border-red-800/50 text-white'
                                         : 'border-gray-300 bg-white'
                                         } ${loadingMaterias ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    style={isDark ? { backgroundColor: '#ffffff', color: '#111827' } : {}}
                                 >
-                                    <option value={0}>Seleccione...</option>
+                                    <option value={0} style={{ backgroundColor: '#ffffff', color: '#111827' }}>Seleccione...</option>
                                     {materias.map((materia) => (
-                                        <option key={materia.id} value={materia.id}>
+                                        <option key={materia.id} value={materia.id} style={{ backgroundColor: '#ffffff', color: '#111827' }}>
                                             {materia.descripcion}
                                         </option>
                                     ))}
