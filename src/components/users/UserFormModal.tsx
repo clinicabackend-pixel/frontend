@@ -20,7 +20,8 @@ export default function UserFormModal({ isOpen, onClose, onSuccess }: UserFormMo
         tipoUsuario: 'ESTUDIANTE',
         estatus: 'ACTIVO',
         termino: '',
-        sexo: ''
+        sexo: '',
+        contrasena: ''
     });
     const [semestres, setSemestres] = useState<Semestre[]>([]);
     const [loading, setLoading] = useState(false);
@@ -145,6 +146,17 @@ export default function UserFormModal({ isOpen, onClose, onSuccess }: UserFormMo
                                         <option value="COORDINADOR">Coordinador</option>
                                         <option value="ADMINISTRADOR">Administrador</option>
                                     </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Contraseña (Opcional)</label>
+                                    <input
+                                        type="password"
+                                        name="contrasena"
+                                        value={formData.contrasena || ''}
+                                        onChange={handleChange}
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                                        placeholder="Por defecto: Generada aleatoria"
+                                    />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Sexo</label>
