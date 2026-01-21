@@ -154,7 +154,7 @@ export default function UsuariosPage() {
     const handleConfirmPermanentDelete = async () => {
         if (!userToDelete) return;
         try {
-            await usuarioService.deleteUsuario(userToDelete.username);
+            await usuarioService.deletePermanently(userToDelete.username);
             await fetchUsuarios();
             setPermanentDeleteModalOpen(false);
             setUserToDelete(null);

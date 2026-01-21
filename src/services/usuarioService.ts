@@ -41,6 +41,10 @@ const usuarioService = {
 
     deleteUsuario: async (username: string): Promise<void> => {
         await api.delete(`/usuarios/${username}`);
+    },
+
+    deletePermanently: async (username: string): Promise<void> => {
+        await api.delete(`/usuarios/${username}/permanent`);
     }
 };
 
