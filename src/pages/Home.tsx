@@ -367,7 +367,7 @@ function Home() {
               <span className="font-medium text-sm">Buscar Caso</span>
             </button>
             <button 
-              onClick={() => navigate('/calendario')} 
+              onClick={() => navigate('/agenda')} 
               className={`w-full flex items-center gap-3 p-3 text-left rounded-lg transition-all duration-200 group ${
                 isDark 
                   ? 'hover:bg-red-900/50 text-white border border-transparent hover:border-red-900/50' 

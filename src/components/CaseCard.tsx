@@ -140,7 +140,7 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
           {/* Requirements: Materia (Ambito Legal) below name */}
           <div className="mb-3 flex items-center">
             <p
-              className={`text-xs font-semibold uppercase tracking-wide line-clamp-1 ${isDark ? 'text-red-800' : 'text-red-700'
+              className={`text-xs font-semibold uppercase tracking-wide line-clamp-1 ${isDark ? 'text-white' : 'text-red-700'
                 }`}
             >
               {materia}

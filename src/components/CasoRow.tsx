@@ -38,7 +38,7 @@ export default function CasoRow({ caso, materia, onClick }: CasoRowProps) {
                 <div className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{caso.nombreSolicitante}</div>
                 <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{caso.cedula}</div>
             </td>
-            <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+            <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDark ? 'text-white' : 'text-gray-500'}`}>
                 {materia}
             </td>
             <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>

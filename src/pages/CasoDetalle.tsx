@@ -386,15 +386,15 @@ function CasoDetalle() {
 
   if (loading) {
     return (
-      <div className={`flex h-screen w-screen items-center justify-center ${isDark ? 'bg-red-900' : 'bg-gray-50'}`}>
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-900"></div>
+      <div className={`flex h-screen w-screen items-center justify-center ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <div className={`animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 ${isDark ? 'border-red-900' : 'border-red-900'}`}></div>
       </div>
     );
   }
 
   if (error || !casoDetalle) {
     return (
-      <div className={`flex h-screen w-screen flex-col ${isDark ? 'bg-red-900' : 'bg-gray-50'}`}>
+      <div className={`flex h-screen w-screen flex-col ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <Header title="Error" onMenuClick={handleMenuClick} />
         <div className="flex flex-1 items-center justify-center">
           <div className={`text-center p-8 rounded-lg shadow-md border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
@@ -420,19 +420,19 @@ function CasoDetalle() {
   const pruebas = casoDetalle.pruebas || [];
 
   return (
-    <div className={`flex w-screen h-screen overflow-hidden ${isDark ? 'bg-red-900' : 'bg-gray-50'}`}>
+    <div className={`flex w-screen h-screen overflow-hidden ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <Sidebar isOpen={isSidebarOpen} onClose={handleCloseSidebar} />
 
-      <div className={`flex-1 flex flex-col w-full min-w-0 ${isDark ? 'bg-red-900' : ''}`}>
+      <div className={`flex-1 flex flex-col w-full min-w-0 ${isDark ? 'bg-gray-900' : ''}`}>
         <Header title={`CASO ${caso.numCaso}`} onMenuClick={handleMenuClick} />
 
-        <main className={`flex-1 overflow-y-auto py-6 px-8 md:px-10 lg:px-16 xl:px-20 pb-20 ${isDark ? 'bg-red-900' : 'bg-white'}`}>
+        <main className={`flex-1 overflow-y-auto py-6 px-8 md:px-10 lg:px-16 xl:px-20 pb-20 ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
           <div className="w-full space-y-6">
             {/* Top Bar with Back & Actions */}
             <div className="flex justify-between items-center">
               <button
                 onClick={() => navigate('/casos')}
-                className={`flex items-center hover:text-red-900 transition-colors font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'
+                className={`flex items-center hover:text-red-900 transition-colors font-medium ${isDark ? 'text-white' : 'text-gray-600'
                   }`}
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -462,7 +462,7 @@ function CasoDetalle() {
                         }
                       }
                     }}
-                    className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-950 font-medium transition-colors flex items-center gap-2 text-sm"
+                    className="px-3 py-1.5 bg-red-900 text-white rounded-lg hover:bg-red-950 font-medium transition-colors flex items-center gap-2 text-sm"
                     title="Eliminar Caso Permanentemente"
                   >
                     <FontAwesomeIcon icon={faTrash} />
@@ -473,7 +473,7 @@ function CasoDetalle() {
                 {/* Botón Exportar Reporte Caso */}
                 <button
                   onClick={() => caso.numCaso && reporteService.downloadReporteCaso(caso.numCaso)}
-                  className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors flex items-center gap-2 text-sm"
+                  className="px-3 py-1.5 bg-red-900 text-white rounded-lg hover:bg-red-950 font-medium transition-colors flex items-center gap-2 text-sm"
                   title="Descargar Reporte del Caso"
                 >
                   <FontAwesomeIcon icon={faFileExcel} />
@@ -497,7 +497,7 @@ function CasoDetalle() {
                     }}
                     className={`px-4 py-1.5 rounded-full text-sm font-semibold border outline-none cursor-pointer ${caso.estatus === 'ABIERTO'
                       ? isDark ? 'bg-green-900/50 text-green-300 border-green-700' : 'bg-green-100 text-green-800 border-green-200'
-                      : isDark ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-gray-100 text-gray-800 border-gray-200'
+                      : isDark ? 'bg-gray-800 text-white border-gray-700' : 'bg-gray-100 text-gray-800 border-gray-200'
                       }`}
                   >
                     <option value="ABIERTO">ABIERTO</option>
@@ -512,7 +512,7 @@ function CasoDetalle() {
                         ? 'bg-green-900/50 text-green-300 border-green-700'
                         : 'bg-green-100 text-green-800 border-green-200'
                       : isDark
-                        ? 'bg-gray-800 text-gray-300 border-gray-700'
+                        ? 'bg-gray-800 text-white border-gray-700'
                         : 'bg-gray-100 text-gray-800 border-gray-200'
                       }`}
                   >
@@ -524,7 +524,7 @@ function CasoDetalle() {
 
             {/* Header Card */}
             <div
-              className={`rounded-xl shadow-sm border p-6 ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'
+              className={`rounded-xl shadow-sm border p-6 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                 }`}
             >
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
@@ -534,18 +534,18 @@ function CasoDetalle() {
                   >
                     {nombreSolicitante}
                   </h1>
-                  <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                  <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-500'}`}>
                     Solicitante (CI: {caso.cedula})
                   </p>
                 </div>
                 <div className="text-right">
                   <div
-                    className={`text-lg font-semibold text-right ${isDark ? 'text-red-800' : 'text-red-900'
+                    className={`text-lg font-semibold text-right ${isDark ? 'text-white' : 'text-red-900'
                       }`}
                   >
                     {materiaNombre}
                   </div>
-                  <div className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                  <div className={`text-sm ${isDark ? 'text-white' : 'text-gray-500'}`}>
                     Materia
                   </div>
                 </div>
@@ -554,18 +554,18 @@ function CasoDetalle() {
               {/* Información del Solicitante Expandida */}
               {solicitante && (
                 <div
-                  className={`rounded-lg p-4 mb-6 border ${isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-100'
+                  className={`rounded-lg p-4 mb-6 border ${isDark ? 'bg-gray-700/50 border-gray-700' : 'bg-gray-50 border-gray-100'
                     }`}
                 >
                   <h3
-                    className={`text-xs font-bold uppercase tracking-wider mb-3 ${isDark ? 'text-gray-300' : 'text-gray-400'
+                    className={`text-xs font-bold uppercase tracking-wider mb-3 ${isDark ? 'text-white' : 'text-gray-400'
                       }`}
                   >
                     Datos del Solicitante
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
-                      <span className={`block text-xs ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                      <span className={`block text-xs ${isDark ? 'text-white' : 'text-gray-500'}`}>
                         Teléfono
                       </span>
                       <span
@@ -575,7 +575,7 @@ function CasoDetalle() {
                       </span>
                     </div>
                     <div>
-                      <span className={`block text-xs ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                      <span className={`block text-xs ${isDark ? 'text-white' : 'text-gray-500'}`}>
                         Correo
                       </span>
                       <span
@@ -586,7 +586,7 @@ function CasoDetalle() {
                       </span>
                     </div>
                     <div>
-                      <span className={`block text-xs ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                      <span className={`block text-xs ${isDark ? 'text-white' : 'text-gray-500'}`}>
                         Edad / Estado Civil
                       </span>
                       <span
@@ -600,12 +600,12 @@ function CasoDetalle() {
               )}
 
               <div
-                className={`grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t ${isDark ? 'border-red-800/50' : 'border-gray-100'
+                className={`grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t ${isDark ? 'border-gray-700' : 'border-gray-100'
                   }`}
               >
                 <div>
                   <span
-                    className={`block text-xs uppercase tracking-wide ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                    className={`block text-xs uppercase tracking-wide ${isDark ? 'text-white' : 'text-gray-500'}`}
                   >
                     Fecha Recepción
                   </span>
@@ -615,7 +615,7 @@ function CasoDetalle() {
                 </div>
                 <div>
                   <span
-                    className={`block text-xs uppercase tracking-wide ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                    className={`block text-xs uppercase tracking-wide ${isDark ? 'text-white' : 'text-gray-500'}`}
                   >
                     Trámite
                   </span>
@@ -625,7 +625,7 @@ function CasoDetalle() {
                 </div>
                 <div>
                   <span
-                    className={`block text-xs uppercase tracking-wide ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                    className={`block text-xs uppercase tracking-wide ${isDark ? 'text-white' : 'text-gray-500'}`}
                   >
                     Asignado a
                   </span>
@@ -635,7 +635,7 @@ function CasoDetalle() {
                 </div>
                 <div>
                   <span
-                    className={`block text-xs uppercase tracking-wide ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                    className={`block text-xs uppercase tracking-wide ${isDark ? 'text-white' : 'text-gray-500'}`}
                   >
                     Término
                   </span>
@@ -647,12 +647,12 @@ function CasoDetalle() {
 
               {(caso.nombreTribunal || caso.codCasoTribunal) && (
                 <div
-                  className={`mt-4 pt-4 border-t ${isDark ? 'border-red-800/50' : 'border-gray-100'}`}
+                  className={`mt-4 pt-4 border-t ${isDark ? 'border-gray-700' : 'border-gray-100'}`}
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <span
-                        className={`block text-xs uppercase tracking-wide ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                        className={`block text-xs uppercase tracking-wide ${isDark ? 'text-white' : 'text-gray-500'}`}
                       >
                         Tribunal
                       </span>
@@ -664,7 +664,7 @@ function CasoDetalle() {
                     </div>
                     <div>
                       <span
-                        className={`block text-xs uppercase tracking-wide ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                        className={`block text-xs uppercase tracking-wide ${isDark ? 'text-white' : 'text-gray-500'}`}
                       >
                         N° Expediente / Causa
                       </span>
@@ -680,7 +680,7 @@ function CasoDetalle() {
             </div>
 
             {/* Tabs */}
-            <div className={`border-b ${isDark ? 'border-red-800/50' : 'border-gray-200'}`}>
+            <div className={`border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
               <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                 {[
                   { id: 'general', label: 'General' },
@@ -698,10 +698,10 @@ function CasoDetalle() {
                                 py-4 px-1 border-b-2 font-medium text-sm capitalize transition-colors
                                 ${activeTab === tab.id
                         ? isDark
-                          ? 'border-red-600 text-red-800'
+                          ? 'border-red-900 text-white'
                           : 'border-red-900 text-red-900'
                         : isDark
-                          ? 'border-transparent text-gray-300 hover:text-white hover:border-red-900'
+                          ? 'border-transparent text-white hover:text-white hover:border-red-900'
                           : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                       }
                             `}
@@ -714,7 +714,7 @@ function CasoDetalle() {
 
             {/* Content Area */}
             <div
-              className={`rounded-xl shadow-sm border min-h-[400px] ${isDark ? 'bg-[#630000] border-red-800/50' : 'bg-white border-gray-200'
+              className={`rounded-xl shadow-sm border min-h-[400px] ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                 }`}
             >
               {/* GENERAL TAB */}
@@ -729,7 +729,7 @@ function CasoDetalle() {
                     <button
                       onClick={openEditModal}
                       className={`px-3 py-1 text-sm font-medium border rounded-md transition-colors ${isDark
-                        ? 'text-red-800 border-red-600 hover:bg-red-950'
+                        ? 'text-white border-red-900 hover:bg-gray-700'
                         : 'text-red-900 border-red-900 hover:bg-red-50'
                         }`}
                     >
@@ -738,7 +738,7 @@ function CasoDetalle() {
                   </div>
                   <p
                     className={`whitespace-pre-line leading-relaxed p-4 rounded-lg border ${isDark
-                      ? 'text-white bg-red-950/30 border-red-800/50'
+                      ? 'text-white bg-gray-700/50 border-gray-700'
                       : 'text-gray-700 bg-gray-50 border-gray-100'
                       }`}
                   >
@@ -753,10 +753,10 @@ function CasoDetalle() {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div
-                        className={`p-3 rounded border ${isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-100'
+                        className={`p-3 rounded border ${isDark ? 'bg-gray-700/50 border-gray-700' : 'bg-gray-50 border-gray-100'
                           }`}
                       >
-                        <div className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                        <div className={`text-xs ${isDark ? 'text-white' : 'text-gray-500'}`}>
                           Tribunal
                         </div>
                         <div className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -764,10 +764,10 @@ function CasoDetalle() {
                         </div>
                       </div>
                       <div
-                        className={`p-3 rounded border ${isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-100'
+                        className={`p-3 rounded border ${isDark ? 'bg-gray-700/50 border-gray-700' : 'bg-gray-50 border-gray-100'
                           }`}
                       >
-                        <div className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                        <div className={`text-xs ${isDark ? 'text-white' : 'text-gray-500'}`}>
                           Causa / Expediente
                         </div>
                         <div className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -797,7 +797,7 @@ function CasoDetalle() {
                     </Button>
                   </div>
                   {!beneficiarios || beneficiarios.length === 0 ? (
-                    <p className={`italic ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                    <p className={`italic ${isDark ? 'text-white' : 'text-gray-500'}`}>
                       No hay beneficiarios registrados.
                     </p>
                   ) : (
@@ -806,28 +806,28 @@ function CasoDetalle() {
                         className={`min-w-full divide-y ${isDark ? 'divide-red-800/50' : 'divide-gray-200'
                           }`}
                       >
-                        <thead className={isDark ? 'bg-red-950/30' : 'bg-gray-50'}>
+                        <thead className={isDark ? 'bg-gray-700/50' : 'bg-gray-50'}>
                           <tr>
                             <th
-                              className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'
+                              className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-white' : 'text-gray-500'
                                 }`}
                             >
                               Cédula
                             </th>
                             <th
-                              className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'
+                              className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-white' : 'text-gray-500'
                                 }`}
                             >
                               Parentesco
                             </th>
                             <th
-                              className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'
+                              className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDark ? 'text-white' : 'text-gray-500'
                                 }`}
                             >
                               Tipo
                             </th>
                             <th
-                              className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-500'
+                              className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${isDark ? 'text-white' : 'text-gray-500'
                                 }`}
                             >
                               Acciones
@@ -849,12 +849,12 @@ function CasoDetalle() {
                                 {ben.cedula}
                               </td>
                               <td
-                                className={`px-6 py-4 whitespace-nowrap text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                                className={`px-6 py-4 whitespace-nowrap text-sm ${isDark ? 'text-white' : 'text-gray-500'}`}
                               >
                                 {ben.parentesco}
                               </td>
                               <td
-                                className={`px-6 py-4 whitespace-nowrap text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                                className={`px-6 py-4 whitespace-nowrap text-sm ${isDark ? 'text-white' : 'text-gray-500'}`}
                               >
                                 {ben.tipoBeneficiario}
                               </td>
@@ -862,7 +862,7 @@ function CasoDetalle() {
                                 <button
                                   onClick={() => handleEditBeneficiario(ben.cedula)}
                                   className={`transition-colors ${isDark
-                                    ? 'text-gray-400 hover:text-red-800'
+                                    ? 'text-gray-400 hover:text-white'
                                     : 'text-gray-400 hover:text-red-900'
                                     }`}
                                   title="Editar información del beneficiario"
@@ -973,7 +973,7 @@ function CasoDetalle() {
                     if (timeline.length === 0) {
                       return (
                         <p
-                          className={`italic text-center py-12 ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                          className={`italic text-center py-12 ${isDark ? 'text-white' : 'text-gray-500'}`}
                         >
                           No hay eventos registrados en el historial.
                         </p>
@@ -984,9 +984,9 @@ function CasoDetalle() {
                       <div className="relative w-full">
                         {/* Línea vertical */}
                         <div
-                          className={`absolute left-8 top-0 bottom-0 w-0.5 bg-linear-to-b ${isDark
-                            ? 'from-red-700 via-red-600 to-red-800'
-                            : 'from-red-900 via-red-600 to-gray-300'
+                          className={`absolute left-8 top-0 bottom-0 w-0.5 ${isDark
+                            ? 'bg-white'
+                            : 'bg-gradient-to-b from-red-900 via-red-600 to-gray-300'
                             }`}
                         ></div>
 
@@ -998,7 +998,7 @@ function CasoDetalle() {
                             // Colores y estilos según tipo
                             const typeStyles = {
                               accion: {
-                                bgColor: isDark ? 'bg-red-700' : 'bg-red-900',
+                                bgColor: isDark ? 'bg-gray-800' : 'bg-red-900',
                                 borderColor: isDark ? 'border-green-700' : 'border-green-200',
                                 textColor: isDark ? 'text-green-400' : 'text-green-700',
                                 badgeBg: isDark ? 'bg-green-300' : 'bg-green-100',
@@ -1006,7 +1006,7 @@ function CasoDetalle() {
                                 label: 'Acción Legal',
                               },
                               encuentro: {
-                                bgColor: isDark ? 'bg-red-700' : 'bg-red-900',
+                                bgColor: isDark ? 'bg-gray-800' : 'bg-red-900',
                                 borderColor: isDark ? 'border-blue-700' : 'border-blue-200',
                                 textColor: isDark ? 'text-blue-400' : 'text-blue-700',
                                 badgeBg: isDark ? 'bg-blue-300' : 'bg-blue-100',
@@ -1014,9 +1014,9 @@ function CasoDetalle() {
                                 label: 'Encuentro / Cita',
                               },
                               inicio: {
-                                bgColor: isDark ? 'bg-red-700' : 'bg-red-900',
+                                bgColor: isDark ? 'bg-gray-800' : 'bg-red-900',
                                 borderColor: isDark ? 'border-red-900' : 'border-red-200',
-                                textColor: isDark ? 'text-red-800' : 'text-red-900',
+                                textColor: isDark ? 'text-white' : 'text-red-900',
                                 badgeBg: isDark ? 'bg-gray-300' : 'bg-gray-100',
                                 badgeText: isDark ? 'text-gray-900' : 'text-gray-800',
                                 label: 'Inicio del Caso',
@@ -1030,7 +1030,7 @@ function CasoDetalle() {
                                 {/* Círculo en la línea */}
                                 <div
                                   className={`absolute top-12 w-8 h-8 left-4 rounded-full 
-                                  ${style.bgColor} border-4 ${isDark ? 'border-[#630000]' : 'border-white'} shadow-lg flex items-center 
+                                  ${style.bgColor} border-4 ${isDark ? 'border-white' : 'border-white'} shadow-lg flex items-center 
                                   justify-center z-10 transition-all`}
                                 ></div>
 
@@ -1040,7 +1040,11 @@ function CasoDetalle() {
                                     setSelectedEvento(evento);
                                     setIsEventoModalOpen(true);
                                   }}
-                                  className={`w-full rounded-lg shadow-md border-l-4 ${style.borderColor} p-5 hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer ${isDark ? 'bg-red-700/50' : 'bg-white'
+                                  className={`w-full rounded-lg shadow-md border-l-4 ${style.borderColor} p-5 hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer ${isDark 
+                                    ? evento.type === 'encuentro' 
+                                      ? 'bg-gray-700/30 border-2 border-blue-700' 
+                                      : 'bg-gray-700/30 border border-gray-700/50'
+                                    : 'bg-white'
                                     } ${isLast ? 'opacity-80' : ''}`}
                                 >
                                   {/* Header */}
@@ -1051,7 +1055,7 @@ function CasoDetalle() {
                                       {style.label}
                                     </span>
                                     <span
-                                      className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                                      className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-500'}`}
                                     >
                                       {evento.fecha.toLocaleDateString('es-ES', {
                                         day: 'numeric',
@@ -1096,17 +1100,17 @@ function CasoDetalle() {
                                   {evento.observacion && (
                                     <div
                                       className={`mt-3 rounded p-3 border ${isDark
-                                        ? 'bg-red-950/30 border-red-800/50'
+                                        ? 'bg-gray-700/50 border-gray-700'
                                         : 'bg-gray-50 border-gray-200'
                                         }`}
                                     >
                                       <p
-                                        className={`text-xs uppercase font-semibold mb-1 ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                                        className={`text-xs uppercase font-semibold mb-1 ${isDark ? 'text-white' : 'text-gray-500'}`}
                                       >
                                         Observación:
                                       </p>
                                       <p
-                                        className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                                        className={`text-sm ${isDark ? 'text-white' : 'text-gray-700'}`}
                                       >
                                         {evento.observacion}
                                       </p>
@@ -1116,7 +1120,7 @@ function CasoDetalle() {
                                   {/* Indicador de click */}
                                   <div className="mt-4 text-right">
                                     <span
-                                      className={`text-xs font-medium ${isDark ? 'text-gray-400' : 'text-gray-400'}`}
+                                      className={`text-xs font-medium ${isDark ? 'text-white' : 'text-gray-500'}`}
                                     >
                                       Click para ver más detalles →
                                     </span>
@@ -1186,11 +1190,11 @@ function CasoDetalle() {
                     </div>
 
                     {!asignados || asignados.length === 0 ? (
-                      <p className={`text-center py-8 ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>No hay estudiantes asignados.</p>
+                      <p className={`text-center py-8 ${isDark ? 'text-white' : 'text-gray-500'}`}>No hay estudiantes asignados.</p>
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {asignados.map((asig, idx) => (
-                          <div key={`${asig.username}-${idx}`} className={`p-4 rounded-lg border ${isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-200'}`}>
+                          <div key={`${asig.username}-${idx}`} className={`p-4 rounded-lg border ${isDark ? 'bg-gray-700/50 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
                             <div className="flex justify-between items-start">
                               <div>
                                 <h4 className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{asig.nombre}</h4>
@@ -1229,13 +1233,13 @@ function CasoDetalle() {
                   </div>
 
                   {!documentos || documentos.length === 0 ? (
-                    <p className={`text-center py-8 ${isDark ? 'text-gray-300' : 'text-gray-500'} ${isDark ? 'bg-red-950/30 border-red-800/50' : 'bg-gray-50 border-gray-200'} border border-dashed rounded-lg`}>
+                    <p className={`text-center py-8 ${isDark ? 'text-white' : 'text-gray-500'} ${isDark ? 'bg-gray-700/50 border-gray-700' : 'bg-gray-50 border-gray-200'} border border-dashed rounded-lg`}>
                       No hay folios físicos registrados.
                     </p>
                   ) : (
                     <ul className="space-y-4">
                       {documentos.map((doc, idx) => (
-                        <li key={idx} className={`p-4 rounded-lg border flex gap-4 ${isDark ? 'border-red-800/50 bg-red-950/30' : 'border-gray-200 bg-gray-50'}`}>
+                        <li key={idx} className={`p-4 rounded-lg border flex gap-4 ${isDark ? 'border-gray-700 bg-gray-700/50' : 'border-gray-200 bg-gray-50'}`}>
                           <div className={`p-3 rounded-lg h-fit ${isDark ? 'bg-red-900/50 text-red-800' : 'bg-red-100 text-red-700'}`}>
                             <FontAwesomeIcon icon={faFolderOpen} size="lg" />
                           </div>
@@ -1280,7 +1284,7 @@ function CasoDetalle() {
 
                   <div className="mt-8 space-y-3">
                     {pruebas.length === 0 ? (
-                      <p className={`italic ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>No hay archivos digitales asociados.</p>
+                      <p className={`italic ${isDark ? 'text-white' : 'text-gray-500'}`}>No hay archivos digitales asociados.</p>
                     ) : (
                       pruebas.map(prueba => {
                         // Determinar icono basado en el titulo o extension
@@ -1292,7 +1296,7 @@ function CasoDetalle() {
                         else if (lowerTitle.includes('(jpg)') || lowerTitle.includes('(png)') || lowerTitle.includes('(jpeg)') || lowerTitle.includes('image')) fileIcon = faFileImage;
 
                         return (
-                          <div key={prueba.idPrueba} className={`flex items-center justify-between p-3 border rounded-lg ${isDark ? 'border-red-800/50 bg-red-950/30 hover:bg-red-950/50' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
+                          <div key={prueba.idPrueba} className={`flex items-center justify-between p-3 border rounded-lg ${isDark ? 'border-gray-700 bg-gray-700/50 hover:bg-red-950/50' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
                             <div className="flex items-center gap-3">
                               <div className={`p-2 rounded ${isDark ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-50 text-blue-600'}`}>
                                 <FontAwesomeIcon icon={fileIcon} />
@@ -1333,25 +1337,25 @@ function CasoDetalle() {
                     </h3>
                   </div>
                   {!documentos || documentos.length === 0 ? (
-                    <p className={`italic ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                    <p className={`italic ${isDark ? 'text-white' : 'text-gray-500'}`}>
                       No hay documentos cargados.
                     </p>
                   ) : (
                     <ul
                       className={`divide-y border rounded-lg overflow-hidden ${isDark
-                        ? 'divide-red-800/50 border-red-800/50'
+                        ? 'divide-red-800/50 border-gray-700'
                         : 'divide-gray-200 border-gray-200'
                         }`}
                     >
                       {documentos.map((doc) => (
                         <li
                           key={doc.idDocumento}
-                          className={`p-4 flex items-center justify-between transition-colors ${isDark ? 'bg-red-950/30 hover:bg-red-950/50' : 'bg-white hover:bg-gray-50'
+                          className={`p-4 flex items-center justify-between transition-colors ${isDark ? 'bg-gray-700/50 hover:bg-red-950/50' : 'bg-white hover:bg-gray-50'
                             }`}
                         >
                           <div className="flex items-start gap-3">
                             <div
-                              className={`p-2 rounded-lg ${isDark ? 'bg-red-900/50 text-red-800' : 'bg-red-50 text-red-700'
+                              className={`p-2 rounded-lg ${isDark ? 'bg-gray-700 text-white' : 'bg-red-50 text-red-700'
                                 }`}
                             >
                               <svg
@@ -1375,7 +1379,7 @@ function CasoDetalle() {
                                 {doc.titulo}
                               </p>
                               <div
-                                className={`flex gap-2 text-xs mt-1 ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                                className={`flex gap-2 text-xs mt-1 ${isDark ? 'text-white' : 'text-gray-500'}`}
                               >
                                 <span>
                                   Registrado: {new Date(doc.fechaRegistro).toLocaleDateString()}
