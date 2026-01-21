@@ -20,7 +20,7 @@ import ConfirmationModal from '../components/common/ConfirmationModal';
 import UniversalUploader from '../components/common/UniversalUploader';
 import { Plus, Search, UserPlus, Pencil, CheckCircle, XCircle } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileExcel, faTrash, faFolderOpen, faFilePdf, faFileAlt, faFileWord, faFileImage } from '@fortawesome/free-solid-svg-icons';
+import { faFileExcel, faTrash, faFolderOpen, faFilePdf, faFileAlt, faFileWord, faFileImage, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -481,6 +481,7 @@ function CasoDetalle() {
   const pruebas = casoDetalle.pruebas || [];
 
   return (
+    <>
     <div className={`flex w-screen h-screen overflow-hidden ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <Sidebar isOpen={isSidebarOpen} onClose={handleCloseSidebar} />
 
@@ -1117,13 +1118,19 @@ function CasoDetalle() {
                             };
 
                             const style = typeStyles[evento.type];
+                            
+                            // Determinar si la acción está pendiente (sin fechaEjecucion o fechaEjecucion vacía)
+                            const esAccionPendiente = evento.type === 'accion' && (!evento.fechaEjecucion || evento.fechaEjecucion.trim() === '');
 
                             return (
                               <div key={evento.id} className="relative w-full pl-20 pb-6">
                                 {/* Círculo en la línea */}
                                 <div
                                   className={`absolute top-12 w-8 h-8 left-4 rounded-full 
-                                  ${style.bgColor} border-4 ${isDark ? 'border-white' : 'border-white'} shadow-lg flex items-center 
+                                  ${esAccionPendiente 
+                                    ? (isDark ? 'bg-orange-600' : 'bg-orange-500')
+                                    : style.bgColor
+                                  } border-4 ${isDark ? 'border-white' : 'border-white'} shadow-lg flex items-center 
                                   justify-center z-10 transition-all`}
                                 ></div>
 
@@ -1133,20 +1140,39 @@ function CasoDetalle() {
                                     setSelectedEvento(evento);
                                     setIsEventoModalOpen(true);
                                   }}
-                                  className={`w-full rounded-lg shadow-md border-l-4 ${style.borderColor} p-5 hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer ${isDark 
+                                  className={`w-full rounded-lg shadow-md border-l-4 ${
+                                    esAccionPendiente
+                                      ? (isDark ? 'border-orange-600' : 'border-orange-500')
+                                      : style.borderColor
+                                  } p-5 hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer ${isDark 
                                     ? evento.type === 'encuentro' 
                                       ? 'bg-gray-700/30 border-2 border-blue-700' 
+                                      : esAccionPendiente
+                                      ? 'bg-gray-700/30 border-2 border-orange-600'
                                       : 'bg-gray-700/30 border border-gray-700/50'
                                     : 'bg-white'
                                     } ${isLast ? 'opacity-80' : ''}`}
                                 >
                                   {/* Header */}
                                   <div className="flex justify-between items-start mb-3">
-                                    <span
-                                      className={`text-xs font-bold ${style.badgeBg} ${style.badgeText} px-3 py-1 rounded-full uppercase tracking-wide`}
-                                    >
-                                      {style.label}
-                                    </span>
+                                    <div className="flex items-center gap-2">
+                                      <span
+                                        className={`text-xs font-bold ${style.badgeBg} ${style.badgeText} px-3 py-1 rounded-full uppercase tracking-wide`}
+                                      >
+                                        {style.label}
+                                      </span>
+                                      {esAccionPendiente && (
+                                        <span
+                                          className={`text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wide ${
+                                            isDark
+                                              ? 'bg-orange-900/70 text-orange-200 border border-orange-600'
+                                              : 'bg-orange-100 text-orange-800 border border-orange-300'
+                                          }`}
+                                        >
+                                          PENDIENTE
+                                        </span>
+                                      )}
+                                    </div>
                                     <span
                                       className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-500'}`}
                                     >
@@ -1160,7 +1186,11 @@ function CasoDetalle() {
 
                                   {/* Título */}
                                   <div className="mb-2">
-                                    <h4 className={`font-bold text-lg ${style.textColor} inline`}>
+                                    <h4 className={`font-bold text-lg ${
+                                      esAccionPendiente
+                                        ? (isDark ? 'text-orange-400' : 'text-orange-700')
+                                        : style.textColor
+                                    } inline`}>
                                       {evento.titulo}
                                     </h4>
                                   </div>
@@ -1919,9 +1949,42 @@ function CasoDetalle() {
                         {selectedEvento.fechaEjecucion ? parseLocalDate(selectedEvento.fechaEjecucion).toLocaleDateString('es-ES') : 'N/A'}
                       </p>
                     ) : (
-                      <p className="text-sm font-medium text-orange-700 bg-orange-50 px-3 py-2 rounded inline-block">
-                        Acción No Ejecutada
-                      </p>
+                      <>
+                        <p className="text-sm font-medium text-orange-700 bg-orange-50 px-3 py-2 rounded inline-block mb-3">
+                          Acción No Ejecutada
+                        </p>
+                        <div>
+                          <button
+                            onClick={async () => {
+                              if (!numCaso || !selectedEvento.idAccion) return;
+                              try {
+                                const fechaHoy = new Date().toISOString().split('T')[0];
+                                await casoService.updateAccion(numCaso, selectedEvento.idAccion, {
+                                  fechaEjecucion: fechaHoy
+                                });
+                                showConfirmationModal(true, 'Acción marcada como ejecutada exitosamente');
+                                await handleRefresh();
+                                // Actualizar el evento seleccionado para reflejar el cambio
+                                const updated = await casoService.getById(numCaso);
+                                const accionActualizada = updated.acciones.find((a: any) => a.idAccion === selectedEvento.idAccion);
+                                if (accionActualizada) {
+                                  setSelectedEvento({
+                                    ...selectedEvento,
+                                    fechaEjecucion: accionActualizada.fechaEjecucion
+                                  });
+                                }
+                              } catch (err) {
+                                console.error('Error al marcar acción como ejecutada:', err);
+                                showConfirmationModal(false, 'Error al marcar la acción como ejecutada');
+                              }
+                            }}
+                            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 text-sm"
+                          >
+                            <FontAwesomeIcon icon={faCheckCircle} />
+                            Marcar como Ejecutada
+                          </button>
+                        </div>
+                      </>
                     )}
                   </div>
                 </>
@@ -2021,7 +2084,7 @@ function CasoDetalle() {
         )
       }
 
-      {/* Modal de confirmación */}
+    </div>
       {confirmationModal.isOpen && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
           <div className={`relative w-full max-w-md rounded-xl shadow-2xl overflow-hidden animate-slide-up-modal ${
@@ -2066,7 +2129,7 @@ function CasoDetalle() {
         </div>,
         document.body
       )}
-    </div >
+    </>
   );
 }
 

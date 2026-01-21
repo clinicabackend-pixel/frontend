@@ -25,6 +25,15 @@ function Home() {
   const [loadingStats, setLoadingStats] = useState<boolean>(true);
   const [citasSemana, setCitasSemana] = useState<{ fecha: Date; count: number }[]>([]);
   const [loadingCitas, setLoadingCitas] = useState<boolean>(true);
+  const [accionesPendientes, setAccionesPendientes] = useState<Array<{
+    idAccion: number;
+    numCaso: string;
+    titulo: string;
+    descripcion?: string;
+    fechaRegistro: string;
+    nombreSolicitante?: string;
+  }>>([]);
+  const [loadingAccionesPendientes, setLoadingAccionesPendientes] = useState<boolean>(true);
   const [isDark, setIsDark] = useState(() => {
     if (theme === 'dark') return true;
     if (theme === 'light') return false;
@@ -248,6 +257,92 @@ function Home() {
     loadCitasSemana();
   }, [username, user]);
 
+  // Cargar acciones pendientes
+  useEffect(() => {
+    if (!user && !username) {
+      return;
+    }
+
+    const loadAccionesPendientes = async () => {
+      setLoadingAccionesPendientes(true);
+      try {
+        const puedeVerTodosLosCasos = user?.tipoUsuario === 'COORDINADOR' || user?.tipoUsuario === 'ADMINISTRADOR' || user?.tipoUsuario === 'PROFESOR';
+        const currentUsername = user?.username || username;
+        const userFilter = (currentUsername && !puedeVerTodosLosCasos) ? currentUsername : undefined;
+
+        if (!currentUsername && !puedeVerTodosLosCasos) {
+          setLoadingAccionesPendientes(false);
+          setAccionesPendientes([]);
+          return;
+        }
+
+        // Obtener todos los casos del usuario
+        const todosCasos = await casoService.getAll(undefined, userFilter, undefined);
+        
+        // Obtener acciones pendientes de todos los casos
+        const acciones: Array<{
+          idAccion: number;
+          numCaso: string;
+          titulo: string;
+          descripcion?: string;
+          fechaRegistro: string;
+          nombreSolicitante?: string;
+        }> = [];
+        
+        // Procesar casos en lotes para mejorar rendimiento
+        const tamanoLote = 20;
+        const casosAProcesar = todosCasos.slice(0, 50); // Limitar a 50 casos para mejor rendimiento
+        
+        for (let i = 0; i < casosAProcesar.length; i += tamanoLote) {
+          const lote = casosAProcesar.slice(i, i + tamanoLote);
+          
+          const promesas = lote.map(async (caso) => {
+            try {
+              const casoDetalle = await casoService.getById(caso.numCaso);
+              // Filtrar solo acciones pendientes (sin fechaEjecucion o fechaEjecucion vacía)
+              const accionesPendientes = (casoDetalle.acciones || []).filter((accion: any) => 
+                !accion.fechaEjecucion || accion.fechaEjecucion.trim() === ''
+              );
+              
+              return accionesPendientes.map((accion: any) => ({
+                idAccion: accion.idAccion,
+                numCaso: caso.numCaso,
+                titulo: accion.titulo,
+                descripcion: accion.descripcion,
+                fechaRegistro: accion.fechaRegistro,
+                nombreSolicitante: caso.nombreSolicitante || ''
+              }));
+            } catch (error) {
+              console.error(`Error cargando caso ${caso.numCaso}:`, error);
+              return [];
+            }
+          });
+          
+          const resultados = await Promise.all(promesas);
+          resultados.forEach(accionesCaso => {
+            acciones.push(...accionesCaso);
+          });
+        }
+        
+        // Ordenar por fecha de registro (más recientes primero) y limitar a 4
+        acciones.sort((a, b) => {
+          const fechaA = new Date(a.fechaRegistro);
+          const fechaB = new Date(b.fechaRegistro);
+          return fechaB.getTime() - fechaA.getTime();
+        });
+        
+        setAccionesPendientes(acciones.slice(0, 4)); // Solo mostrar las 4 más recientes
+      } catch (error) {
+        console.error('Error cargando acciones pendientes:', error);
+        setAccionesPendientes([]);
+      } finally {
+        setLoadingAccionesPendientes(false);
+      }
+    };
+
+    loadAccionesPendientes();
+  }, [username, user]);
+
   return (
     <MainLayout title="DASHBOARD">
 
@@ -365,39 +460,75 @@ function Home() {
           </div>
         </div>
 
-        {/* WIDGET C: Agenda / Notificaciones (1 columna - Row Span 2) */}
+        {/* WIDGET C: Acciones Pendientes (1 columna - Row Span 2) */}
         <div className={`md:col-span-1 md:row-span-2 ${isDark ? 'bg-gray-800 border-gray-700/50' : 'bg-white border-gray-100'} rounded-xl shadow-sm border overflow-hidden flex flex-col h-full`}>
           <div className={`p-5 border-b ${isDark ? 'border-gray-700 bg-red-900/70' : 'border-gray-100 bg-gray-50/50'}`}>
-            <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>Próximos Vencimientos</h3>
+            <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>Acciones Pendientes</h3>
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[500px]">
-            {/* Item Agenda 1 - Alta Prioridad */}
-            <div className={`pl-4 border-l-4 border-red-500 p-3 rounded-r-lg ${isDark ? 'bg-red-900/70' : 'bg-red-50/30'}`}>
-              <p className={`text-xs font-bold mb-1 ${isDark ? 'text-red-200' : 'text-red-600'}`}>MAÑANA, 09:00 AM</p>
-              <h4 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>Audiencia Preliminar</h4>
-              <p className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Caso #2026-045 - Familia Gomez</p>
-            </div>
-            {/* Item Agenda 2 - Media Prioridad */}
-            <div className={`pl-4 border-l-4 border-yellow-400 p-3 rounded-r-lg ${isDark ? 'bg-yellow-900/30' : 'bg-yellow-50/30'}`}>
-              <p className={`text-xs font-bold mb-1 ${isDark ? 'text-yellow-200' : 'text-yellow-600'}`}>JUEVES 21, 02:00 PM</p>
-              <h4 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>Entrega de Documentos</h4>
-              <p className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Caso #2026-089 - Sra. Martinez</p>
-            </div>
-            {/* Item Agenda 3 - Baja Prioridad */}
-            <div className={`pl-4 border-l-4 border-blue-400 p-3 rounded-r-lg ${isDark ? 'bg-blue-900/30' : 'bg-blue-50/30'}`}>
-              <p className={`text-xs font-bold mb-1 ${isDark ? 'text-blue-200' : 'text-blue-600'}`}>LUNES 25, 10:00 AM</p>
-              <h4 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>Reunión de Equipo</h4>
-              <p className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Revisión mensual de casos</p>
-            </div>
-            {/* Item Agenda 4 */}
-            <div className={`pl-4 border-l-4 p-3 rounded-r-lg ${isDark ? 'border-gray-600 bg-gray-800/30' : 'border-gray-300 bg-gray-50'}`}>
-              <p className={`text-xs font-bold mb-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>VIERNES 29</p>
-              <h4 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>Cierre de Actas</h4>
-              <p className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Todos los expedientes</p>
-            </div>
+            {loadingAccionesPendientes ? (
+              <div className="flex justify-center items-center h-32">
+                <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${isDark ? 'border-red-900' : 'border-red-900'}`}></div>
+              </div>
+            ) : accionesPendientes.length === 0 ? (
+              <div className={`text-center py-8 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                <p className="text-sm">No hay acciones pendientes</p>
+              </div>
+            ) : (
+              accionesPendientes.map((accion, index) => {
+                // Función helper para parsear fechas locales
+                const parseLocalDate = (dateString: string): Date => {
+                  const partes = dateString.split('-');
+                  if (partes.length === 3) {
+                    const año = parseInt(partes[0], 10);
+                    const mes = parseInt(partes[1], 10) - 1;
+                    const dia = parseInt(partes[2], 10);
+                    return new Date(año, mes, dia);
+                  }
+                  return new Date(dateString);
+                };
+
+                const fechaRegistro = parseLocalDate(accion.fechaRegistro);
+                const fechaFormateada = fechaRegistro.toLocaleDateString('es-ES', {
+                  weekday: 'long',
+                  day: 'numeric',
+                  month: 'long'
+                });
+                const fechaCorta = fechaRegistro.toLocaleDateString('es-ES', {
+                  day: 'numeric',
+                  month: 'short'
+                });
+
+                // Colores alternados para diferenciar acciones
+                const colores = [
+                  { border: isDark ? 'border-orange-500' : 'border-orange-400', bg: isDark ? 'bg-orange-900/30' : 'bg-orange-50/30', text: isDark ? 'text-orange-200' : 'text-orange-600' },
+                  { border: isDark ? 'border-yellow-500' : 'border-yellow-400', bg: isDark ? 'bg-yellow-900/30' : 'bg-yellow-50/30', text: isDark ? 'text-yellow-200' : 'text-yellow-600' },
+                  { border: isDark ? 'border-red-500' : 'border-red-400', bg: isDark ? 'bg-red-900/30' : 'bg-red-50/30', text: isDark ? 'text-red-200' : 'text-red-600' },
+                  { border: isDark ? 'border-blue-500' : 'border-blue-400', bg: isDark ? 'bg-blue-900/30' : 'bg-blue-50/30', text: isDark ? 'text-blue-200' : 'text-blue-600' },
+                ];
+                const color = colores[index % colores.length];
+
+                return (
+                  <div
+                    key={`${accion.numCaso}-${accion.idAccion}`}
+                    onClick={() => navigate(`/casos/${accion.numCaso}`)}
+                    className={`pl-4 border-l-4 ${color.border} p-3 rounded-r-lg ${color.bg} cursor-pointer hover:opacity-80 transition-opacity`}
+                  >
+                    <p className={`text-xs font-bold mb-1 ${color.text} uppercase`}>{fechaCorta}</p>
+                    <h4 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>{accion.titulo}</h4>
+                    <p className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Caso {accion.numCaso}{accion.nombreSolicitante ? ` - ${accion.nombreSolicitante}` : ''}
+                    </p>
+                  </div>
+                );
+              })
+            )}
           </div>
           <div className={`p-3 border-t ${isDark ? 'border-gray-700' : 'border-gray-100'} text-center`}>
-            <button className={`text-xs font-semibold transition-colors ${isDark ? 'text-white hover:text-gray-200' : 'text-red-900 hover:text-red-700'}`}>
+            <button
+              onClick={() => navigate('/agenda')}
+              className={`text-xs font-semibold transition-colors ${isDark ? 'text-white hover:text-gray-200' : 'text-red-900 hover:text-red-700'}`}
+            >
               Ver toda la agenda
             </button>
           </div>

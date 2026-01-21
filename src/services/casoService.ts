@@ -35,6 +35,10 @@ const casoService = {
         await api.post(`/casos/${id}/acciones`, data);
     },
 
+    updateAccion: async (id: string, idAccion: number, data: { fechaEjecucion?: string; titulo?: string; descripcion?: string }): Promise<void> => {
+        await api.patch(`/casos/${id}/acciones/${idAccion}`, data);
+    },
+
     createEncuentro: async (id: string, data: EncuentroCreateRequest): Promise<void> => {
         await api.post(`/casos/${id}/encuentros`, data);
     },
@@ -104,8 +108,8 @@ const casoService = {
     },
 
     updateEstatus: async (id: string, nuevoEstatus: string): Promise<void> => {
-        await api.patch(`/casos/${id}/estatus`, null, {
-            params: { nuevoEstatus }
+        await api.patch(`/casos/${id}/estatus`, {
+            estatus: nuevoEstatus
         });
     },
 
