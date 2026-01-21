@@ -19,7 +19,9 @@ export default function UserFormModal({ isOpen, onClose, onSuccess }: UserFormMo
         idUsuario: '', // Cedula
         tipoUsuario: 'ESTUDIANTE',
         estatus: 'ACTIVO',
-        termino: ''
+        termino: '',
+        sexo: '',
+        contrasena: ''
     });
     const [semestres, setSemestres] = useState<Semestre[]>([]);
     const [loading, setLoading] = useState(false);
@@ -75,7 +77,8 @@ export default function UserFormModal({ isOpen, onClose, onSuccess }: UserFormMo
                 idUsuario: '',
                 tipoUsuario: 'ESTUDIANTE',
                 estatus: 'ACTIVO',
-                termino: ''
+                termino: '',
+                sexo: ''
             });
         } catch (err) {
             console.error('Error creating user:', err);
@@ -145,6 +148,27 @@ export default function UserFormModal({ isOpen, onClose, onSuccess }: UserFormMo
                                     </select>
                                 </div>
                                 <div>
+                                    <label className="block text-sm font-medium text-gray-700">Contraseña (Opcional)</label>
+                                    <input
+                                        type="password"
+                                        name="contrasena"
+                                        value={formData.contrasena || ''}
+                                        onChange={handleChange}
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2"
+                                        placeholder="Por defecto: Generada aleatoria"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Sexo</label>
+                                    <select name="sexo" value={formData.sexo} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
+                                        <option value="">Seleccione...</option>
+                                        <option value="MASCULINO">Masculino</option>
+                                        <option value="FEMENINO">Femenino</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
                                     <label className="block text-sm font-medium text-gray-700">Estatus</label>
                                     <select name="estatus" value={formData.estatus} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                                         <option value="ACTIVO">Activo</option>
@@ -193,8 +217,8 @@ export default function UserFormModal({ isOpen, onClose, onSuccess }: UserFormMo
                             </button>
                         </div>
                     </div>
-                </form>
-            </div>
-        </div>
+                </form >
+            </div >
+        </div >
     );
 }

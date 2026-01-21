@@ -160,6 +160,18 @@ export interface CasoAsignadoProjection {
   nombre: string;
 }
 
+export interface CasoSupervisadoProjection {
+  numCaso: string;
+  username: string;
+  termino: string;
+  nombre: string;
+}
+
+export interface CasoSupervisadoRequest {
+  username: string;
+  termino: string;
+}
+
 export interface CasoDetalleResponse {
   caso: CasoResponse;
   acciones: AccionResponse[];
@@ -167,9 +179,9 @@ export interface CasoDetalleResponse {
   documentos: DocumentoResponse[];
   pruebas: PruebaResponse[];
   asignados: CasoAsignadoProjection[];
-  supervisores: any[];
+  supervisores: CasoSupervisadoProjection[];
   beneficiarios: BeneficiarioResponse[];
-  solicitante: Solicitante; // Added missing property
+  solicitante: Solicitante;
 }
 
 export interface CasoSummary {

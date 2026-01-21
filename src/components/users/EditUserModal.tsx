@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import usuarioService from '../../services/usuarioService';
+import catalogoService from '../../services/catalogoService';
 import type { Usuario } from '../../types/usuario';
+import type { Semestre } from '../../types/catalogo';
 
 
 interface EditUserModalProps {
@@ -20,8 +22,10 @@ export default function EditUserModal({ isOpen, onClose, onSuccess, usuario }: E
         idUsuario: '',
         tipoUsuario: 'ESTUDIANTE',
         estatus: 'ACTIVO',
-        sexo: ''
+        sexo: '',
+        termino: ''
     });
+    const [semestres, setSemestres] = useState<Semestre[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -34,10 +38,21 @@ export default function EditUserModal({ isOpen, onClose, onSuccess, usuario }: E
                 idUsuario: usuario.idUsuario || '',
                 tipoUsuario: usuario.tipoUsuario || 'ESTUDIANTE',
                 estatus: usuario.estatus || 'ACTIVO',
-                sexo: usuario.sexo || ''
+                sexo: usuario.sexo || '',
+                termino: usuario.termino || ''
             });
+            fetchSemestres();
         }
     }, [usuario, isOpen]);
+
+    const fetchSemestres = async () => {
+        try {
+            const data = await catalogoService.getSemestres();
+            setSemestres(data);
+        } catch (error) {
+            console.error('Error fetching semestres:', error);
+        }
+    };
 
     if (!isOpen) return null;
 
@@ -61,7 +76,8 @@ export default function EditUserModal({ isOpen, onClose, onSuccess, usuario }: E
                 username: formData.username,
                 sexo: formData.sexo,
                 estatus: formData.estatus,
-                tipoUsuario: formData.tipoUsuario
+                tipoUsuario: formData.tipoUsuario,
+                termino: formData.termino
             };
 
             await usuarioService.updateUsuario(usuario.username, payload);
@@ -191,6 +207,24 @@ export default function EditUserModal({ isOpen, onClose, onSuccess, usuario }: E
                                     </select>
                                 </div>
                             </div>
+                            {(formData.tipoUsuario === 'ESTUDIANTE' || formData.tipoUsuario === 'PROFESOR') && (
+                                <div>
+                                    <label className="block text-sm font-medium mb-1 text-gray-700">Semestre</label>
+                                    <select
+                                        name="termino"
+                                        value={formData.termino || ''}
+                                        onChange={handleChange}
+                                        className="mt-1 block w-full rounded-md shadow-sm sm:text-sm border border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-gray-900 p-2"
+                                    >
+                                        <option value="">Seleccione un semestre</option>
+                                        {semestres.map(sem => (
+                                            <option key={sem.termino} value={sem.termino}>
+                                                {sem.nombre || sem.termino}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
                         </div>
 
                         <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 mt-6">
