@@ -16,7 +16,7 @@ const initialFormData: SolicitanteRequest = {
     nombre: '',
     cedula: '',
     sexo: '',
-    estadoCivil: '',
+    idEstadoCivil: 0,
     fechaNacimiento: '',
     concubinato: false,
     nacionalidad: 'Venezolano',
@@ -24,9 +24,9 @@ const initialFormData: SolicitanteRequest = {
     telfCelular: '',
     email: '',
     idParroquia: 0,
-    nivelEducativo: '',
-    condicionLaboral: '',
-    condicionActividad: ''
+    idNivelEducativo: undefined,
+    idCondicionLaboral: undefined,
+    idCondicionActividad: undefined
 };
 
 interface SolicitanteFormProps {
@@ -90,23 +90,14 @@ export default function SolicitanteForm({
     const [municipios, setMunicipios] = useState<Municipio[]>([]);
     const [parroquias, setParroquias] = useState<Parroquia[]>([]);
 
-    // Static Options
-    const ESTADO_CIVIL_OPTIONS = [
-        { value: 'Soltero(a)', label: 'Soltero(a)' },
-        { value: 'Casado(a)', label: 'Casado(a)' },
-        { value: 'Divorciado(a)', label: 'Divorciado(a)' },
-        { value: 'Viudo(a)', label: 'Viudo(a)' },
-        { value: 'Concubino(a)', label: 'Concubino(a)' }
-    ];
+    // Estados para catálogos adicionales
+    const [estadosCiviles, setEstadosCiviles] = useState<any[]>([]);
+    const [nivelesEducativos, setNivelesEducativos] = useState<any[]>([]);
+    const [condicionesLaborales, setCondicionesLaborales] = useState<any[]>([]);
+    const [condicionesActividad, setCondicionesActividad] = useState<any[]>([]);
 
-    const NIVEL_EDUCATIVO_OPTIONS = [
-        { value: 'Primaria', label: 'Primaria' },
-        { value: 'Bachillerato', label: 'Bachillerato' },
-        { value: 'Técnico Superior', label: 'Técnico Superior' },
-        { value: 'Universitario', label: 'Universitario' },
-        { value: 'Postgrado', label: 'Postgrado' },
-        { value: 'Sin Instrucción', label: 'Sin Instrucción' }
-    ];
+    // Static Options Removed
+
 
     const [selectedEstado, setSelectedEstado] = useState<number>(0);
     const [selectedMunicipio, setSelectedMunicipio] = useState<number>(0);
@@ -115,21 +106,33 @@ export default function SolicitanteForm({
     // Duplicate Error State for Modal
     const [duplicateError, setDuplicateError] = useState<any>(null);
 
-    // Cargar Catálogos de Ubicación al montar
+    // Cargar Catálogos de Ubicación y otros al montar
     useEffect(() => {
         const loadCatalogos = async () => {
             try {
-                const [estadosData, municipiosData, parroquiasData] = await Promise.all([
+                const [
+                    estadosData, municipiosData, parroquiasData,
+                    estadosCivilesData, nivelesEducativosData,
+                    condicionesLaboralesData, condicionesActividadData
+                ] = await Promise.all([
                     catalogoService.getEstados(),
                     catalogoService.getAllMunicipios(),
-                    catalogoService.getAllParroquias()
+                    catalogoService.getAllParroquias(),
+                    catalogoService.getEstadosCiviles(),
+                    catalogoService.getNivelesEducativos(),
+                    catalogoService.getCondicionesLaborales(),
+                    catalogoService.getCondicionesActividad()
                 ]);
 
                 setEstados(estadosData);
                 setMunicipios(municipiosData);
                 setParroquias(parroquiasData);
+                setEstadosCiviles(estadosCivilesData);
+                setNivelesEducativos(nivelesEducativosData);
+                setCondicionesLaborales(condicionesLaboralesData);
+                setCondicionesActividad(condicionesActividadData);
             } catch (error) {
-                console.error("Error al cargar catálogos de ubicación", error);
+                console.error("Error al cargar catálogos", error);
             }
         };
 
@@ -416,13 +419,12 @@ export default function SolicitanteForm({
 
                         {/* Estado civil */}
                         <div>
-                            {/* Estado civil */}
                             <div>
                                 <CustomSelect
                                     label="Estado civil"
-                                    value={formData.estadoCivil || ''}
-                                    options={ESTADO_CIVIL_OPTIONS}
-                                    onChange={(val) => setFormData(prev => ({ ...prev, estadoCivil: String(val) }))}
+                                    value={formData.idEstadoCivil || ''}
+                                    options={estadosCiviles.map(ec => ({ value: ec.id, label: ec.nombre }))}
+                                    onChange={(val) => setFormData(prev => ({ ...prev, idEstadoCivil: Number(val) }))}
                                     required={isStrict}
                                     disabled={!isEditing}
                                 />
@@ -480,9 +482,31 @@ export default function SolicitanteForm({
                         <div>
                             <CustomSelect
                                 label="Nivel Educativo (Opcional)"
-                                value={formData.nivelEducativo || ''}
-                                options={NIVEL_EDUCATIVO_OPTIONS}
-                                onChange={(val) => setFormData(prev => ({ ...prev, nivelEducativo: String(val) }))}
+                                value={formData.idNivelEducativo || ''}
+                                options={nivelesEducativos.map(ne => ({ value: ne.id, label: ne.nombre }))}
+                                onChange={(val) => setFormData(prev => ({ ...prev, idNivelEducativo: Number(val) }))}
+                                disabled={!isEditing}
+                            />
+                        </div>
+
+                        {/* Condición Laboral */}
+                        <div>
+                            <CustomSelect
+                                label="Condición Laboral (Opcional)"
+                                value={formData.idCondicionLaboral || ''}
+                                options={condicionesLaborales.map(cl => ({ value: cl.id, label: cl.nombre }))}
+                                onChange={(val) => setFormData(prev => ({ ...prev, idCondicionLaboral: Number(val) }))}
+                                disabled={!isEditing}
+                            />
+                        </div>
+
+                        {/* Condición Actividad */}
+                        <div>
+                            <CustomSelect
+                                label="Condición Actividad (Opcional)"
+                                value={formData.idCondicionActividad || ''}
+                                options={condicionesActividad.map(ca => ({ value: ca.id, label: ca.nombre }))}
+                                onChange={(val) => setFormData(prev => ({ ...prev, idCondicionActividad: Number(val) }))}
                                 disabled={!isEditing}
                             />
                         </div>
@@ -663,8 +687,8 @@ export default function SolicitanteForm({
                         <div className={`p-6 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
                             <div className="flex flex-col items-center text-center">
                                 <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${confirmationModal.success
-                                        ? (isDark ? 'bg-green-900/30' : 'bg-green-100')
-                                        : (isDark ? 'bg-red-900/30' : 'bg-red-100')
+                                    ? (isDark ? 'bg-green-900/30' : 'bg-green-100')
+                                    : (isDark ? 'bg-red-900/30' : 'bg-red-100')
                                     }`}>
                                     {confirmationModal.success ? (
                                         <CheckCircle className={`w-10 h-10 ${isDark ? 'text-green-400' : 'text-green-600'}`} />
@@ -686,12 +710,12 @@ export default function SolicitanteForm({
                                         }
                                     }}
                                     className={`px-6 py-2 rounded-lg font-medium transition-colors ${confirmationModal.success
-                                            ? isDark
-                                                ? 'bg-green-900 hover:bg-green-950 text-white'
-                                                : 'bg-green-600 hover:bg-green-700 text-white'
-                                            : isDark
-                                                ? 'bg-red-900 hover:bg-red-950 text-white'
-                                                : 'bg-red-600 hover:bg-red-700 text-white'
+                                        ? isDark
+                                            ? 'bg-green-900 hover:bg-green-950 text-white'
+                                            : 'bg-green-600 hover:bg-green-700 text-white'
+                                        : isDark
+                                            ? 'bg-red-900 hover:bg-red-950 text-white'
+                                            : 'bg-red-600 hover:bg-red-700 text-white'
                                         }`}
                                 >
                                     Aceptar

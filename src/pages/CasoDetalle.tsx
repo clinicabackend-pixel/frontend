@@ -1954,16 +1954,16 @@ function CasoDetalle() {
                             <button
                               onClick={async () => {
                                 if (!numCaso || !selectedEvento.idAccion) {
-                                showConfirmationModal(false, 'Error: No se pudo identificar la acción');
-                                return;
-                              }
-                                try {
-                                  const fechaHoy = new Date().toISOString().split('T')[0];
-                                const idAccion = Number(selectedEvento.idAccion);
-                                if (isNaN(idAccion)) {
-                                  showConfirmationModal(false, 'Error: ID de acción inválido');
+                                  showConfirmationModal(false, 'Error: No se pudo identificar la acción');
                                   return;
                                 }
+                                try {
+                                  const fechaHoy = new Date().toISOString().split('T')[0];
+                                  const idAccion = Number(selectedEvento.idAccion);
+                                  if (isNaN(idAccion)) {
+                                    showConfirmationModal(false, 'Error: ID de acción inválido');
+                                    return;
+                                  }
                                   await casoService.updateAccion(numCaso, idAccion, {
                                     fechaEjecucion: fechaHoy
                                   });
@@ -1980,7 +1980,7 @@ function CasoDetalle() {
                                   }
                                 } catch (err: any) {
                                   console.error('Error al marcar acción como ejecutada:', err);
-                                const errorMessage = err?.response?.data?.message || err?.message || 'Error al marcar la acción como ejecutada';
+                                  const errorMessage = err?.response?.data?.message || err?.message || 'Error al marcar la acción como ejecutada';
                                   showConfirmationModal(false, errorMessage);
                                 }
                               }}
