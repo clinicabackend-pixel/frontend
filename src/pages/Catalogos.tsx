@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faPlus,
@@ -24,6 +25,7 @@ import CustomInput from '../components/common/CustomInput';
 import catalogoService from '../services/catalogoService';
 import Loader from '../components/common/Loader';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import type {
     TipoViviendaResponse,
     Estado,
@@ -97,6 +99,8 @@ const TreeNode = ({ node, isDark, onAddChild }: { node: AmbitoLegal; isDark: boo
 
 export function Catalogos() {
     const { theme } = useTheme();
+    const { user } = useAuth();
+    const navigate = useNavigate();
     const isDark = theme === 'dark';
     const [activeTab, setActiveTab] = useState<CatalogType>('NIVEL_EDUCATIVO');
     const [items, setItems] = useState<any[]>([]);
@@ -144,6 +148,13 @@ export function Catalogos() {
     // For Housing which has categories
     const [housingData, setHousingData] = useState<TipoViviendaResponse[]>([]);
     const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
+
+    // Verificar permisos de acceso
+    useEffect(() => {
+        if (user && user.tipoUsuario !== 'COORDINADOR' && user.tipoUsuario !== 'ADMINISTRADOR') {
+            navigate('/home');
+        }
+    }, [user, navigate]);
 
     useEffect(() => {
         fetchCatalogData();

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { Chart as ChartJS } from 'chart.js';
 import type { ReporteEstadisticoDto } from '../types/reporteStats';
@@ -8,8 +9,11 @@ import ReportePDF from '../components/ReportePDF';
 import ReporteChart from '../components/charts/ReporteChart';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilePdf, faSpinner, faChartPie } from '@fortawesome/free-solid-svg-icons';
+import { useAuth } from '../context/AuthContext';
 
 const ReportGenerator: React.FC = () => {
+    const { user } = useAuth();
+    const navigate = useNavigate();
     // Individual Data States
     const [materiaData, setMateriaData] = useState<ReporteData | null>(null);
     const [parroquiaData, setParroquiaData] = useState<ReporteData | null>(null);
@@ -24,6 +28,13 @@ const ReportGenerator: React.FC = () => {
     const materiaChartRef = useRef<ChartJS>(null);
     const parroquiaChartRef = useRef<ChartJS>(null);
     const historicoChartRef = useRef<ChartJS>(null);
+
+    // Verificar permisos de acceso - Solo COORDINADOR y ADMINISTRADOR
+    useEffect(() => {
+        if (user && user.tipoUsuario !== 'COORDINADOR' && user.tipoUsuario !== 'ADMINISTRADOR') {
+            navigate('/reportes');
+        }
+    }, [user, navigate]);
 
     useEffect(() => {
         const fetchData = async () => {

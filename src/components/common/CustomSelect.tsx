@@ -25,7 +25,6 @@ export default function CustomSelect({
     required = false
 }: CustomSelectProps) {
     const [isOpen, setIsOpen] = useState(false);
-    const [placement, setPlacement] = useState<'bottom' | 'top'>('bottom');
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     // Find the label for the current value
@@ -33,21 +32,6 @@ export default function CustomSelect({
 
     const toggleOpen = () => {
         if (disabled) return;
-
-        if (!isOpen) {
-            // Check available space before opening
-            if (dropdownRef.current) {
-                const rect = dropdownRef.current.getBoundingClientRect();
-                const spaceBelow = window.innerHeight - rect.bottom;
-                const minSpaceRequired = 250; // Aprox height of max-h-60 (15rem = 240px)
-
-                if (spaceBelow < minSpaceRequired && rect.top > minSpaceRequired) {
-                    setPlacement('top');
-                } else {
-                    setPlacement('bottom');
-                }
-            }
-        }
         setIsOpen(!isOpen);
     };
 
@@ -73,7 +57,7 @@ export default function CustomSelect({
     };
 
     return (
-        <div className="relative" ref={dropdownRef}>
+        <div className="relative overflow-visible" ref={dropdownRef}>
             {label && (
                 <label className="block text-sm font-semibold mb-2">
                     {label}
@@ -114,34 +98,39 @@ export default function CustomSelect({
                 tabIndex={-1}
             />
 
-            {/* Dropdown Menu - Standard Absolute Positioning */}
+            {/* Dropdown Menu - Always opens downward */}
             {isOpen && !disabled && (
                 <div
-                    className={`absolute z-50 w-full bg-white border border-gray-200 rounded-lg shadow-lg ${placement === 'top'
-                        ? 'bottom-full mb-1'
-                        : 'top-full mt-1'
-                        }`}
-                    style={{ backgroundColor: '#ffffff' }}
+                    className="absolute z-[9999] w-full bg-white border border-gray-200 rounded-lg shadow-lg top-full mt-1"
+                    style={{ backgroundColor: '#ffffff', position: 'absolute' }}
                 >
-                    <ul className="max-h-60 overflow-y-auto py-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100" style={{ backgroundColor: '#ffffff' }}>
-                        {options.map((option, index) => (
-                            <li
-                                key={`${option.value}-${index}`}
-                                onClick={() => handleSelect(option.value)}
-                                className={`
-                                    px-4 py-2 cursor-pointer transition-colors duration-150
-                                    ${option.value === value ? 'bg-red-50 text-red-900 font-medium' : 'text-gray-900 hover:bg-gray-50'}
-                                `}
-                                style={{
-                                    backgroundColor: option.value === value ? '#fef2f2' : '#ffffff',
-                                    color: option.value === value ? '#991b1b' : '#111827'
-                                }}
-                            >
-                                {option.label}
-                            </li>
-                        ))}
+                    <ul className="max-h-60 overflow-y-auto px-1.5 py-1.5 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100" style={{ backgroundColor: '#ffffff' }}>
+                        {options.map((option, index) => {
+                            const isFirst = index === 0;
+                            const isLast = index === options.length - 1;
+                            const isSelected = option.value === value;
+                            
+                            return (
+                                <li
+                                    key={`${option.value}-${index}`}
+                                    onClick={() => handleSelect(option.value)}
+                                    className={`
+                                        w-full px-4 py-2 cursor-pointer transition-colors duration-150
+                                        ${isFirst ? 'rounded-t-md' : ''}
+                                        ${isLast ? 'rounded-b-md' : ''}
+                                        ${isSelected ? 'bg-red-50 text-red-900 font-medium' : 'text-gray-900 hover:bg-gray-50'}
+                                    `}
+                                    style={{
+                                        backgroundColor: isSelected ? '#fef2f2' : '#ffffff',
+                                        color: isSelected ? '#991b1b' : '#111827'
+                                    }}
+                                >
+                                    {option.label}
+                                </li>
+                            );
+                        })}
                         {options.length === 0 && (
-                            <li className="px-4 py-2 text-gray-500 italic" style={{ backgroundColor: '#ffffff', color: '#6b7280' }}>No hay opciones disponibles</li>
+                            <li className="w-full px-4 py-2 text-gray-500 italic rounded-md" style={{ backgroundColor: '#ffffff', color: '#6b7280' }}>No hay opciones disponibles</li>
                         )}
                     </ul>
                 </div>

@@ -181,8 +181,27 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
               </ul>
             </div>
 
-            {/* Group: SISTEMA */}
-            {user?.tipoUsuario !== 'ESTUDIANTE' && (
+            {/* Group: REPORTES - Visible para todos los usuarios */}
+            <div>
+              {!isCollapsed && (
+                <p className={`px-4 text-sm font-semibold uppercase tracking-wider mb-2 transition-opacity duration-300 ${isDark ? 'text-gray-300' : 'text-gray-400'}`}>
+                  Reportes
+                </p>
+              )}
+              {isCollapsed && <div className="h-4"></div>} {/* Spacer for collapsed mode alignment */}
+              <ul className="space-y-1">
+                <li>
+                  <NavLink to="/reportes" className={navLinkClasses} onClick={() => isOpen && onClose()}>
+                    <FontAwesomeIcon icon={faFileLines} className={`${isCollapsed ? 'text-2xl' : 'text-xl'}`} />
+                    {!isCollapsed && <span className="truncate">Reportes</span>}
+                    <Tooltip text="Reportes" />
+                  </NavLink>
+                </li>
+              </ul>
+            </div>
+
+            {/* Group: SISTEMA - Solo visible para COORDINADOR y ADMINISTRADOR */}
+            {(user?.tipoUsuario === 'COORDINADOR' || user?.tipoUsuario === 'ADMINISTRADOR') && (
               <div>
                 {!isCollapsed && (
                   <p className={`px-4 text-sm font-semibold uppercase tracking-wider mb-2 transition-opacity duration-300 ${isDark ? 'text-gray-300' : 'text-gray-400'}`}>
@@ -195,13 +214,6 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
                       <FontAwesomeIcon icon={faTags} className={`${isCollapsed ? '' : 'w-5 text-center'}`} />
                       {!isCollapsed && <span className="truncate">Catálogos</span>}
                       <Tooltip text="Catálogos" />
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink to="/reportes" className={navLinkClasses} onClick={() => isOpen && onClose()}>
-                      <FontAwesomeIcon icon={faFileLines} className={`${isCollapsed ? 'text-2xl' : 'text-xl'}`} />
-                      {!isCollapsed && <span className="truncate">Reportes</span>}
-                      <Tooltip text="Reportes" />
                     </NavLink>
                   </li>
                   <li>

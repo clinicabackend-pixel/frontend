@@ -12,11 +12,15 @@ import Layout from '../components/layout/MainLayout';
 import ReportCard from '../components/ReportCard';
 import { reporteService } from '../services/reporteService';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import catalogoService from '../services/catalogoService';
+import CustomSelect from '../components/common/CustomSelect';
 import type { AmbitoLegal } from '../types/catalogo';
 
 export default function Reportes() {
     const { theme } = useTheme();
+    const { user } = useAuth();
+    const canViewRestrictedReports = user?.tipoUsuario === 'COORDINADOR' || user?.tipoUsuario === 'ADMINISTRADOR';
     const [isDark, setIsDark] = useState(() => {
         if (theme === 'dark') return true;
         if (theme === 'light') return false;
@@ -109,7 +113,7 @@ export default function Reportes() {
 
     return (
         <Layout title="Reportes e Indicadores">
-            <div className="max-w-7xl mx-auto p-6">
+            <div className="max-w-7xl mx-auto p-6 pb-32">
                 <div className="mb-8">
                     <h1 className={`text-3xl font-bold flex items-center gap-3 ${isDark ? 'text-white' : 'text-gray-800'}`}>
                         <FontAwesomeIcon icon={faChartBar} className={isDark ? 'text-white' : 'text-red-900'} />
@@ -384,113 +388,106 @@ export default function Reportes() {
                             handleDownload('estatus', () => reporteService.downloadReportePorEstatus(statusFilter));
                         }}
                     >
-                        <div>
-                            <label className={`block text-sm font-medium mb-1 ${isDark ? 'text-white' : 'text-gray-700'}`}>Estatus del Caso</label>
-                            <select
-                                value={statusFilter}
-                                onChange={(e) => setStatusFilter(e.target.value)}
-                                className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${isDark
-                                    ? 'bg-gray-800/50 border-gray-700 text-white'
-                                    : 'border-gray-300 bg-white'
-                                    }`}
-                                style={isDark ? { backgroundColor: '#ffffff', color: '#111827' } : {}}
-                            >
-                                <option value="ABIERTO" style={{ backgroundColor: '#ffffff', color: '#111827' }}>Abierto</option>
-                                <option value="CERRADO" style={{ backgroundColor: '#ffffff', color: '#111827' }}>Cerrado</option>
-                                <option value="PENDIENTE" style={{ backgroundColor: '#ffffff', color: '#111827' }}>Pendiente</option>
-                                <option value="EN_PROCESO" style={{ backgroundColor: '#ffffff', color: '#111827' }}>En Proceso</option>
-                                <option value="ARCHIVO" style={{ backgroundColor: '#ffffff', color: '#111827' }}>Archivo</option>
-                            </select>
-                        </div>
+                        <CustomSelect
+                            value={statusFilter}
+                            options={[
+                                { value: 'ABIERTO', label: 'Abierto' },
+                                { value: 'CERRADO', label: 'Cerrado' },
+                                { value: 'PENDIENTE', label: 'Pendiente' },
+                                { value: 'EN_PROCESO', label: 'En Proceso' },
+                                { value: 'ARCHIVO', label: 'Archivo' }
+                            ]}
+                            onChange={(value) => setStatusFilter(value as string)}
+                            placeholder="Seleccione un estatus"
+                        />
                     </ReportCard>
 
-                    {/* 5. Informe Resumen */}
-                    <ReportCard
-                        title="Informe Resumen"
-                        description="Estadísticas y conteos por semestre y tipo de caso."
-                        icon={faChartPie}
-                        loading={loading['resumen'] || false}
-                        onDownload={() => {
-                            if (!resumenSemestre || !resumenTipo) {
-                                setNotification({ type: 'error', message: 'Complete los campos del resumen' }); return;
-                            }
-                            handleDownload('resumen', () => reporteService.downloadResumenSemestral(resumenSemestre, resumenTipo));
-                        }}
-                    >
-                        <div className="space-y-3">
-                            <div>
-                                <label className={`block text-sm font-medium mb-1 ${isDark ? 'text-white' : 'text-gray-700'}`}>Semestre Académico</label>
-                                <input
-                                    type="text"
-                                    value={resumenSemestre}
-                                    onChange={(e) => setResumenSemestre(e.target.value)}
-                                    className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${isDark
-                                        ? 'bg-gray-800/50 border-gray-700 text-white placeholder-gray-400'
-                                        : 'border-gray-300'
-                                        }`}
-                                    placeholder="Ej: 2024-1"
-                                />
-                            </div>
-                            <div>
-                                <label className={`block text-sm font-medium mb-1 ${isDark ? 'text-white' : 'text-gray-700'}`}>Tipo de Caso (Materia)</label>
-                                <select
-                                    value={resumenTipo}
-                                    onChange={(e) => setResumenTipo(Number(e.target.value))}
-                                    disabled={loadingMaterias}
-                                    className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${isDark
-                                        ? 'bg-gray-800/50 border-gray-700 text-white'
-                                        : 'border-gray-300 bg-white'
-                                        } ${loadingMaterias ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    style={isDark ? { backgroundColor: '#ffffff', color: '#111827' } : {}}
-                                >
-                                    <option value={0} style={{ backgroundColor: '#ffffff', color: '#111827' }}>Seleccione...</option>
-                                    {materias.map((materia) => (
-                                        <option key={materia.id} value={materia.id} style={{ backgroundColor: '#ffffff', color: '#111827' }}>
-                                            {materia.descripcion}
-                                        </option>
-                                    ))}
-                                </select>
-                                {loadingMaterias && (
-                                    <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Cargando materias...</p>
-                                )}
-                                {!loadingMaterias && materias.length === 0 && (
-                                    <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>No hay materias disponibles</p>
-                                )}
-                            </div>
-                        </div>
-                    </ReportCard>
-
-
-                    {/* 6. Memoria y Cuenta */}
-                    <ReportCard
-                        title="Memoria y Cuenta"
-                        description="Generación del informe anual con gráficos estadísticos, usuarios por parroquia y comparativas."
-                        icon={faChartPie}
-                        loading={false}
-                        onDownload={() => {
-                            window.location.href = '/reportes/memoria-cuenta';
-                        }}
-                    >
-                        <button
-                            onClick={() => window.location.href = '/reportes/memoria-cuenta'}
-                            className={`w-full py-2 px-4 rounded-md font-semibold text-white transition-colors ${isDark ? 'bg-red-900 hover:bg-red-950' : 'bg-red-900 hover:bg-red-950'
-                                }`}
+                    {/* 5. Informe Resumen - Solo COORDINADOR y ADMINISTRADOR */}
+                    {canViewRestrictedReports && (
+                        <ReportCard
+                            title="Informe Resumen"
+                            description="Estadísticas y conteos por semestre y tipo de caso."
+                            icon={faChartPie}
+                            loading={loading['resumen'] || false}
+                            onDownload={() => {
+                                if (!resumenSemestre || !resumenTipo) {
+                                    setNotification({ type: 'error', message: 'Complete los campos del resumen' }); return;
+                                }
+                                handleDownload('resumen', () => reporteService.downloadResumenSemestral(resumenSemestre, resumenTipo));
+                            }}
                         >
-                            Ir al Generador
-                        </button>
-                    </ReportCard>
+                            <div className="space-y-3">
+                                <div>
+                                    <label className={`block text-sm font-medium mb-1 ${isDark ? 'text-white' : 'text-gray-700'}`}>Semestre Académico</label>
+                                    <input
+                                        type="text"
+                                        value={resumenSemestre}
+                                        onChange={(e) => setResumenSemestre(e.target.value)}
+                                        className={`w-full h-10 px-3 border rounded-md focus:ring-2 focus:ring-red-900 outline-none ${isDark
+                                            ? 'bg-gray-800/50 border-gray-700 text-white placeholder-gray-400'
+                                            : 'border-gray-300'
+                                            }`}
+                                        placeholder="Ej: 2024-1"
+                                    />
+                                </div>
+                                <div>
+                                    <CustomSelect
+                                        label="Tipo de Caso (Materia)"
+                                        value={resumenTipo}
+                                        options={[
+                                            { value: 0, label: 'Seleccione...' },
+                                            ...materias.map(materia => ({ value: materia.id, label: materia.descripcion }))
+                                        ]}
+                                        onChange={(value) => setResumenTipo(Number(value))}
+                                        placeholder="Seleccione una materia"
+                                        disabled={loadingMaterias || materias.length === 0}
+                                    />
+                                    {loadingMaterias && (
+                                        <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Cargando materias...</p>
+                                    )}
+                                    {!loadingMaterias && materias.length === 0 && (
+                                        <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>No hay materias disponibles</p>
+                                    )}
+                                </div>
+                            </div>
+                        </ReportCard>
+                    )}
 
-                    <ReportCard
-                        title="Reporte Socioeconómico"
-                        description="Reporte unificado con datos laborales, familiares y de vivienda."
-                        icon={faFileAlt}
-                        loading={loading['socioeconomico'] || false}
-                        onDownload={() => {
-                            handleDownload('socioeconomico', () => reporteService.downloadReporteSocioeconomico());
-                        }}
-                    >
-                        <div className="h-4"></div>
-                    </ReportCard>
+                    {/* 6. Memoria y Cuenta - Solo COORDINADOR y ADMINISTRADOR */}
+                    {canViewRestrictedReports && (
+                        <ReportCard
+                            title="Memoria y Cuenta"
+                            description="Generación del informe anual con gráficos estadísticos, usuarios por parroquia y comparativas."
+                            icon={faChartPie}
+                            loading={false}
+                            onDownload={() => {
+                                window.location.href = '/reportes/memoria-cuenta';
+                            }}
+                        >
+                            <button
+                                onClick={() => window.location.href = '/reportes/memoria-cuenta'}
+                                className={`w-full py-2 px-4 rounded-md font-semibold text-white transition-colors ${isDark ? 'bg-red-900 hover:bg-red-950' : 'bg-red-900 hover:bg-red-950'
+                                    }`}
+                            >
+                                Ir al Generador
+                            </button>
+                        </ReportCard>
+                    )}
+
+                    {/* 7. Reporte Socioeconómico - Solo COORDINADOR y ADMINISTRADOR */}
+                    {canViewRestrictedReports && (
+                        <ReportCard
+                            title="Reporte Socioeconómico"
+                            description="Reporte unificado con datos laborales, familiares y de vivienda."
+                            icon={faFileAlt}
+                            loading={loading['socioeconomico'] || false}
+                            onDownload={() => {
+                                handleDownload('socioeconomico', () => reporteService.downloadReporteSocioeconomico());
+                            }}
+                        >
+                            <div className="h-4"></div>
+                        </ReportCard>
+                    )}
 
                 </div>
             </div>
