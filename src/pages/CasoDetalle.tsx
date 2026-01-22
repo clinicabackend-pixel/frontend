@@ -559,7 +559,7 @@ function CasoDetalle() {
                           }
                         }
                       }}
-                      className="px-3 py-1.5 bg-red-900 text-white rounded-lg hover:bg-red-950 font-medium transition-colors flex items-center gap-2 text-sm"
+                      className="h-10 px-4 bg-red-900 text-white rounded-lg hover:bg-red-950 font-medium transition-colors flex items-center gap-2 text-sm"
                       title="Eliminar Caso Permanentemente"
                     >
                       <FontAwesomeIcon icon={faTrash} />
@@ -570,7 +570,7 @@ function CasoDetalle() {
                   {/* Botón Exportar Reporte Caso */}
                   <button
                     onClick={() => caso.numCaso && reporteService.downloadReporteCasoPdf(caso.numCaso)}
-                    className="h-11 px-4 bg-red-900 text-white rounded-lg hover:bg-red-950 font-medium transition-colors flex items-center gap-2 text-sm"
+                    className="h-10 px-4 bg-red-900 text-white rounded-lg hover:bg-red-950 font-medium transition-colors flex items-center gap-2 text-sm"
                     title="Descargar Reporte del Caso (PDF)"
                   >
                     <FontAwesomeIcon icon={faFilePdf} />
