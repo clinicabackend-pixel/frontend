@@ -114,8 +114,8 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
                 <button
                   onClick={handleAssignClick}
                   className={`mt-1 text-xs flex items-center gap-1 px-2 py-1 rounded transition-colors z-10 ${isDark
-                    ? 'text-blue-300 hover:bg-blue-900/50'
-                    : 'text-blue-700 hover:bg-blue-50'
+                    ? 'text-red-900 hover:bg-red-950 hover:text-white shadow-sm'
+                    : 'text-red-900 hover:bg-red-950 hover:text-white shadow-sm'
                     }`}
                   title="Asignar Estudiante"
                 >

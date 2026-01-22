@@ -127,10 +127,12 @@ export default function SolicitanteForm({
                 setEstados(estadosData);
                 setMunicipios(municipiosData);
                 setParroquias(parroquiasData);
-                setEstadosCiviles(estadosCivilesData);
-                setNivelesEducativos(nivelesEducativosData);
-                setCondicionesLaborales(condicionesLaboralesData);
-                setCondicionesActividad(condicionesActividadData);
+
+                // Filter only active catalog items
+                setEstadosCiviles(estadosCivilesData.filter((item: any) => item.estatus === 'ACTIVO'));
+                setNivelesEducativos(nivelesEducativosData.filter((item: any) => item.estatus === 'ACTIVO'));
+                setCondicionesLaborales(condicionesLaboralesData.filter((item: any) => item.estatus === 'ACTIVO'));
+                setCondicionesActividad(condicionesActividadData.filter((item: any) => item.estatus === 'ACTIVO'));
             } catch (error) {
                 console.error("Error al cargar catálogos", error);
             }

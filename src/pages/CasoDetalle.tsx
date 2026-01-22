@@ -110,6 +110,11 @@ function CasoDetalle() {
   // Document/Folio State (para pestaña Folios)
   const [isAddDocModalOpen, setIsAddDocModalOpen] = useState(false);
 
+  // Status Change State
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState<string>('');
+  const [statusObservation, setStatusObservation] = useState<string>('');
+
   // Modal de confirmación state
   const [confirmationModal, setConfirmationModal] = useState<{
     isOpen: boolean;
@@ -440,8 +445,29 @@ function CasoDetalle() {
       const updated = await casoService.getById(numCaso);
       setCasoDetalle(updated);
     } catch (err) {
-      console.error('Error adding encuentro', err);
       showConfirmationModal(false, 'Error al registrar el encuentro');
+    }
+  };
+
+  const handleStatusSelect = (status: string) => {
+    setPendingStatus(status);
+    setStatusObservation('');
+    setIsStatusModalOpen(true);
+  };
+
+  const handleConfirmStatusChange = async () => {
+    if (!numCaso || !pendingStatus) return;
+    try {
+      setLoading(true);
+      await casoService.updateEstatus(numCaso, pendingStatus, statusObservation);
+      await handleRefresh();
+      setIsStatusModalOpen(false);
+      showConfirmationModal(true, `Estatus actualizado a ${pendingStatus}`);
+    } catch (err) {
+      console.error(err);
+      showConfirmationModal(false, 'Error al cambiar el estatus');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -534,45 +560,30 @@ function CasoDetalle() {
 
                   {/* Botón Exportar Reporte Caso */}
                   <button
-                    onClick={() => caso.numCaso && reporteService.downloadReporteCaso(caso.numCaso)}
-                    className="px-3 py-1.5 bg-red-900 text-white rounded-lg hover:bg-red-950 font-medium transition-colors flex items-center gap-2 text-sm"
-                    title="Descargar Reporte del Caso"
+                    onClick={() => caso.numCaso && reporteService.downloadReporteCasoPdf(caso.numCaso)}
+                    className="h-11 px-4 bg-red-900 text-white rounded-lg hover:bg-red-950 font-medium transition-colors flex items-center gap-2 text-sm"
+                    title="Descargar Reporte del Caso (PDF)"
                   >
-                    <FontAwesomeIcon icon={faFileExcel} />
+                    <FontAwesomeIcon icon={faFilePdf} />
                     <span className="hidden sm:inline">Exportar</span>
                   </button>
 
                   {/* Selector de Estatus (Coordinador / Profesor) */}
                   {(user?.tipoUsuario === 'COORDINADOR' || user?.tipoUsuario === 'PROFESOR') ? (
-                    <select
-                      value={caso.estatus}
-                      onChange={async (e) => {
-                        const newStatus = e.target.value;
-                        if (!caso.numCaso) return;
-                        try {
-                          await casoService.updateEstatus(caso.numCaso, newStatus);
-                          await handleRefresh();
-                        } catch (err) {
-                          console.error(err);
-                          showConfirmationModal(false, 'Error al cambiar el estatus');
-                        }
-                      }}
-                      className={`px-4 py-1.5 rounded text-sm font-semibold border outline-none cursor-pointer bg-white text-gray-900 border-gray-300`}
-                      style={{
-                        color: caso.estatus === 'ABIERTO'
-                          ? '#16a34a' // green-600
-                          : caso.estatus === 'EN TRÁMITE'
-                            ? '#2563eb' // blue-600
-                            : caso.estatus === 'EN PAUSA'
-                              ? '#ca8a04' // yellow-600
-                              : '#6b7280' // gray-500
-                      }}
-                    >
-                      <option value="ABIERTO" style={{ backgroundColor: '#ffffff', color: '#16a34a' }}>ABIERTO</option>
-                      <option value="EN TRÁMITE" style={{ backgroundColor: '#ffffff', color: '#2563eb' }}>EN TRÁMITE</option>
-                      <option value="EN PAUSA" style={{ backgroundColor: '#ffffff', color: '#ca8a04' }}>EN PAUSA</option>
-                      <option value="CERRADO" style={{ backgroundColor: '#ffffff', color: '#6b7280' }}>CERRADO</option>
-                    </select>
+                    <div className="w-48">
+                      <CustomSelect
+                        value={caso.estatus}
+                        options={[
+                          { value: 'ABIERTO', label: 'ABIERTO' },
+                          { value: 'EN TRÁMITE', label: 'EN TRÁMITE' },
+                          { value: 'EN PAUSA', label: 'EN PAUSA' },
+                          { value: 'CERRADO', label: 'CERRADO' }
+                        ]}
+                        onChange={handleStatusSelect}
+                        placeholder="Estatus"
+                        disabled={caso.estatus === 'CERRADO'}
+                      />
+                    </div>
                   ) : (
                     <span
                       className={`px-4 py-1 rounded-full text-sm font-semibold border ${caso.estatus === 'ABIERTO'
@@ -796,9 +807,10 @@ function CasoDetalle() {
                       </h3>
                       <button
                         onClick={openEditModal}
+                        disabled={caso.estatus === 'CERRADO'}
                         className={`px-3 py-1 text-sm font-medium border rounded-md transition-colors ${isDark
-                          ? 'text-white border-red-900 hover:bg-gray-700'
-                          : 'text-red-900 border-red-900 hover:bg-red-50'
+                          ? 'text-white border-red-900 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed'
+                          : 'text-red-900 border-red-900 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed'
                           }`}
                       >
                         Editar Informacion
@@ -2091,6 +2103,48 @@ function CasoDetalle() {
         }
 
       </div>
+
+      {/* Modal de Confirmación de Estatus */}
+      <Modal
+        isOpen={isStatusModalOpen}
+        onClose={() => setIsStatusModalOpen(false)}
+        title="Confirmar Cambio de Estatus"
+      >
+        <div className="space-y-4">
+          <p className="text-gray-700">
+            Está a punto de cambiar el estatus del caso a <strong>{pendingStatus}</strong>.
+            ¿Desea continuar?
+          </p>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Observación (Opcional)
+            </label>
+            <textarea
+              value={statusObservation}
+              onChange={(e) => setStatusObservation(e.target.value)}
+              placeholder="Ingrese una razón o comentario para este cambio..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-transparent outline-none resize-none h-24"
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 mt-6">
+            <Button
+              variant="secondary"
+              onClick={() => setIsStatusModalOpen(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleConfirmStatusChange}
+            >
+              Confirmar Cambio
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
       {confirmationModal.isOpen && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
           <div className={`relative w-full max-w-md rounded-xl shadow-2xl overflow-hidden animate-slide-up-modal ${isDark ? 'bg-gray-800' : 'bg-white'
