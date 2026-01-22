@@ -1883,14 +1883,7 @@ function CasoDetalle() {
               <div className="flex items-center justify-between border-b pb-4">
                 <div>
                   <span
-                    className={`inline-block px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wide ${selectedEvento.type === 'accion'
-                      ? 'bg-green-50 text-green-700'
-                      : selectedEvento.type === 'encuentro'
-                        ? 'bg-blue-50 text-blue-700'
-                        : selectedEvento.type === 'cita-programada'
-                          ? 'bg-purple-50 text-purple-700'
-                          : 'bg-red-50 text-red-900'
-                      }`}
+                    className="inline-block px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wide bg-gray-100 text-gray-700"
                   >
                     {selectedEvento.type === 'accion'
                       ? 'Acción Legal'
@@ -1939,7 +1932,7 @@ function CasoDetalle() {
                   <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
                     Observación
                   </h3>
-                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+                  <div className="bg-gray-50 border-l-4 border-gray-300 p-4 rounded">
                     <p className="text-base text-gray-700 leading-relaxed">
                       {selectedEvento.observacion}
                     </p>
@@ -1968,13 +1961,13 @@ function CasoDetalle() {
                         Fecha de ejecución
                       </p>
                       {selectedEvento.fechaEjecucion ? (
-                        <p className="text-sm font-medium text-green-700 bg-green-50 px-3 py-2 rounded inline-block">
+                        <p className="text-sm font-medium text-gray-700 bg-gray-100 px-3 py-2 rounded inline-block">
                           Ejecutada el{' '}
                           {selectedEvento.fechaEjecucion ? parseLocalDate(selectedEvento.fechaEjecucion).toLocaleDateString('es-ES') : 'N/A'}
                         </p>
                       ) : (
                         <>
-                          <p className="text-sm font-medium text-orange-700 bg-orange-50 px-3 py-2 rounded inline-block mb-3">
+                          <p className="text-sm font-medium text-gray-700 bg-gray-100 px-3 py-2 rounded inline-block mb-3">
                             Acción No Ejecutada
                           </p>
                           <div>
@@ -2011,7 +2004,7 @@ function CasoDetalle() {
                                   showConfirmationModal(false, errorMessage);
                                 }
                               }}
-                              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 text-sm"
+                              className="px-4 py-2 bg-red-900 hover:bg-red-950 text-white rounded-lg font-medium transition-colors flex items-center gap-2 text-sm"
                             >
                               <FontAwesomeIcon icon={faCheckCircle} />
                               Marcar como Ejecutada
@@ -2038,11 +2031,11 @@ function CasoDetalle() {
                         Tipo de Encuentro
                       </p>
                       {selectedEvento.fechaProxima ? (
-                        <p className="text-sm font-medium text-blue-700 bg-blue-50 px-3 py-2 rounded inline-block">
+                        <p className="text-sm font-medium text-gray-700 bg-gray-100 px-3 py-2 rounded inline-block">
                           Cita Programada
                         </p>
                       ) : (
-                        <p className="text-sm font-medium text-gray-700 bg-gray-50 px-3 py-2 rounded inline-block">
+                        <p className="text-sm font-medium text-gray-700 bg-gray-100 px-3 py-2 rounded inline-block">
                           Encuentro Realizado
                         </p>
                       )}
@@ -2064,7 +2057,7 @@ function CasoDetalle() {
                         <p className="text-xs text-gray-500 uppercase font-semibold mb-1">
                           Fecha de la Cita Programada
                         </p>
-                        <p className="text-sm font-medium text-purple-700 bg-purple-50 px-3 py-2 rounded inline-block">
+                        <p className="text-sm font-medium text-gray-700 bg-gray-100 px-3 py-2 rounded inline-block">
                           {parseLocalDate(selectedEvento.fechaAtencion).toLocaleDateString('es-ES', {
                             day: 'numeric',
                             month: 'long',
@@ -2078,7 +2071,7 @@ function CasoDetalle() {
                         <p className="text-xs text-gray-500 uppercase font-semibold mb-1">
                           Próxima Cita Programada
                         </p>
-                        <p className="text-sm font-medium text-blue-700 bg-blue-50 px-3 py-2 rounded inline-block">
+                        <p className="text-sm font-medium text-gray-700 bg-gray-100 px-3 py-2 rounded inline-block">
                           {parseLocalDate(selectedEvento.fechaProxima).toLocaleDateString('es-ES', {
                             day: 'numeric',
                             month: 'long',
