@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTheme } from '../../context/ThemeContext';
 
 interface Option {
     value: string | number;
@@ -24,6 +25,8 @@ export default function CustomSelect({
     disabled = false,
     required = false
 }: CustomSelectProps) {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +62,7 @@ export default function CustomSelect({
     return (
         <div className="relative overflow-visible" ref={dropdownRef}>
             {label && (
-                <label className="block text-sm font-semibold mb-2">
+                <label className={`block text-sm font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>
                     {label}
                 </label>
             )}
