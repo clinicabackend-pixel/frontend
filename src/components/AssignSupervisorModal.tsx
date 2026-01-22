@@ -30,6 +30,7 @@ const AssignSupervisorModal = ({ isOpen, onClose, numCaso, onAssignSuccess }: As
             setSearchText('');
             setSelectedProfesor(null);
             setError(null);
+            setAssigning(false);
         } else {
             setIsVisible(false);
         }
@@ -196,7 +197,7 @@ const AssignSupervisorModal = ({ isOpen, onClose, numCaso, onAssignSuccess }: As
                         disabled={!selectedProfesor || assigning}
                         className="px-5 py-2.5 rounded-lg bg-blue-900 text-white font-medium text-sm shadow-md hover:bg-blue-800 hover:shadow-lg transition-all focus:outline-none disabled:opacity-50 disabled:shadow-none"
                     >
-                        {assigning ? 'Asignando...' : 'Confirmar Asignación'}
+                        {assigning && selectedProfesor ? 'Asignando...' : 'Confirmar Asignación'}
                     </button>
                 </div>
             </div>

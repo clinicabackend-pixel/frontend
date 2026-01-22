@@ -48,11 +48,13 @@ export default function CasoRow({ caso, materia, onClick }: CasoRowProps) {
                 <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                     caso.estatus === 'ABIERTO' 
                         ? (isDark ? 'bg-green-300 text-green-900' : 'bg-green-100 text-green-800')
+                        : caso.estatus === 'EN TRÁMITE' || caso.estatus === 'EN TRAMITE'
+                        ? (isDark ? 'bg-blue-300 text-blue-900' : 'bg-blue-100 text-blue-800')
                         : caso.estatus === 'CERRADO' 
-                        ? (isDark ? 'bg-gray-300 text-gray-900' : 'bg-gray-100 text-gray-800')
+                        ? (isDark ? 'bg-gray-400 text-gray-900' : 'bg-gray-200 text-gray-800')
                         : caso.estatus === 'EN PAUSA' 
                         ? (isDark ? 'bg-yellow-300 text-yellow-900' : 'bg-yellow-100 text-yellow-800')
-                        : (isDark ? 'bg-blue-300 text-blue-900' : 'bg-blue-100 text-blue-800')
+                        : (isDark ? 'bg-purple-300 text-purple-900' : 'bg-purple-100 text-purple-800')
                 }`}>
                     {caso.estatus}
                 </span>

@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import AssignStudentModal from './AssignStudentModal';
 import { useAuth } from '../context/AuthContext';
+import casoService from '../services/casoService';
 
 interface CaseCardProps {
   numCaso: string;
@@ -45,13 +46,16 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
       case 'ACTIVO':
       case 'ABIERTO':
         return isDark ? 'bg-green-300 text-green-900' : 'bg-green-100 text-green-800';
+      case 'EN TRÁMITE':
+      case 'EN TRAMITE':
+        return isDark ? 'bg-blue-300 text-blue-900' : 'bg-blue-100 text-blue-800';
       case 'CERRADO':
-        return isDark ? 'bg-gray-300 text-gray-900' : 'bg-gray-100 text-gray-800';
+        return isDark ? 'bg-gray-400 text-gray-900' : 'bg-gray-200 text-gray-800';
       case 'PENDIENTE':
       case 'EN PAUSA':
         return isDark ? 'bg-yellow-300 text-yellow-900' : 'bg-yellow-100 text-yellow-800';
       case 'REVISIÓN':
-        return isDark ? 'bg-blue-300 text-blue-900' : 'bg-blue-100 text-blue-800';
+        return isDark ? 'bg-purple-300 text-purple-900' : 'bg-purple-100 text-purple-800';
       default:
         return isDark ? 'bg-gray-300 text-gray-900' : 'bg-gray-100 text-gray-800';
     }
@@ -70,13 +74,54 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
 
   const { user } = useAuth();
   const [showAssignModal, setShowAssignModal] = useState(false);
+  const [isSupervisorAssigned, setIsSupervisorAssigned] = useState<boolean | null>(null);
+  const [checkingSupervisor, setCheckingSupervisor] = useState(false);
 
   // Determine if user can assign (Coordinator/Professor)
   const canAssign = user?.tipoUsuario === 'COORDINADOR' || user?.tipoUsuario === 'PROFESOR' || user?.tipoUsuario === 'ADMIN';
+  
+  // Para COORDINADOR y ADMIN, siempre pueden asignar
+  const canAssignStudents = user?.tipoUsuario === 'COORDINADOR' || user?.tipoUsuario === 'ADMIN' 
+    ? true 
+    : (user?.tipoUsuario === 'PROFESOR' ? (isSupervisorAssigned === true) : false);
+
+  // Verificar si el profesor está asignado como supervisor
+  useEffect(() => {
+    const checkSupervisorAssignment = async () => {
+      // Solo verificar si el usuario es PROFESOR
+      if (user?.tipoUsuario !== 'PROFESOR') {
+        setIsSupervisorAssigned(true); // COORDINADOR y ADMIN siempre pueden asignar
+        return;
+      }
+
+      setCheckingSupervisor(true);
+      try {
+        const casoDetalle = await casoService.getById(numCaso);
+        const currentUsername = user?.username;
+        const isAssigned = casoDetalle.supervisores?.some(
+          (supervisor) => supervisor.username === currentUsername
+        ) || false;
+        setIsSupervisorAssigned(isAssigned);
+      } catch (err) {
+        console.error("Error checking supervisor assignment", err);
+        setIsSupervisorAssigned(false);
+      } finally {
+        setCheckingSupervisor(false);
+      }
+    };
+
+    if (canAssign && user?.tipoUsuario === 'PROFESOR') {
+      checkSupervisorAssignment();
+    } else if (canAssign) {
+      setIsSupervisorAssigned(true);
+    }
+  }, [numCaso, user, canAssign]);
 
   const handleAssignClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click
-    setShowAssignModal(true);
+    if (canAssignStudents) {
+      setShowAssignModal(true);
+    }
   };
 
   return (
@@ -113,11 +158,19 @@ function CaseCard({ numCaso, materia, cedula, nombre, fecha, estatus, sintesis, 
               {canAssign && (
                 <button
                   onClick={handleAssignClick}
-                  className={`mt-1 text-xs flex items-center gap-1 px-2 py-1 rounded transition-colors z-10 ${isDark
-                    ? 'text-blue-300 hover:bg-blue-900/50'
-                    : 'text-blue-700 hover:bg-blue-50'
-                    }`}
-                  title="Asignar Estudiante"
+                  disabled={!canAssignStudents || checkingSupervisor}
+                  className={`mt-1 text-xs flex items-center gap-1 px-2 py-1 rounded transition-colors z-10 ${
+                    checkingSupervisor || !canAssignStudents
+                      ? (isDark ? 'text-gray-500 cursor-not-allowed opacity-50' : 'text-gray-400 cursor-not-allowed opacity-50')
+                      : (isDark ? 'text-blue-300 hover:bg-blue-900/50' : 'text-blue-700 hover:bg-blue-50')
+                  }`}
+                  title={
+                    checkingSupervisor 
+                      ? 'Verificando permisos...' 
+                      : canAssignStudents 
+                      ? 'Asignar Estudiante' 
+                      : 'Debe estar asignado como supervisor para asignar estudiantes'
+                  }
                 >
                   <FontAwesomeIcon icon={faUserPlus} />
                   <span>Asignar</span>

@@ -479,6 +479,15 @@ function CasoDetalle() {
   const asignados = casoDetalle.asignados || [];
   const supervisores = casoDetalle.supervisores || [];
   const pruebas = casoDetalle.pruebas || [];
+  
+  // Verificar si el profesor actual está asignado como supervisor
+  const isCurrentUserSupervisor = user?.tipoUsuario === 'PROFESOR' 
+    ? supervisores.some(sup => sup.username === user?.username)
+    : true; // COORDINADOR y ADMINISTRADOR siempre pueden asignar
+  
+  const canAssignStudents = user?.tipoUsuario === 'ADMINISTRADOR' || user?.tipoUsuario === 'COORDINADOR'
+    ? true
+    : (user?.tipoUsuario === 'PROFESOR' ? isCurrentUserSupervisor : false);
 
   return (
     <>
@@ -1296,7 +1305,13 @@ function CasoDetalle() {
                       <div className="flex justify-between items-center mb-6">
                         <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Estudiantes Asignados</h3>
                         {canAssign && (
-                          <Button size="sm" variant="primary" onClick={() => setIsAssignModalOpen(true)}>
+                          <Button 
+                            size="sm" 
+                            variant="primary" 
+                            onClick={() => setIsAssignModalOpen(true)}
+                            disabled={!canAssignStudents}
+                            title={!canAssignStudents && user?.tipoUsuario === 'PROFESOR' ? 'Debe estar asignado como supervisor para asignar estudiantes' : 'Asignar Estudiante'}
+                          >
                             <Plus size={16} className="mr-2" /> Asignar Estudiante
                           </Button>
                         )}
