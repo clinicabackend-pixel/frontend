@@ -1956,26 +1956,35 @@ function CasoDetalle() {
                         <div>
                           <button
                             onClick={async () => {
-                              if (!numCaso || !selectedEvento.idAccion) return;
+                              if (!numCaso || !selectedEvento.idAccion) {
+                                showConfirmationModal(false, 'Error: No se pudo identificar la acción');
+                                return;
+                              }
                               try {
                                 const fechaHoy = new Date().toISOString().split('T')[0];
-                                await casoService.updateAccion(numCaso, selectedEvento.idAccion, {
+                                const idAccion = Number(selectedEvento.idAccion);
+                                if (isNaN(idAccion)) {
+                                  showConfirmationModal(false, 'Error: ID de acción inválido');
+                                  return;
+                                }
+                                await casoService.updateAccion(numCaso, idAccion, {
                                   fechaEjecucion: fechaHoy
                                 });
                                 showConfirmationModal(true, 'Acción marcada como ejecutada exitosamente');
                                 await handleRefresh();
                                 // Actualizar el evento seleccionado para reflejar el cambio
                                 const updated = await casoService.getById(numCaso);
-                                const accionActualizada = updated.acciones.find((a: any) => a.idAccion === selectedEvento.idAccion);
+                                const accionActualizada = updated.acciones.find((a: any) => a.idAccion === idAccion);
                                 if (accionActualizada) {
                                   setSelectedEvento({
                                     ...selectedEvento,
                                     fechaEjecucion: accionActualizada.fechaEjecucion
                                   });
                                 }
-                              } catch (err) {
+                              } catch (err: any) {
                                 console.error('Error al marcar acción como ejecutada:', err);
-                                showConfirmationModal(false, 'Error al marcar la acción como ejecutada');
+                                const errorMessage = err?.response?.data?.message || err?.message || 'Error al marcar la acción como ejecutada';
+                                showConfirmationModal(false, errorMessage);
                               }
                             }}
                             className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 text-sm"
