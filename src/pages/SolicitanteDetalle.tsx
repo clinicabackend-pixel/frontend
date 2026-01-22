@@ -398,7 +398,7 @@ export function SolicitanteDetalle() {
 
                             {/* Casos como Solicitante */}
                             <div className="mb-8">
-                                <h4 className={`font-semibold text-lg mb-4 border-l-4 pl-3 ${isDark ? 'text-red-800 border-red-900' : 'text-red-800 border-red-800'}`}>
+                                <h4 className={`font-semibold text-lg mb-4 border-l-4 pl-3 ${isDark ? 'text-white border-red-900' : 'text-red-800 border-red-800'}`}>
                                     Como Solicitante (Titular)
                                 </h4>
                                 {casosTitular.length > 0 ? (
@@ -416,7 +416,7 @@ export function SolicitanteDetalle() {
                                             <tbody className={`${isDark ? 'bg-[#630000] divide-red-800/50' : 'bg-white divide-gray-200'} divide-y`}>
                                                 {casosTitular.map((caso) => (
                                                     <tr key={caso.numCaso} className={`cursor-pointer ${isDark ? 'hover:bg-red-950/50' : 'hover:bg-gray-50'}`} onClick={() => navigate(`/casos/${caso.numCaso}`)}>
-                                                        <td className={`px-4 py-3 whitespace-nowrap text-sm font-medium ${isDark ? 'text-red-800' : 'text-red-900'}`}>{caso.numCaso}</td>
+                                                        <td className={`px-4 py-3 whitespace-nowrap text-sm font-medium ${isDark ? 'text-white' : 'text-red-900'}`}>{caso.numCaso}</td>
                                                         <td className={`px-4 py-3 whitespace-nowrap text-sm ${isDark ? 'text-white' : 'text-gray-500'}`}>{caso.fechaRecepcion}</td>
                                                         <td className={`px-4 py-3 text-sm max-w-xs truncate ${isDark ? 'text-white' : 'text-gray-500'}`}>{caso.sintesis}</td>
                                                         <td className={`px-4 py-3 text-sm max-w-xs truncate ${isDark ? 'text-white' : 'text-gray-500'}`} title={caso.legalHierarchy}>{caso.legalHierarchy || 'N/A'}</td>
@@ -455,7 +455,7 @@ export function SolicitanteDetalle() {
                                             <tbody className={`${isDark ? 'bg-[#630000] divide-red-800/50' : 'bg-white divide-gray-200'} divide-y`}>
                                                 {casosBeneficiario.map((caso) => (
                                                     <tr key={caso.numCaso} className={`cursor-pointer ${isDark ? 'hover:bg-red-950/50' : 'hover:bg-gray-50'}`} onClick={() => navigate(`/casos/${caso.numCaso}`)}>
-                                                        <td className={`px-4 py-3 whitespace-nowrap text-sm font-medium ${isDark ? 'text-red-800' : 'text-red-900'}`}>{caso.numCaso}</td>
+                                                        <td className={`px-4 py-3 whitespace-nowrap text-sm font-medium ${isDark ? 'text-white' : 'text-red-900'}`}>{caso.numCaso}</td>
                                                         <td className={`px-4 py-3 whitespace-nowrap text-sm ${isDark ? 'text-white' : 'text-gray-500'}`}>{caso.fechaRecepcion}</td>
                                                         <td className={`px-4 py-3 text-sm max-w-xs truncate ${isDark ? 'text-white' : 'text-gray-500'}`}>{caso.sintesis}</td>
                                                         <td className={`px-4 py-3 text-sm max-w-xs truncate ${isDark ? 'text-white' : 'text-gray-500'}`} title={caso.legalHierarchy}>{caso.legalHierarchy || 'N/A'}</td>

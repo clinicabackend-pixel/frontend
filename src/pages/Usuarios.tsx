@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import SearchBar from '../components/common/SearchBar';
 import Pagination from '../components/common/Pagination';
+import CustomSelect from '../components/common/CustomSelect';
+import Button from '../components/common/Button';
 import usuarioService from '../services/usuarioService';
-import ImportModal from '../components/users/ImportModal';
 import UserFormModal from '../components/users/UserFormModal';
 import type { Usuario } from '../types/usuario';
 import { useTheme } from '../context/ThemeContext';
@@ -12,13 +13,13 @@ import { useAuth } from '../context/AuthContext';
 import {
     Mail,
     User,
-    Upload,
     Plus,
     MoreVertical,
     Trash2,
     CheckCircle,
     X
 } from 'lucide-react';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 export default function UsuariosPage() {
     const navigate = useNavigate();
@@ -36,7 +37,8 @@ export default function UsuariosPage() {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchText, setSearchText] = useState('');
-    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    const [filtroTipoUsuario, setFiltroTipoUsuario] = useState<string | number>('TODOS');
+    const [filtroEstatus, setFiltroEstatus] = useState<string | number>('TODOS');
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
     const [openMenuId, setOpenMenuId] = useState<string | null>(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -57,10 +59,10 @@ export default function UsuariosPage() {
         fetchUsuarios();
     }, []);
 
-    // Resetear página cuando cambia el texto de búsqueda
+    // Resetear página cuando cambian los filtros o el texto de búsqueda
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchText]);
+    }, [searchText, filtroTipoUsuario, filtroEstatus]);
 
     // Cerrar menú al hacer clic fuera
     useEffect(() => {
@@ -125,6 +127,17 @@ export default function UsuariosPage() {
 
     // Filter logic
     const filteredUsuarios = usuarios.filter((user) => {
+        // Filtro por tipo de usuario
+        if (filtroTipoUsuario !== 'TODOS' && user.tipoUsuario !== filtroTipoUsuario) {
+            return false;
+        }
+
+        // Filtro por estatus
+        if (filtroEstatus !== 'TODOS' && user.estatus !== filtroEstatus) {
+            return false;
+        }
+
+        // Filtro por texto de búsqueda
         if (!searchText) return true;
         const search = searchText.toLowerCase();
         return (
@@ -254,38 +267,61 @@ export default function UsuariosPage() {
             <div className="w-full mx-auto">
 
                 {/* Controls */}
-                <div className={`p-4 rounded-lg shadow-sm mb-6 border flex flex-col md:flex-row justify-between items-center gap-4 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                    <div className="w-full md:w-1/2">
-                        <SearchBar
-                            value={searchText}
-                            onChange={setSearchText}
-                            placeholder="Buscar por nombre, cédula, usuario..."
-                        />
-                    </div>
-                    {canManageUsers && (
-                        <div className="flex gap-2 w-full md:w-auto">
-                            <button
-                                onClick={() => setIsImportModalOpen(true)}
-                                className={`flex items-center justify-center px-4 py-2 border rounded-md transition-colors w-full md:w-auto ${isDark
-                                    ? 'border-gray-600 text-gray-300 hover:bg-gray-700 hover:border-red-600'
-                                    : 'border-red-900 text-red-900 hover:bg-red-50'
-                                    }`}
-                            >
-                                <Upload size={18} className="mr-2" />
-                                import
-                            </button>
-                            <button
-                                onClick={() => setIsUserModalOpen(true)}
-                                className={`flex items-center justify-center px-4 py-2 rounded-md transition-colors w-full md:w-auto ${isDark
-                                    ? 'bg-red-900 text-white hover:bg-red-950'
-                                    : 'bg-red-900 text-white hover:bg-red-950'
-                                    }`}
-                            >
-                                <Plus size={18} className="mr-2" />
-                                Crear usuario
-                            </button>
+                <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-3 rounded-lg shadow-sm mb-6 border`}>
+                    <div className="flex flex-col lg:flex-row gap-3 justify-between items-stretch lg:items-center">
+                        {/* Buscador de Texto */}
+                        <div className="w-full lg:w-64 xl:w-80">
+                            <SearchBar
+                                value={searchText}
+                                onChange={setSearchText}
+                                placeholder="Buscar por nombre, cédula, usuario..."
+                            />
                         </div>
-                    )}
+
+                        {/* Filtros y Botones */}
+                        <div className="flex flex-wrap gap-2 items-center justify-end">
+                            {/* Filtro por Tipo de Usuario */}
+                            <div className="w-36 xl:w-40">
+                                <CustomSelect
+                                    value={filtroTipoUsuario}
+                                    options={[
+                                        { value: 'TODOS', label: 'Todos' },
+                                        { value: 'ESTUDIANTE', label: 'Estudiantes' },
+                                        { value: 'PROFESOR', label: 'Profesores' },
+                                        { value: 'COORDINADOR', label: 'Coordinadores' },
+                                        { value: 'ADMINISTRADOR', label: 'Administradores' }
+                                    ]}
+                                    onChange={(value) => setFiltroTipoUsuario(value as string)}
+                                    placeholder="Tipo"
+                                />
+                            </div>
+
+                            {/* Filtro por Estatus */}
+                            <div className="w-36 xl:w-40">
+                                <CustomSelect
+                                    value={filtroEstatus}
+                                    options={[
+                                        { value: 'TODOS', label: 'Todos' },
+                                        { value: 'ACTIVO', label: 'Activos' },
+                                        { value: 'INACTIVO', label: 'Inactivos' }
+                                    ]}
+                                    onChange={(value) => setFiltroEstatus(value as string)}
+                                    placeholder="Estatus"
+                                />
+                            </div>
+
+                            {canManageUsers && (
+                                <Button
+                                    variant="primary"
+                                    onClick={() => setIsUserModalOpen(true)}
+                                    className="gap-1.5 px-3"
+                                    icon={faPlus}
+                                >
+                                    <span className="hidden md:inline">Crear</span>
+                                </Button>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Content */}
@@ -420,12 +456,6 @@ export default function UsuariosPage() {
                     </div>
                 )}
             </div>
-
-            <ImportModal
-                isOpen={isImportModalOpen}
-                onClose={() => setIsImportModalOpen(false)}
-                onSuccess={fetchUsuarios}
-            />
 
             <UserFormModal
                 isOpen={isUserModalOpen}
