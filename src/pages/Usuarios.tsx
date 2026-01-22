@@ -7,6 +7,7 @@ import CustomSelect from '../components/common/CustomSelect';
 import Button from '../components/common/Button';
 import usuarioService from '../services/usuarioService';
 import UserFormModal from '../components/users/UserFormModal';
+import ImportModal from '../components/users/ImportModal';
 import type { Usuario } from '../types/usuario';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -18,7 +19,7 @@ import {
     CheckCircle,
     X
 } from 'lucide-react';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faUpload } from '@fortawesome/free-solid-svg-icons';
 
 export default function UsuariosPage() {
     const navigate = useNavigate();
@@ -39,6 +40,7 @@ export default function UsuariosPage() {
     const [filtroTipoUsuario, setFiltroTipoUsuario] = useState<string | number>('TODOS');
     const [filtroEstatus, setFiltroEstatus] = useState<string | number>('TODOS');
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [openMenuId, setOpenMenuId] = useState<string | null>(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [permanentDeleteModalOpen, setPermanentDeleteModalOpen] = useState(false);
@@ -310,14 +312,24 @@ export default function UsuariosPage() {
                             </div>
 
                             {canManageUsers && (
-                                <Button
-                                    variant="primary"
-                                    onClick={() => setIsUserModalOpen(true)}
-                                    className="gap-1.5 px-3"
-                                    icon={faPlus}
-                                >
-                                    <span className="hidden md:inline">Crear</span>
-                                </Button>
+                                <>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setIsImportModalOpen(true)}
+                                        className="gap-1.5 px-3"
+                                        icon={faUpload}
+                                    >
+                                        <span className="hidden md:inline">Importar</span>
+                                    </Button>
+                                    <Button
+                                        variant="primary"
+                                        onClick={() => setIsUserModalOpen(true)}
+                                        className="gap-1.5 px-3"
+                                        icon={faPlus}
+                                    >
+                                        <span className="hidden md:inline">Crear</span>
+                                    </Button>
+                                </>
                             )}
                         </div>
                     </div>
@@ -459,6 +471,12 @@ export default function UsuariosPage() {
             <UserFormModal
                 isOpen={isUserModalOpen}
                 onClose={() => setIsUserModalOpen(false)}
+                onSuccess={fetchUsuarios}
+            />
+
+            <ImportModal
+                isOpen={isImportModalOpen}
+                onClose={() => setIsImportModalOpen(false)}
                 onSuccess={fetchUsuarios}
             />
 
