@@ -107,9 +107,10 @@ const casoService = {
         return response.data;
     },
 
-    updateEstatus: async (id: string, nuevoEstatus: string): Promise<void> => {
+    updateEstatus: async (id: string, nuevoEstatus: string, observacion?: string): Promise<void> => {
         await api.patch(`/casos/${id}/estatus`, {
-            estatus: nuevoEstatus
+            estatus: nuevoEstatus,
+            observacion
         });
     },
 

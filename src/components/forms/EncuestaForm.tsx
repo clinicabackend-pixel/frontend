@@ -66,9 +66,15 @@ export default function EncuestaForm({ cedula, onSuccess, onCancel }: EncuestaFo
                     catalogoService.getCondicionesActividad()
                 ]);
 
-                setTiposVivienda(viviendasData);
-                setCondicionesLaborales(condLabData);
-                setCondicionesActividad(condActData);
+                // Filter active items
+                const activeViviendas = viviendasData.map((tipo: any) => ({
+                    ...tipo,
+                    categorias: tipo.categorias ? tipo.categorias.filter((cat: any) => cat.estatus === 'ACTIVO') : []
+                }));
+
+                setTiposVivienda(activeViviendas);
+                setCondicionesLaborales(condLabData.filter((item: any) => item.estatus === 'ACTIVO'));
+                setCondicionesActividad(condActData.filter((item: any) => item.estatus === 'ACTIVO'));
 
                 // 2. Load Existing Survey Data
                 const surveyData = await solicitanteService.getEncuestaEdicion(cedula);
