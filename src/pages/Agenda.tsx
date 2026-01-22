@@ -55,11 +55,16 @@ export default function AgendaPage() {
         setLoading(true);
         try {
             const puedeVerTodosLosCasos = user?.tipoUsuario === 'COORDINADOR' || user?.tipoUsuario === 'ADMINISTRADOR' || user?.tipoUsuario === 'PROFESOR';
+            const esCoordinador = user?.tipoUsuario === 'COORDINADOR' || user?.tipoUsuario === 'ADMINISTRADOR';
             const currentUsername = user?.username || username;
             
             // Determinar el filtro según el estado del botón
+            // Los coordinadores siempre ven todas las actividades, sin importar el filtro
             let userFilter: string | undefined;
-            if (filtroCasos === 'asignados') {
+            if (esCoordinador) {
+                // Coordinadores siempre ven todos los casos
+                userFilter = undefined;
+            } else if (filtroCasos === 'asignados') {
                 // Si el filtro es "asignados", filtrar por usuario
                 userFilter = currentUsername || undefined;
             } else {
@@ -68,7 +73,7 @@ export default function AgendaPage() {
                 userFilter = undefined;
             }
 
-            if (!currentUsername && !puedeVerTodosLosCasos && filtroCasos === 'asignados') {
+            if (!currentUsername && !puedeVerTodosLosCasos && filtroCasos === 'asignados' && !esCoordinador) {
                 setAccionesPendientes([]);
                 setLoading(false);
                 return;
