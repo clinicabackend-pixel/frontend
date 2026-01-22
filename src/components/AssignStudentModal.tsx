@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faUserPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
 import estudianteService, { type EstudianteInfo } from '../services/estudianteService';
 import casoService from '../services/casoService';
+import { useAuth } from '../context/AuthContext';
 // import { useTheme } from '../context/ThemeContext'; // Theme context less relevant if forcing specific colors, but keeping for dark mode logic if needed essentially
 
 interface AssignStudentModalProps {
@@ -13,6 +14,7 @@ interface AssignStudentModalProps {
 }
 
 const AssignStudentModal = ({ isOpen, onClose, numCaso, onAssignSuccess }: AssignStudentModalProps) => {
+    const { user } = useAuth();
     // Ensuring we start with a fresh state when opening
     const [isVisible, setIsVisible] = useState(false);
 
@@ -21,9 +23,11 @@ const AssignStudentModal = ({ isOpen, onClose, numCaso, onAssignSuccess }: Assig
     const [filteredStudents, setFilteredStudents] = useState<EstudianteInfo[]>([]);
     const [searchText, setSearchText] = useState('');
     const [selectedStudents, setSelectedStudents] = useState<EstudianteInfo[]>([]);
+    const [isSupervisorAssigned, setIsSupervisorAssigned] = useState<boolean | null>(null);
 
     // Status State
     const [loading, setLoading] = useState(false);
+    const [loadingCaseInfo, setLoadingCaseInfo] = useState(false);
     const [assigning, setAssigning] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -33,6 +37,7 @@ const AssignStudentModal = ({ isOpen, onClose, numCaso, onAssignSuccess }: Assig
             // Trigger animation
             requestAnimationFrame(() => setIsVisible(true));
             loadStudents();
+            checkSupervisorAssignment();
             // Reset fields
             setSearchText('');
             setSelectedStudents([]);
@@ -40,7 +45,30 @@ const AssignStudentModal = ({ isOpen, onClose, numCaso, onAssignSuccess }: Assig
         } else {
             setIsVisible(false);
         }
-    }, [isOpen]);
+    }, [isOpen, numCaso, user]);
+
+    const checkSupervisorAssignment = async () => {
+        // Solo verificar si el usuario es PROFESOR
+        if (user?.tipoUsuario !== 'PROFESOR') {
+            setIsSupervisorAssigned(true); // COORDINADOR y ADMIN siempre pueden asignar
+            return;
+        }
+
+        setLoadingCaseInfo(true);
+        try {
+            const casoDetalle = await casoService.getById(numCaso);
+            const currentUsername = user?.username;
+            const isAssigned = casoDetalle.supervisores?.some(
+                (supervisor) => supervisor.username === currentUsername
+            ) || false;
+            setIsSupervisorAssigned(isAssigned);
+        } catch (err) {
+            console.error("Error checking supervisor assignment", err);
+            setIsSupervisorAssigned(false);
+        } finally {
+            setLoadingCaseInfo(false);
+        }
+    };
 
     const loadStudents = async () => {
         setLoading(true);
@@ -85,6 +113,13 @@ const AssignStudentModal = ({ isOpen, onClose, numCaso, onAssignSuccess }: Assig
 
     const handleAssign = async () => {
         if (selectedStudents.length === 0) return;
+        
+        // Verificar nuevamente si el profesor está asignado (por si cambió algo)
+        if (user?.tipoUsuario === 'PROFESOR' && !isSupervisorAssigned) {
+            setError('Debe estar asignado como supervisor de este caso para poder asignar estudiantes.');
+            return;
+        }
+        
         setAssigning(true);
         setError(null);
         try {
@@ -253,7 +288,7 @@ const AssignStudentModal = ({ isOpen, onClose, numCaso, onAssignSuccess }: Assig
                     </button>
                     <button
                         onClick={handleAssign}
-                        disabled={selectedStudents.length === 0 || assigning}
+                        disabled={selectedStudents.length === 0 || assigning || loadingCaseInfo || (user?.tipoUsuario === 'PROFESOR' && !isSupervisorAssigned)}
                         className="px-5 py-2.5 rounded-lg bg-red-900 text-white font-medium text-sm shadow-md hover:bg-red-950 hover:shadow-lg transition-all focus:outline-none disabled:opacity-50 disabled:shadow-none translate-y-0 active:translate-y-0.5"
                     >
                         {assigning ? (

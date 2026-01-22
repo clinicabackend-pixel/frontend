@@ -37,6 +37,7 @@ export default function AgendaPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [searchText, setSearchText] = useState('');
     const [ordenFecha, setOrdenFecha] = useState<'nueva' | 'vieja'>('nueva'); // 'nueva' = más reciente primero, 'vieja' = más antigua primero
+    const [filtroCasos, setFiltroCasos] = useState<'asignados' | 'todos'>('asignados'); // 'asignados' = solo casos asignados, 'todos' = todos los casos
     const navigate = useNavigate();
 
     const itemsPerPage = 10;
@@ -48,23 +49,35 @@ export default function AgendaPage() {
         if (username || user?.tipoUsuario === 'COORDINADOR' || user?.tipoUsuario === 'PROFESOR') {
             fetchAccionesPendientes();
         }
-    }, [username, user]);
+    }, [username, user, filtroCasos]);
 
     const fetchAccionesPendientes = async () => {
         setLoading(true);
         try {
             const puedeVerTodosLosCasos = user?.tipoUsuario === 'COORDINADOR' || user?.tipoUsuario === 'ADMINISTRADOR' || user?.tipoUsuario === 'PROFESOR';
             const currentUsername = user?.username || username;
-            const userFilter = (currentUsername && !puedeVerTodosLosCasos) ? currentUsername : undefined;
+            
+            // Determinar el filtro según el estado del botón
+            let userFilter: string | undefined;
+            if (filtroCasos === 'asignados') {
+                // Si el filtro es "asignados", filtrar por usuario
+                userFilter = currentUsername || undefined;
+            } else {
+                // Si el filtro es "todos", NO filtrar por usuario (obtener todos los casos)
+                // Todos los usuarios pueden ver todos los casos cuando seleccionan "Todos"
+                userFilter = undefined;
+            }
 
-            if (!currentUsername && !puedeVerTodosLosCasos) {
+            if (!currentUsername && !puedeVerTodosLosCasos && filtroCasos === 'asignados') {
                 setAccionesPendientes([]);
                 setLoading(false);
                 return;
             }
 
-            // Obtener todos los casos del usuario
+            // Obtener todos los casos según el filtro
+            console.log('Fetching acciones - Filtro:', filtroCasos, 'UserFilter:', userFilter, 'Puede ver todos:', puedeVerTodosLosCasos, 'Usuario:', currentUsername, 'Tipo:', user?.tipoUsuario);
             const todosCasos = await casoService.getAll(undefined, userFilter, undefined);
+            console.log('Casos obtenidos:', todosCasos.length, 'Primeros 3 casos:', todosCasos.slice(0, 3).map(c => c.numCaso));
 
             // Obtener acciones pendientes de todos los casos
             const acciones: AccionPendiente[] = [];
@@ -107,6 +120,7 @@ export default function AgendaPage() {
                 return fechaB.getTime() - fechaA.getTime();
             });
 
+            console.log('Acciones pendientes encontradas:', acciones.length);
             setAccionesPendientes(acciones);
         } catch (error) {
             console.error('Error fetching acciones pendientes:', error);
@@ -175,26 +189,45 @@ export default function AgendaPage() {
                             isDark={darkMode}
                         />
                     </div>
-                    <button
-                        onClick={toggleOrdenFecha}
-                        className={`px-4 py-2 rounded-lg border transition-colors flex items-center gap-2 text-sm font-medium ${darkMode
-                            ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
-                            : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                            }`}
-                        title={ordenFecha === 'nueva' ? 'Ordenar: Más antigua primero' : 'Ordenar: Más nueva primero'}
-                    >
-                        {ordenFecha === 'nueva' ? (
-                            <>
-                                <ArrowDown size={16} />
-                                <span>Más nueva</span>
-                            </>
-                        ) : (
-                            <>
-                                <ArrowUp size={16} />
-                                <span>Más vieja</span>
-                            </>
-                        )}
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => {
+                                setFiltroCasos(prev => prev === 'asignados' ? 'todos' : 'asignados');
+                                setCurrentPage(1);
+                            }}
+                            className={`px-4 py-2 rounded-lg border transition-colors flex items-center gap-2 text-sm font-medium whitespace-nowrap ${darkMode
+                                ? filtroCasos === 'asignados'
+                                    ? 'bg-red-900 border-red-800 text-white hover:bg-red-800'
+                                    : 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
+                                : filtroCasos === 'asignados'
+                                    ? 'bg-red-600 border-red-500 text-white hover:bg-red-700'
+                                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                                }`}
+                            title={filtroCasos === 'asignados' ? 'Mostrando: Casos asignados' : 'Mostrando: Todos los casos'}
+                        >
+                            {filtroCasos === 'asignados' ? 'Mis Casos' : 'Todos'}
+                        </button>
+                        <button
+                            onClick={toggleOrdenFecha}
+                            className={`px-4 py-2 rounded-lg border transition-colors flex items-center gap-2 text-sm font-medium ${darkMode
+                                ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
+                                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                                }`}
+                            title={ordenFecha === 'nueva' ? 'Ordenar: Más antigua primero' : 'Ordenar: Más nueva primero'}
+                        >
+                            {ordenFecha === 'nueva' ? (
+                                <>
+                                    <ArrowDown size={16} />
+                                    <span>Más nueva</span>
+                                </>
+                            ) : (
+                                <>
+                                    <ArrowUp size={16} />
+                                    <span>Más vieja</span>
+                                </>
+                            )}
+                        </button>
+                    </div>
                 </div>
 
                 {/* Content */}
@@ -279,7 +312,9 @@ export default function AgendaPage() {
                             <div className={`px-6 py-10 text-center ${darkMode ? 'text-gray-300' : 'text-gray-500'}`}>
                                 {searchText
                                     ? 'No se encontraron acciones pendientes que coincidan con la búsqueda.'
-                                    : 'No hay acciones pendientes en los casos asignados.'}
+                                    : filtroCasos === 'asignados'
+                                        ? 'No hay acciones pendientes en los casos asignados.'
+                                        : 'No hay acciones pendientes en todos los casos.'}
                             </div>
                         )}
 

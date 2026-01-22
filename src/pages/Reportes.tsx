@@ -214,7 +214,7 @@ export default function Reportes() {
                                 {/* Vulnerability Indicator */}
                                 <div className={`p-6 rounded-lg shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
                                     <h3 className={`text-lg font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-800'}`}>Índice de Vulnerabilidad (Estimado)</h3>
-                                    <div className="flex flex-col items-center justify-center h-48">
+                                    <div className="flex flex-col items-center justify-center" style={{ minHeight: '280px' }}>
                                         <div className="relative w-40 h-40">
                                             <svg className="w-full h-full" viewBox="0 0 36 36">
                                                 <path
@@ -238,7 +238,7 @@ export default function Reportes() {
                                                 <span className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>Ingresos Bajos</span>
                                             </div>
                                         </div>
-                                        <p className={`text-sm mt-4 text-center px-4 ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
+                                        <p className={`text-sm mt-4 text-center max-w-xs ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
                                             Porcentaje de familias con ingresos inferiores al umbral referencial.
                                         </p>
                                     </div>
