@@ -18,7 +18,6 @@ interface CustomInputProps {
     pattern?: string;
     title?: string;
     className?: string;
-    isDark?: boolean;
 }
 
 export default function CustomInput({
@@ -37,7 +36,6 @@ export default function CustomInput({
     pattern,
     title,
     className = '',
-    isDark = false,
 }: CustomInputProps) {
     const handleIncrement = () => {
         if (disabled) return;

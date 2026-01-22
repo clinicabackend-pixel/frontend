@@ -647,7 +647,6 @@ export function Catalogos() {
                                 value={tribunalForm.nombre}
                                 onChange={(e) => setTribunalForm({ ...tribunalForm, nombre: e.target.value })}
                                 placeholder="Ej. Tribunal Primero de Municipio"
-                                isDark={isDark}
                             />
                             <div className="grid grid-cols-2 gap-4">
                                 <CustomInput
@@ -656,7 +655,6 @@ export function Catalogos() {
                                     value={tribunalForm.materia}
                                     onChange={(e) => setTribunalForm({ ...tribunalForm, materia: e.target.value })}
                                     placeholder="Ej. Civil, Penal"
-                                    isDark={isDark}
                                 />
                                 <CustomInput
                                     name="instancia"
@@ -664,7 +662,6 @@ export function Catalogos() {
                                     value={tribunalForm.instancia}
                                     onChange={(e) => setTribunalForm({ ...tribunalForm, instancia: e.target.value })}
                                     placeholder="Ej. Primera Instancia"
-                                    isDark={isDark}
                                 />
                             </div>
                             <CustomInput
@@ -673,7 +670,6 @@ export function Catalogos() {
                                 value={tribunalForm.ubicacion}
                                 onChange={(e) => setTribunalForm({ ...tribunalForm, ubicacion: e.target.value })}
                                 placeholder="Ej. Palacio de Justicia, Piso 2"
-                                isDark={isDark}
                             />
                         </>
                     ) : activeTab === 'SEMESTRE' ? (
@@ -685,7 +681,6 @@ export function Catalogos() {
                                     value={semestreForm.termino}
                                     onChange={(e) => setSemestreForm({ ...semestreForm, termino: e.target.value })}
                                     placeholder="Ej. 2024-01"
-                                    isDark={isDark}
                                 />
                                 <CustomInput
                                     name="nombre"
@@ -693,7 +688,6 @@ export function Catalogos() {
                                     value={semestreForm.nombre}
                                     onChange={(e) => setSemestreForm({ ...semestreForm, nombre: e.target.value })}
                                     placeholder="Ej. Primer Semestre 2024"
-                                    isDark={isDark}
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
@@ -731,7 +725,6 @@ export function Catalogos() {
                                 value={centroForm.nombre}
                                 onChange={(e) => setCentroForm({ ...centroForm, nombre: e.target.value })}
                                 placeholder="Ej. Sede Principal"
-                                isDark={isDark}
                             />
                             <CustomInput
                                 name="abreviatura"
@@ -739,7 +732,6 @@ export function Catalogos() {
                                 value={centroForm.abreviatura}
                                 onChange={(e) => setCentroForm({ ...centroForm, abreviatura: e.target.value })}
                                 placeholder="Ej. SP"
-                                isDark={isDark}
                             />
                             <div className="space-y-3">
                                 <h4 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Ubicación Geográfica</h4>
@@ -789,7 +781,6 @@ export function Catalogos() {
                             value={newItemName}
                             onChange={(e) => setNewItemName(e.target.value)}
                             placeholder="Ej. Nuevo Registro"
-                            isDark={isDark}
                         />
                     )}
                     <div className="flex justify-end gap-3 mt-6">

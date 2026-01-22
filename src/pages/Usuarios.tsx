@@ -13,7 +13,6 @@ import { useAuth } from '../context/AuthContext';
 import {
     Mail,
     User,
-    Plus,
     MoreVertical,
     Trash2,
     CheckCircle,

@@ -42,7 +42,7 @@ function Header({ title, onMenuClick }: HeaderProps) {
       </h1>
 
       {/* Theme Toggle y Logo DERECHO (derecha) */}
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0 overflow-visible">
         {/* Theme Toggle Button */}
         <button
           onClick={() => {
@@ -64,13 +64,20 @@ function Header({ title, onMenuClick }: HeaderProps) {
             <Moon className="h-4 w-4 sm:h-5 sm:w-5" />
           )}
         </button>
-        {/* Logo - Oculto en pantallas muy pequeñas */}
-        <img
-          src={isDark ? LogoFondNegro : LogoDerecho}
-          alt="Logo Derecho"
-          className="hidden sm:block h-8 sm:h-10 w-auto object-contain cursor-pointer hover:scale-105 transition-transform duration-200 shrink-0"
-          onClick={() => navigate('/home')}
-        />
+        {/* Logo */}
+        <div className="shrink-0 overflow-visible">
+          <img
+            src={isDark ? LogoFondNegro : LogoDerecho}
+            alt="Logo Derecho"
+            className="h-8 sm:h-10 w-auto min-w-[60px] object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
+            onClick={() => navigate('/home')}
+            onError={(e) => {
+              console.error('Error loading logo:', isDark ? LogoFondNegro : LogoDerecho);
+              const target = e.target as HTMLImageElement;
+              target.style.display = 'none';
+            }}
+          />
+        </div>
       </div>
     </header>
   );
