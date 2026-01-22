@@ -128,6 +128,19 @@ export const reporteService = {
     downloadBlob(response.data, `casos_${estatus}.xlsx`);
   },
 
+  downloadReporteAuditoria: async (inicio: string, fin: string) => {
+    try {
+      const response = await api.get('/reportes/auditoria', {
+        params: { inicio, fin },
+        responseType: 'blob'
+      });
+      downloadBlob(response.data, `auditoria_sistema_${inicio}_al_${fin}.xlsx`);
+    } catch (error) {
+      console.error('Error downloading audit report:', error);
+      throw error;
+    }
+  },
+
   downloadResumenSemestral: async (semestre: string, tipoCaso: number) => {
     const response = await api.get('/reportes/resumen', {
       params: { semestre, tipoCaso },
