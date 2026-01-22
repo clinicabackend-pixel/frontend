@@ -38,7 +38,7 @@ export default function Reportes() {
 
     const [resumenSemestre, setResumenSemestre] = useState('');
     const [resumenTipo, setResumenTipo] = useState<number>(0); // 0 = Select...
-    const [cedulaSocioeconomico, setCedulaSocioeconomico] = useState('');
+
 
     // Estados de carga
     const [loading, setLoading] = useState<{ [key: string]: boolean }>({});

@@ -83,7 +83,7 @@ function Home() {
       const puedeVerTodosLosCasos = user?.tipo === 'COORDINADOR' || user?.tipo === 'ADMINISTRADOR' || user?.tipo === 'PROFESOR';
       const currentUsername = user?.username || username;
       const userFilter = (currentUsername && !puedeVerTodosLosCasos) ? currentUsername : undefined;
-      
+
       if (!currentUsername && !puedeVerTodosLosCasos) {
         setLoadingStats(false);
         return;
@@ -95,14 +95,14 @@ function Home() {
         // Si es Coordinador/Administrador/Profesor, no pasar userFilter para ver todos los casos
         // Si es Alumno/Estudiante, pasar userFilter para ver solo sus casos asignados
         const todosCasos = await casoService.getAll(undefined, userFilter, undefined);
-        
+
         // Casos activos (estatus = 'ABIERTO')
         const activos = todosCasos.filter(caso => caso.estatus === 'ABIERTO');
         setCasosActivos(activos.length);
 
         // Pendientes revisión (estatus = 'EN TRÁMITE' o casos sin acciones recientes)
         // Por ahora usaremos 'EN TRÁMITE' como pendientes de revisión
-        const pendientes = todosCasos.filter(caso => 
+        const pendientes = todosCasos.filter(caso =>
           caso.estatus === 'EN TRÁMITE' || caso.estatus === 'EN PAUSA'
         );
         setPendientesRevision(pendientes.length);
@@ -113,7 +113,7 @@ function Home() {
         const cerrados = todosCasos.filter(caso => {
           if (caso.estatus !== 'CERRADO') return false;
           if (!caso.fechaRecepcion) return false;
-          
+
           // Si el caso tiene fecha de cierre, usar esa, sino usar fecha de recepción como aproximación
           const fechaCaso = new Date(caso.fechaRecepcion);
           return fechaCaso >= inicioMes && fechaCaso <= ahora;
@@ -176,8 +176,8 @@ function Home() {
         // Función auxiliar para comparar fechas por día (ignorando horas)
         const esMismoDia = (fecha1: Date, fecha2: Date): boolean => {
           return fecha1.getFullYear() === fecha2.getFullYear() &&
-                 fecha1.getMonth() === fecha2.getMonth() &&
-                 fecha1.getDate() === fecha2.getDate();
+            fecha1.getMonth() === fecha2.getMonth() &&
+            fecha1.getDate() === fecha2.getDate();
         };
 
         // Función para verificar si una fecha está en el rango de los próximos 7 días
@@ -191,7 +191,7 @@ function Home() {
 
         for (let i = 0; i < casosAProcesar.length; i += tamanoLote) {
           const lote = casosAProcesar.slice(i, i + tamanoLote);
-          
+
           const promesas = lote.map(async (caso) => {
             try {
               const casoDetalle = await casoService.getById(caso.numCaso);
@@ -200,7 +200,7 @@ function Home() {
               return [];
             }
           });
-          
+
           const resultados = await Promise.all(promesas);
           resultados.forEach((encuentros) => {
             // Procesar encuentros: contar fechaAtencion y fechaProxima si están en los próximos 7 días
@@ -208,7 +208,7 @@ function Home() {
               // Función helper para procesar una fecha
               const procesarFecha = (fechaString: string) => {
                 if (!fechaString) return;
-                
+
                 let fechaEncuentro: Date | null = null;
                 const partes = fechaString.split('-');
                 if (partes.length === 3) {
@@ -219,24 +219,24 @@ function Home() {
                 } else {
                   fechaEncuentro = new Date(fechaString);
                 }
-                
+
                 if (fechaEncuentro && !isNaN(fechaEncuentro.getTime()) && estaEnRango(fechaEncuentro)) {
                   // Buscar el día correspondiente en la semana
-                  const indiceDia = citasPorDia.findIndex(item => 
+                  const indiceDia = citasPorDia.findIndex(item =>
                     esMismoDia(item.fecha, fechaEncuentro!)
                   );
-                  
+
                   if (indiceDia >= 0) {
                     citasPorDia[indiceDia].count++;
                   }
                 }
               };
-              
+
               // Contar fechaAtencion si está en los próximos 7 días
               if (encuentro.fechaAtencion) {
                 procesarFecha(encuentro.fechaAtencion);
               }
-              
+
               // Contar fechaProxima si está en los próximos 7 días (citas programadas)
               if (encuentro.fechaProxima) {
                 procesarFecha(encuentro.fechaProxima);
@@ -278,7 +278,7 @@ function Home() {
 
         // Obtener todos los casos del usuario
         const todosCasos = await casoService.getAll(undefined, userFilter, undefined);
-        
+
         // Obtener acciones pendientes de todos los casos
         const acciones: Array<{
           idAccion: number;
@@ -288,22 +288,22 @@ function Home() {
           fechaRegistro: string;
           nombreSolicitante?: string;
         }> = [];
-        
+
         // Procesar casos en lotes para mejorar rendimiento
         const tamanoLote = 20;
         const casosAProcesar = todosCasos.slice(0, 50); // Limitar a 50 casos para mejor rendimiento
-        
+
         for (let i = 0; i < casosAProcesar.length; i += tamanoLote) {
           const lote = casosAProcesar.slice(i, i + tamanoLote);
-          
+
           const promesas = lote.map(async (caso) => {
             try {
               const casoDetalle = await casoService.getById(caso.numCaso);
               // Filtrar solo acciones pendientes (sin fechaEjecucion o fechaEjecucion vacía)
-              const accionesPendientes = (casoDetalle.acciones || []).filter((accion: any) => 
+              const accionesPendientes = (casoDetalle.acciones || []).filter((accion: any) =>
                 !accion.fechaEjecucion || accion.fechaEjecucion.trim() === ''
               );
-              
+
               return accionesPendientes.map((accion: any) => ({
                 idAccion: accion.idAccion,
                 numCaso: caso.numCaso,
@@ -317,20 +317,20 @@ function Home() {
               return [];
             }
           });
-          
+
           const resultados = await Promise.all(promesas);
           resultados.forEach(accionesCaso => {
             acciones.push(...accionesCaso);
           });
         }
-        
+
         // Ordenar por fecha de registro (más recientes primero) y limitar a 4
         acciones.sort((a, b) => {
           const fechaA = new Date(a.fechaRegistro);
           const fechaB = new Date(b.fechaRegistro);
           return fechaB.getTime() - fechaA.getTime();
         });
-        
+
         setAccionesPendientes(acciones.slice(0, 4)); // Solo mostrar las 4 más recientes
       } catch (error) {
         console.error('Error cargando acciones pendientes:', error);
@@ -406,53 +406,47 @@ function Home() {
         <div className={`${isDark ? 'bg-gray-800 border-gray-700/50' : 'bg-white border-gray-100'} p-6 rounded-xl shadow-sm border flex flex-col justify-between`}>
           <h3 className={`text-lg font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-800'}`}>Accesos Rápidos</h3>
           <div className="space-y-2">
-            <button 
-              onClick={() => navigate('/solicitantes?mode=create')} 
-              className={`w-full flex items-center gap-3 p-3 text-left rounded-lg transition-all duration-200 group ${
-                isDark 
-                  ? 'hover:bg-red-900/50 text-white border border-transparent hover:border-red-900/50' 
-                  : 'hover:bg-red-50 text-gray-700 hover:text-red-900 border border-transparent hover:border-red-100'
-              }`}
+            <button
+              onClick={() => navigate('/solicitantes?mode=create')}
+              className={`w-full flex items-center gap-3 p-3 text-left rounded-lg transition-all duration-200 group ${isDark
+                ? 'hover:bg-red-900/50 text-white border border-transparent hover:border-red-900/50'
+                : 'hover:bg-red-50 text-gray-700 hover:text-red-900 border border-transparent hover:border-red-100'
+                }`}
             >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
-                isDark 
-                  ? 'bg-red-900/70 group-hover:bg-red-900 text-white group-hover:scale-110' 
-                  : 'bg-red-100 group-hover:bg-red-200 text-red-900 group-hover:scale-110'
-              }`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${isDark
+                ? 'bg-red-900/70 group-hover:bg-red-900 text-white group-hover:scale-110'
+                : 'bg-red-100 group-hover:bg-red-200 text-red-900 group-hover:scale-110'
+                }`}>
                 <FontAwesomeIcon icon={faUserPlus} className="text-base" />
               </div>
               <span className="font-medium text-sm">Registrar Solicitante</span>
             </button>
-            <button 
-              onClick={() => navigate('/casos')} 
-              className={`w-full flex items-center gap-3 p-3 text-left rounded-lg transition-all duration-200 group ${
-                isDark 
-                  ? 'hover:bg-red-900/50 text-white border border-transparent hover:border-red-900/50' 
-                  : 'hover:bg-red-50 text-gray-700 hover:text-red-900 border border-transparent hover:border-red-100'
-              }`}
+            <button
+              onClick={() => navigate('/casos')}
+              className={`w-full flex items-center gap-3 p-3 text-left rounded-lg transition-all duration-200 group ${isDark
+                ? 'hover:bg-red-900/50 text-white border border-transparent hover:border-red-900/50'
+                : 'hover:bg-red-50 text-gray-700 hover:text-red-900 border border-transparent hover:border-red-100'
+                }`}
             >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
-                isDark 
-                  ? 'bg-red-900/70 group-hover:bg-red-900 text-white group-hover:scale-110' 
-                  : 'bg-red-100 group-hover:bg-red-200 text-red-900 group-hover:scale-110'
-              }`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${isDark
+                ? 'bg-red-900/70 group-hover:bg-red-900 text-white group-hover:scale-110'
+                : 'bg-red-100 group-hover:bg-red-200 text-red-900 group-hover:scale-110'
+                }`}>
                 <FontAwesomeIcon icon={faSearch} className="text-base" />
               </div>
               <span className="font-medium text-sm">Buscar Caso</span>
             </button>
-            <button 
-              onClick={() => navigate('/agenda')} 
-              className={`w-full flex items-center gap-3 p-3 text-left rounded-lg transition-all duration-200 group ${
-                isDark 
-                  ? 'hover:bg-red-900/50 text-white border border-transparent hover:border-red-900/50' 
-                  : 'hover:bg-red-50 text-gray-700 hover:text-red-900 border border-transparent hover:border-red-100'
-              }`}
+            <button
+              onClick={() => navigate('/agenda')}
+              className={`w-full flex items-center gap-3 p-3 text-left rounded-lg transition-all duration-200 group ${isDark
+                ? 'hover:bg-red-900/50 text-white border border-transparent hover:border-red-900/50'
+                : 'hover:bg-red-50 text-gray-700 hover:text-red-900 border border-transparent hover:border-red-100'
+                }`}
             >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
-                isDark 
-                  ? 'bg-red-900/70 group-hover:bg-red-900 text-white group-hover:scale-110' 
-                  : 'bg-red-100 group-hover:bg-red-200 text-red-900 group-hover:scale-110'
-              }`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${isDark
+                ? 'bg-red-900/70 group-hover:bg-red-900 text-white group-hover:scale-110'
+                : 'bg-red-100 group-hover:bg-red-200 text-red-900 group-hover:scale-110'
+                }`}>
                 <FontAwesomeIcon icon={faCalendarAlt} className="text-base" />
               </div>
               <span className="font-medium text-sm">Ver Agenda</span>
@@ -489,11 +483,8 @@ function Home() {
                 };
 
                 const fechaRegistro = parseLocalDate(accion.fechaRegistro);
-                const fechaFormateada = fechaRegistro.toLocaleDateString('es-ES', {
-                  weekday: 'long',
-                  day: 'numeric',
-                  month: 'long'
-                });
+
+
                 const fechaCorta = fechaRegistro.toLocaleDateString('es-ES', {
                   day: 'numeric',
                   month: 'short'
@@ -559,54 +550,53 @@ function Home() {
                   const { fecha, count } = item;
                   const maxCitas = Math.max(...citasSemana.map(c => c.count), 1);
                   const height = maxCitas > 0 ? (count / maxCitas) * 100 : 0;
-                  
+
                   // Formatear fecha: día y mes
                   const diaDelMes = fecha.getDate();
                   const mes = fecha.toLocaleDateString('es-ES', { month: 'short' });
-                  const fechaCompleta = fecha.toLocaleDateString('es-ES', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
+                  const fechaCompleta = fecha.toLocaleDateString('es-ES', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
                   });
-                  
+
                   // Detectar si es hoy
                   const ahora = new Date();
                   ahora.setHours(0, 0, 0, 0);
                   const esHoy = fecha.toDateString() === ahora.toDateString();
-                  
+
                   // Determinar si es el día con más citas
                   const esMaximo = count === maxCitas && count > 0;
-                  
+
                   return (
                     <div key={i} className="flex flex-col items-center gap-2 w-full group cursor-pointer">
                       {/* Número de citas encima de la barra */}
                       <div className={`text-xs font-semibold ${count > 0 ? (isDark ? 'text-white' : 'text-gray-900') : (isDark ? 'text-gray-600' : 'text-gray-400')}`}>
                         {count}
                       </div>
-                      
+
                       {/* Contenedor de la barra */}
                       <div className={`relative w-full ${isDark ? 'bg-gray-700/30' : 'bg-gray-100'} rounded-t-lg overflow-hidden h-40 flex items-end`}>
                         <div
-                          style={{ 
-                            height: `${height}%`, 
-                            minHeight: count > 0 ? '20px' : '0' 
+                          style={{
+                            height: `${height}%`,
+                            minHeight: count > 0 ? '20px' : '0'
                           }}
-                          className={`w-full rounded-t-lg transition-all duration-300 ${
-                            count > 0
-                              ? esMaximo
-                                ? esHoy
-                                  ? isDark ? 'bg-red-500' : 'bg-red-700'
-                                  : isDark ? 'bg-red-600' : 'bg-red-800'
-                                : esHoy
-                                  ? isDark ? 'bg-red-700/80' : 'bg-red-600'
-                                  : isDark ? 'bg-red-800/70 group-hover:bg-red-800' : 'bg-red-400 group-hover:bg-red-500'
-                              : ''
-                          }`}
+                          className={`w-full rounded-t-lg transition-all duration-300 ${count > 0
+                            ? esMaximo
+                              ? esHoy
+                                ? isDark ? 'bg-red-500' : 'bg-red-700'
+                                : isDark ? 'bg-red-600' : 'bg-red-800'
+                              : esHoy
+                                ? isDark ? 'bg-red-700/80' : 'bg-red-600'
+                                : isDark ? 'bg-red-800/70 group-hover:bg-red-800' : 'bg-red-400 group-hover:bg-red-500'
+                            : ''
+                            }`}
                           title={`${fechaCompleta}: ${count} cita${count !== 1 ? 's' : ''}`}
                         ></div>
                       </div>
-                      
+
                       {/* Etiqueta de fecha */}
                       <div className="flex flex-col items-center mt-1">
                         <span className={`text-xs font-medium ${esHoy ? (isDark ? 'font-bold text-white' : 'font-bold text-red-900') : (isDark ? 'text-white' : 'text-gray-700')}`}>

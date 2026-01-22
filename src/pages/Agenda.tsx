@@ -6,7 +6,7 @@ import casoService from '../services/casoService';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import {
-    User, Briefcase, Calendar, ArrowUpDown, ArrowUp, ArrowDown
+    Briefcase, ArrowUp, ArrowDown
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { AccionResponse } from '../types/caso';
@@ -65,23 +65,23 @@ export default function AgendaPage() {
 
             // Obtener todos los casos del usuario
             const todosCasos = await casoService.getAll(undefined, userFilter, undefined);
-            
+
             // Obtener acciones pendientes de todos los casos
             const acciones: AccionPendiente[] = [];
-            
+
             // Procesar casos en lotes para mejorar rendimiento
             const tamanoLote = 20;
             for (let i = 0; i < todosCasos.length; i += tamanoLote) {
                 const lote = todosCasos.slice(i, i + tamanoLote);
-                
+
                 const promesas = lote.map(async (caso) => {
                     try {
                         const casoDetalle = await casoService.getById(caso.numCaso);
                         // Filtrar solo acciones pendientes (sin fechaEjecucion o fechaEjecucion vacía)
-                        const accionesPendientes = (casoDetalle.acciones || []).filter((accion: AccionResponse) => 
+                        const accionesPendientes = (casoDetalle.acciones || []).filter((accion: AccionResponse) =>
                             !accion.fechaEjecucion || accion.fechaEjecucion.trim() === ''
                         );
-                        
+
                         return accionesPendientes.map((accion: AccionResponse) => ({
                             ...accion,
                             numCaso: caso.numCaso,
@@ -93,20 +93,20 @@ export default function AgendaPage() {
                         return [];
                     }
                 });
-                
+
                 const resultados = await Promise.all(promesas);
                 resultados.forEach(accionesCaso => {
                     acciones.push(...accionesCaso);
                 });
             }
-            
+
             // Ordenar por fecha de registro (más recientes primero)
             acciones.sort((a, b) => {
                 const fechaA = new Date(a.fechaRegistro);
                 const fechaB = new Date(b.fechaRegistro);
                 return fechaB.getTime() - fechaA.getTime();
             });
-            
+
             setAccionesPendientes(acciones);
         } catch (error) {
             console.error('Error fetching acciones pendientes:', error);
@@ -177,11 +177,10 @@ export default function AgendaPage() {
                     </div>
                     <button
                         onClick={toggleOrdenFecha}
-                        className={`px-4 py-2 rounded-lg border transition-colors flex items-center gap-2 text-sm font-medium ${
-                            darkMode
-                                ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
-                                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                        }`}
+                        className={`px-4 py-2 rounded-lg border transition-colors flex items-center gap-2 text-sm font-medium ${darkMode
+                            ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600'
+                            : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                            }`}
                         title={ordenFecha === 'nueva' ? 'Ordenar: Más antigua primero' : 'Ordenar: Más nueva primero'}
                     >
                         {ordenFecha === 'nueva' ? (
@@ -217,8 +216,8 @@ export default function AgendaPage() {
                             </thead>
                             <tbody className={`divide-y ${darkMode ? 'divide-gray-700 bg-gray-800' : 'divide-gray-200 bg-white'}`}>
                                 {currentItems.map((accion) => (
-                                    <tr 
-                                        key={`${accion.numCaso}-${accion.idAccion}`} 
+                                    <tr
+                                        key={`${accion.numCaso}-${accion.idAccion}`}
                                         onClick={() => navigate(`/casos/${accion.numCaso}`)}
                                         className={`transition-colors cursor-pointer ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
                                     >
@@ -278,7 +277,7 @@ export default function AgendaPage() {
                         {/* Empty State */}
                         {currentItems.length === 0 && (
                             <div className={`px-6 py-10 text-center ${darkMode ? 'text-gray-300' : 'text-gray-500'}`}>
-                                {searchText 
+                                {searchText
                                     ? 'No se encontraron acciones pendientes que coincidan con la búsqueda.'
                                     : 'No hay acciones pendientes en los casos asignados.'}
                             </div>

@@ -1,6 +1,6 @@
 import api from './api';
 
-import type { Estado, Municipio, Parroquia, AmbitoLegal, Centro, EstadoCivil, Semestre } from '../types';
+import type { Estado, Municipio, Parroquia, AmbitoLegal, Centro, Semestre } from '../types';
 
 const catalogoService = {
     getEstados: async () => {

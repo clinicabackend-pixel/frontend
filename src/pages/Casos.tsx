@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileExcel, faFilter, faPlus } from '@fortawesome/free-solid-svg-icons';
+
+import { faFilter, faPlus } from '@fortawesome/free-solid-svg-icons';
 import MainLayout from '../components/layout/MainLayout';
 import CaseCard from '../components/CaseCard';
 import CasoRow from '../components/CasoRow';
@@ -23,7 +23,7 @@ function CasosPage() {
   const isDark = theme === 'dark';
   const [casos, setCasos] = useState<CasoSummary[]>([]);
   const [loading, setLoading] = useState(true);
-  const [downloadingReport, setDownloadingReport] = useState(false);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [searchText, setSearchText] = useState('');
 

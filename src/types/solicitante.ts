@@ -34,4 +34,7 @@ export interface SolicitanteResponse {
     nombreParroquia?: string;
     nombreMunicipio?: string;
     nombreEstado?: string;
+    trabaja?: boolean;
+    nombreNivel?: string;
+    condicionTrabajo?: string;
 }

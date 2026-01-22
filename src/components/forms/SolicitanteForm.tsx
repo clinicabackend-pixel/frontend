@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { faEdit, faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '../common/Button';
-import type { SolicitanteRequest, Estado, Municipio, Parroquia, EstadoCivil, NivelEducativoResponse } from '../../types'; // Importando todo desde el index
+import type { SolicitanteRequest, Estado, Municipio, Parroquia } from '../../types'; // Importando todo desde el index
 import solicitanteService from '../../services/solicitanteService';
 import catalogoService from '../../services/catalogoService';
 import CustomSelect from '../common/CustomSelect';
@@ -51,7 +51,7 @@ export default function SolicitanteForm({
     // Calcular fechas límite para fecha de nacimiento
     const today = new Date();
     const maxDate = today.toISOString().split('T')[0]; // Fecha máxima: hoy
-    
+
     const minDateObj = new Date(today);
     minDateObj.setFullYear(today.getFullYear() - 100); // 100 años atrás
     const minDate = minDateObj.toISOString().split('T')[0]; // Fecha mínima: 100 años atrás
@@ -244,7 +244,7 @@ export default function SolicitanteForm({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         // Validar email antes de enviar
         if (formData.email && !validateEmail(formData.email)) {
             showConfirmationModal(false, 'Por favor, ingrese un correo electrónico válido (ejemplo: usuario@dominio.com)');
@@ -256,7 +256,7 @@ export default function SolicitanteForm({
             const fechaNac = new Date(formData.fechaNacimiento);
             const hoy = new Date();
             hoy.setHours(0, 0, 0, 0);
-            
+
             const fechaMin = new Date(hoy);
             fechaMin.setFullYear(hoy.getFullYear() - 100);
             fechaMin.setHours(0, 0, 0, 0);
@@ -265,7 +265,7 @@ export default function SolicitanteForm({
                 showConfirmationModal(false, 'La fecha de nacimiento no puede ser posterior a la fecha actual');
                 return;
             }
-            
+
             if (fechaNac < fechaMin) {
                 showConfirmationModal(false, 'La fecha de nacimiento no puede ser anterior a 100 años desde la fecha actual');
                 return;
@@ -331,380 +331,377 @@ export default function SolicitanteForm({
 
     return (
         <>
-        <form onSubmit={handleSubmit} className={isModal ? "p-6 md:p-8" : "bg-white rounded-lg shadow-lg p-6 md:p-8 relative"}>
-            {/* Datos personales */}
-            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-                <h2 className="text-2xl font-bold text-red-900">
-                    {/* Título dinámico: Nuevo solo si modo create O no hay data existente (data vacía) */}
-                    {(formMode === 'create' || (!initialData?.cedula && !initialData?.nombre)) ? 'Nuevo Solicitante' : 'Datos del Solicitante'}
-                </h2>
+            <form onSubmit={handleSubmit} className={isModal ? "p-6 md:p-8" : "bg-white rounded-lg shadow-lg p-6 md:p-8 relative"}>
+                {/* Datos personales */}
+                <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+                    <h2 className="text-2xl font-bold text-red-900">
+                        {/* Título dinámico: Nuevo solo si modo create O no hay data existente (data vacía) */}
+                        {(formMode === 'create' || (!initialData?.cedula && !initialData?.nombre)) ? 'Nuevo Solicitante' : 'Datos del Solicitante'}
+                    </h2>
 
-                {formMode !== 'create' && !isEditing && initialData && (
-                    <Button
-                        type="button"
-                        onClick={() => setIsEditing(true)}
-                        variant="secondary"
-                        icon={faEdit}
-                    >
-                        Editar
-                    </Button>
-                )}
+                    {formMode !== 'create' && !isEditing && initialData && (
+                        <Button
+                            type="button"
+                            onClick={() => setIsEditing(true)}
+                            variant="secondary"
+                            icon={faEdit}
+                        >
+                            Editar
+                        </Button>
+                    )}
 
-                {onCancel && isModal && (
-                    <div className="-mr-2">
-                        {/* Close button for modal usually handled by modal header, but if we need generic close inside form: */}
-                        {/* Using ghost variants or just keeping it simple */}
-                    </div>
-                )}
-            </div>
+                    {onCancel && isModal && (
+                        <div className="-mr-2">
+                            {/* Close button for modal usually handled by modal header, but if we need generic close inside form: */}
+                            {/* Using ghost variants or just keeping it simple */}
+                        </div>
+                    )}
+                </div>
 
-            <section className="mb-8">
-                <h2 className="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Identificación</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* C.I */}
-                    <div>
-                        <label className="block text-sm font-semibold mb-2">
-                            C.I <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            name="cedula"
-                            value={formData.cedula}
-                            onChange={handleInputChange}
-                            placeholder="Ej: 12345678"
-                            maxLength={8}
-                            pattern="\d+"
-                            title="Ingrese solo números"
-                            disabled={!isEditing || ((!!initialData?.cedula && formMode !== 'create') && !allowEditCedula)}
-                            className={`w-full px-4 h-11 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-transparent ${(!isEditing || ((!!initialData?.cedula && formMode !== 'create') && !allowEditCedula)) ? 'bg-gray-100 cursor-not-allowed opacity-70' : ''}`}
-                            required
-                        />
-                    </div>
+                <section className="mb-8">
+                    <h2 className="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Identificación</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* C.I */}
+                        <div>
+                            <label className="block text-sm font-semibold mb-2">
+                                C.I <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                name="cedula"
+                                value={formData.cedula}
+                                onChange={handleInputChange}
+                                placeholder="Ej: 12345678"
+                                maxLength={8}
+                                pattern="\d+"
+                                title="Ingrese solo números"
+                                disabled={!isEditing || ((!!initialData?.cedula && formMode !== 'create') && !allowEditCedula)}
+                                className={`w-full px-4 h-11 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-transparent ${(!isEditing || ((!!initialData?.cedula && formMode !== 'create') && !allowEditCedula)) ? 'bg-gray-100 cursor-not-allowed opacity-70' : ''}`}
+                                required
+                            />
+                        </div>
 
-                    {/* Nombres y apellidos */}
-                    <div>
-                        <label className="block text-sm font-semibold mb-2">
-                            Nombres y apellidos <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            name="nombre"
-                            value={formData.nombre}
-                            onChange={handleInputChange}
-                            disabled={!isEditing}
-                            className={`w-full px-4 h-11 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-transparent ${!isEditing ? 'bg-gray-100 cursor-not-allowed opacity-70' : ''}`}
-                            required
-                        />
-                    </div>
+                        {/* Nombres y apellidos */}
+                        <div>
+                            <label className="block text-sm font-semibold mb-2">
+                                Nombres y apellidos <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                name="nombre"
+                                value={formData.nombre}
+                                onChange={handleInputChange}
+                                disabled={!isEditing}
+                                className={`w-full px-4 h-11 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-transparent ${!isEditing ? 'bg-gray-100 cursor-not-allowed opacity-70' : ''}`}
+                                required
+                            />
+                        </div>
 
 
 
-                    {/* Sexo */}
-                    <div>
-                        <CustomSelect
-                            label="Sexo"
-                            value={formData.sexo}
-                            options={[
-                                { value: 'Masculino', label: 'Masculino' },
-                                { value: 'Femenino', label: 'Femenino' }
-                            ]}
-                            onChange={(val) => setFormData(prev => ({ ...prev, sexo: String(val) }))}
-                            required
-                            disabled={!isEditing}
-                        />
-                    </div>
-
-                    {/* Estado civil */}
-                    <div>
-                        {/* Estado civil */}
+                        {/* Sexo */}
                         <div>
                             <CustomSelect
-                                label="Estado civil"
-                                value={formData.estadoCivil || ''}
-                                options={ESTADO_CIVIL_OPTIONS}
-                                onChange={(val) => setFormData(prev => ({ ...prev, estadoCivil: String(val) }))}
-                                required={isStrict}
-                                disabled={!isEditing}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Fecha nacimiento */}
-                    <div>
-                        <CustomDatePicker
-                            label={<span>Fecha nacimiento {isStrict && <span className="text-red-500">*</span>}</span>}
-                            value={formData.fechaNacimiento}
-                            onChange={(val) => setFormData(prev => ({ ...prev, fechaNacimiento: val }))}
-                            min={minDate}
-                            max={maxDate}
-                            required={isStrict}
-                            disabled={!isEditing}
-                        />
-                    </div>
-
-                    {/* Concubinato */}
-                    <div>
-                        <CustomSelect
-                            label="¿Vive en concubinato?"
-                            value={formData.concubinato ? 'Si' : 'No'}
-                            options={[
-                                { value: 'Si', label: 'Sí' },
-                                { value: 'No', label: 'No' },
-                            ]}
-                            onChange={(val) => setFormData(prev => ({ ...prev, concubinato: val === 'Si' }))}
-                            disabled={!isEditing}
-                        />
-                    </div>
-
-                    {/* Nacionalidad */}
-                    <div>
-                        <CustomSelect
-                            label={<span>Nacionalidad {isStrict && <span className="text-red-500">*</span>}</span>}
-                            value={formData.nacionalidad}
-                            options={[
-                                { value: 'Venezolano', label: 'Venezolano' },
-                                { value: 'Extranjero', label: 'Extranjero' }
-                            ]}
-                            onChange={(val) => setFormData(prev => ({ ...prev, nacionalidad: String(val) }))}
-                            required={isStrict}
-                            disabled={!isEditing}
-                        />
-                    </div>
-
-
-
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                    {/* Nivel Educativo */}
-                    <div>
-                        <CustomSelect
-                            label="Nivel Educativo (Opcional)"
-                            value={formData.nivelEducativo || ''}
-                            options={NIVEL_EDUCATIVO_OPTIONS}
-                            onChange={(val) => setFormData(prev => ({ ...prev, nivelEducativo: String(val) }))}
-                            disabled={!isEditing}
-                        />
-                    </div>
-                </div>
-            </section>
-
-            {/* Datos de contacto y residencia */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                {/* Datos de contacto */}
-                <section>
-                    <h2 className="text-lg font-semibold text-red-900 border-b border-red-100 pb-2 mb-4">Datos de contacto</h2>
-                    <div className="space-y-3">
-                        <div>
-                            <CustomInput
-                                label="Teléfono local"
-                                type="tel"
-                                name="telfCasa"
-                                value={formData.telfCasa}
-                                onChange={handleInputChange}
-                                disabled={!isEditing}
-                            />
-                        </div>
-
-                        <div>
-                            <CustomInput
-                                label={<span>Teléfono Personal {isStrict && <span className="text-red-500">*</span>}</span>}
-                                type="tel"
-                                name="telfCelular"
-                                value={formData.telfCelular}
-                                onChange={handleInputChange}
-                                required={isStrict}
-                                disabled={!isEditing}
-                            />
-                        </div>
-
-                        <div>
-                            <CustomInput
-                                label="Correo electrónico"
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
-                                title="Ingrese un correo electrónico válido (ejemplo: usuario@dominio.com)"
+                                label="Sexo"
+                                value={formData.sexo}
+                                options={[
+                                    { value: 'Masculino', label: 'Masculino' },
+                                    { value: 'Femenino', label: 'Femenino' }
+                                ]}
+                                onChange={(val) => setFormData(prev => ({ ...prev, sexo: String(val) }))}
                                 required
                                 disabled={!isEditing}
                             />
                         </div>
+
+                        {/* Estado civil */}
+                        <div>
+                            {/* Estado civil */}
+                            <div>
+                                <CustomSelect
+                                    label="Estado civil"
+                                    value={formData.estadoCivil || ''}
+                                    options={ESTADO_CIVIL_OPTIONS}
+                                    onChange={(val) => setFormData(prev => ({ ...prev, estadoCivil: String(val) }))}
+                                    required={isStrict}
+                                    disabled={!isEditing}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Fecha nacimiento */}
+                        <div>
+                            <CustomDatePicker
+                                label={<span>Fecha nacimiento {isStrict && <span className="text-red-500">*</span>}</span>}
+                                value={formData.fechaNacimiento}
+                                onChange={(val) => setFormData(prev => ({ ...prev, fechaNacimiento: val }))}
+                                min={minDate}
+                                max={maxDate}
+                                required={isStrict}
+                                disabled={!isEditing}
+                            />
+                        </div>
+
+                        {/* Concubinato */}
+                        <div>
+                            <CustomSelect
+                                label="¿Vive en concubinato?"
+                                value={formData.concubinato ? 'Si' : 'No'}
+                                options={[
+                                    { value: 'Si', label: 'Sí' },
+                                    { value: 'No', label: 'No' },
+                                ]}
+                                onChange={(val) => setFormData(prev => ({ ...prev, concubinato: val === 'Si' }))}
+                                disabled={!isEditing}
+                            />
+                        </div>
+
+                        {/* Nacionalidad */}
+                        <div>
+                            <CustomSelect
+                                label={<span>Nacionalidad {isStrict && <span className="text-red-500">*</span>}</span>}
+                                value={formData.nacionalidad}
+                                options={[
+                                    { value: 'Venezolano', label: 'Venezolano' },
+                                    { value: 'Extranjero', label: 'Extranjero' }
+                                ]}
+                                onChange={(val) => setFormData(prev => ({ ...prev, nacionalidad: String(val) }))}
+                                required={isStrict}
+                                disabled={!isEditing}
+                            />
+                        </div>
+
+
+
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        {/* Nivel Educativo */}
+                        <div>
+                            <CustomSelect
+                                label="Nivel Educativo (Opcional)"
+                                value={formData.nivelEducativo || ''}
+                                options={NIVEL_EDUCATIVO_OPTIONS}
+                                onChange={(val) => setFormData(prev => ({ ...prev, nivelEducativo: String(val) }))}
+                                disabled={!isEditing}
+                            />
+                        </div>
                     </div>
                 </section>
 
-                {/* Datos de residencia */}
-                <section>
-                    <h2 className="text-lg font-semibold text-red-900 border-b border-red-100 pb-2 mb-4">Datos de residencia</h2>
-                    <div className="space-y-3">
-
-                        {/* Selectores de Ubicación en Cascada */}
-                        <div className="grid grid-cols-1 gap-3">
-                            <div>
-                                <CustomSelect
-                                    label={<span>Estado {isStrict && <span className="text-red-500">*</span>}</span>}
-                                    value={selectedEstado || ''}
-                                    options={estados.map(e => ({ value: e.idEstado, label: e.nombreEstado }))}
-                                    onChange={(val) => handleEstadoChange(Number(val))}
-                                    required={isStrict}
-                                    disabled={!isEditing}
-                                />
-                            </div>
-
-                            <div>
-                                <CustomSelect
-                                    label={<span>Municipio {isStrict && <span className="text-red-500">*</span>}</span>}
-                                    value={selectedMunicipio || ''}
-                                    options={filteredMunicipios.map(m => ({ value: m.idMunicipio, label: m.nombreMunicipio }))}
-                                    onChange={(val) => handleMunicipioChange(Number(val))}
-                                    disabled={!isEditing}
-                                    required={isStrict}
-                                />
-                            </div>
-
-                            <div>
-                                <CustomSelect
-                                    label={<span>Parroquia {isStrict && <span className="text-red-500">*</span>}</span>}
-                                    value={selectedParroquia || ''}
-                                    options={filteredParroquias.map(p => ({ value: p.idParroquia, label: p.nombreParroquia }))}
-                                    onChange={(val) => handleParroquiaChange(Number(val))}
-                                    disabled={!isEditing}
-                                    required={isStrict}
-                                />
-                            </div>
-                        </div>
-
-                    </div>
-                </section>
-            </div>
-
-            {/* Botón de enviar */}
-            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-                {onCancel && (
-                    <Button
-                        type="button"
-                        onClick={onCancel}
-                        variant="secondary"
-                        icon={faTimes}
-                    >
-                        {isEditing ? 'Cancelar' : 'Cerrar'}
-                    </Button>
-                )}
-
-                {isEditing && (
-                    <Button
-                        type="submit"
-                        disabled={saving}
-                        isLoading={saving}
-                        variant="primary"
-                        icon={faSave}
-                    >
-                        Guardar
-                    </Button>
-                )}
-            </div>
-
-            {/* DUPLICATE USER MODAL */}
-            {duplicateError && createPortal(
-                <div className="fixed inset-0 z-9999 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 animate-slide-up-modal">
-                        <div className="flex justify-between items-start mb-4">
-                            <h3 className="text-xl font-bold text-red-900 flex items-center gap-2">
-                                <span className="p-2 bg-red-100 rounded-full">
-                                    <FontAwesomeIcon icon={faTimes} className="text-red-600" />
-                                </span>
-                                Usuario ya registrado
-                            </h3>
-                            <button onClick={() => setDuplicateError(null)} className="text-gray-400 hover:text-gray-600">
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                            </button>
-                        </div>
-
-                        <div className="bg-orange-50 border-l-4 border-orange-500 p-4 mb-4">
-                            <p className="text-orange-700">
-                                La cédula <strong>{duplicateError.cedula}</strong> ya se encuentra registrada en el sistema.
-                            </p>
-                        </div>
-
+                {/* Datos de contacto y residencia */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    {/* Datos de contacto */}
+                    <section>
+                        <h2 className="text-lg font-semibold text-red-900 border-b border-red-100 pb-2 mb-4">Datos de contacto</h2>
                         <div className="space-y-3">
-                            <p className="text-sm text-gray-600">Pertenece a:</p>
-                            <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-800 font-bold shrink-0">
-                                    {(duplicateError.nombre || '?').charAt(0).toUpperCase()}
-                                </div>
-                                <div>
-                                    <p className="font-bold text-gray-900">{duplicateError.nombre} {duplicateError.apellido || ''}</p>
-                                    <p className="text-xs text-gray-500">{duplicateError.email || 'Sin correo'}</p>
-                                </div>
+                            <div>
+                                <CustomInput
+                                    label="Teléfono local"
+                                    type="tel"
+                                    name="telfCasa"
+                                    value={formData.telfCasa}
+                                    onChange={handleInputChange}
+                                    disabled={!isEditing}
+                                />
+                            </div>
+
+                            <div>
+                                <CustomInput
+                                    label={<span>Teléfono Personal {isStrict && <span className="text-red-500">*</span>}</span>}
+                                    type="tel"
+                                    name="telfCelular"
+                                    value={formData.telfCelular}
+                                    onChange={handleInputChange}
+                                    required={isStrict}
+                                    disabled={!isEditing}
+                                />
+                            </div>
+
+                            <div>
+                                <CustomInput
+                                    label="Correo electrónico"
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+                                    title="Ingrese un correo electrónico válido (ejemplo: usuario@dominio.com)"
+                                    required
+                                    disabled={!isEditing}
+                                />
                             </div>
                         </div>
+                    </section>
 
-                        <div className="mt-6 flex justify-end">
-                            <Button
-                                onClick={() => setDuplicateError(null)}
-                                variant="secondary"
-                            >
-                                Cerrar
-                            </Button>
+                    {/* Datos de residencia */}
+                    <section>
+                        <h2 className="text-lg font-semibold text-red-900 border-b border-red-100 pb-2 mb-4">Datos de residencia</h2>
+                        <div className="space-y-3">
+
+                            {/* Selectores de Ubicación en Cascada */}
+                            <div className="grid grid-cols-1 gap-3">
+                                <div>
+                                    <CustomSelect
+                                        label={<span>Estado {isStrict && <span className="text-red-500">*</span>}</span>}
+                                        value={selectedEstado || ''}
+                                        options={estados.map(e => ({ value: e.idEstado, label: e.nombreEstado }))}
+                                        onChange={(val) => handleEstadoChange(Number(val))}
+                                        required={isStrict}
+                                        disabled={!isEditing}
+                                    />
+                                </div>
+
+                                <div>
+                                    <CustomSelect
+                                        label={<span>Municipio {isStrict && <span className="text-red-500">*</span>}</span>}
+                                        value={selectedMunicipio || ''}
+                                        options={filteredMunicipios.map(m => ({ value: m.idMunicipio, label: m.nombreMunicipio }))}
+                                        onChange={(val) => handleMunicipioChange(Number(val))}
+                                        disabled={!isEditing}
+                                        required={isStrict}
+                                    />
+                                </div>
+
+                                <div>
+                                    <CustomSelect
+                                        label={<span>Parroquia {isStrict && <span className="text-red-500">*</span>}</span>}
+                                        value={selectedParroquia || ''}
+                                        options={filteredParroquias.map(p => ({ value: p.idParroquia, label: p.nombreParroquia }))}
+                                        onChange={(val) => handleParroquiaChange(Number(val))}
+                                        disabled={!isEditing}
+                                        required={isStrict}
+                                    />
+                                </div>
+                            </div>
+
+                        </div>
+                    </section>
+                </div>
+
+                {/* Botón de enviar */}
+                <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                    {onCancel && (
+                        <Button
+                            type="button"
+                            onClick={onCancel}
+                            variant="secondary"
+                            icon={faTimes}
+                        >
+                            {isEditing ? 'Cancelar' : 'Cerrar'}
+                        </Button>
+                    )}
+
+                    {isEditing && (
+                        <Button
+                            type="submit"
+                            disabled={saving}
+                            isLoading={saving}
+                            variant="primary"
+                            icon={faSave}
+                        >
+                            Guardar
+                        </Button>
+                    )}
+                </div>
+
+                {/* DUPLICATE USER MODAL */}
+                {duplicateError && createPortal(
+                    <div className="fixed inset-0 z-9999 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+                        <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 animate-slide-up-modal">
+                            <div className="flex justify-between items-start mb-4">
+                                <h3 className="text-xl font-bold text-red-900 flex items-center gap-2">
+                                    <span className="p-2 bg-red-100 rounded-full">
+                                        <FontAwesomeIcon icon={faTimes} className="text-red-600" />
+                                    </span>
+                                    Usuario ya registrado
+                                </h3>
+                                <button onClick={() => setDuplicateError(null)} className="text-gray-400 hover:text-gray-600">
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                                </button>
+                            </div>
+
+                            <div className="bg-orange-50 border-l-4 border-orange-500 p-4 mb-4">
+                                <p className="text-orange-700">
+                                    La cédula <strong>{duplicateError.cedula}</strong> ya se encuentra registrada en el sistema.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <p className="text-sm text-gray-600">Pertenece a:</p>
+                                <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                    <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-800 font-bold shrink-0">
+                                        {(duplicateError.nombre || '?').charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-gray-900">{duplicateError.nombre} {duplicateError.apellido || ''}</p>
+                                        <p className="text-xs text-gray-500">{duplicateError.email || 'Sin correo'}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-6 flex justify-end">
+                                <Button
+                                    onClick={() => setDuplicateError(null)}
+                                    variant="secondary"
+                                >
+                                    Cerrar
+                                </Button>
+                            </div>
+                        </div>
+                    </div>,
+                    document.body
+                )}
+
+            </form>
+
+            {/* Modal de confirmación */}
+            {confirmationModal.isOpen && createPortal(
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+                    <div className={`relative w-full max-w-md rounded-xl shadow-2xl overflow-hidden animate-slide-up-modal ${isDark ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                        <div className={`p-6 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+                            <div className="flex flex-col items-center text-center">
+                                <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${confirmationModal.success
+                                        ? (isDark ? 'bg-green-900/30' : 'bg-green-100')
+                                        : (isDark ? 'bg-red-900/30' : 'bg-red-100')
+                                    }`}>
+                                    {confirmationModal.success ? (
+                                        <CheckCircle className={`w-10 h-10 ${isDark ? 'text-green-400' : 'text-green-600'}`} />
+                                    ) : (
+                                        <XCircle className={`w-10 h-10 ${isDark ? 'text-red-400' : 'text-red-600'}`} />
+                                    )}
+                                </div>
+                                <h3 className={`text-xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                    {confirmationModal.success ? '¡Éxito!' : 'Error'}
+                                </h3>
+                                <p className={`mb-6 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                                    {confirmationModal.message}
+                                </p>
+                                <button
+                                    onClick={() => {
+                                        closeConfirmationModal();
+                                        if (confirmationModal.success && onSuccess && confirmationModal.result) {
+                                            onSuccess(confirmationModal.result);
+                                        }
+                                    }}
+                                    className={`px-6 py-2 rounded-lg font-medium transition-colors ${confirmationModal.success
+                                            ? isDark
+                                                ? 'bg-green-900 hover:bg-green-950 text-white'
+                                                : 'bg-green-600 hover:bg-green-700 text-white'
+                                            : isDark
+                                                ? 'bg-red-900 hover:bg-red-950 text-white'
+                                                : 'bg-red-600 hover:bg-red-700 text-white'
+                                        }`}
+                                >
+                                    Aceptar
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>,
                 document.body
             )}
-
-        </form>
-        
-        {/* Modal de confirmación */}
-        {confirmationModal.isOpen && createPortal(
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-                <div className={`relative w-full max-w-md rounded-xl shadow-2xl overflow-hidden animate-slide-up-modal ${
-                    isDark ? 'bg-gray-800' : 'bg-white'
-                }`}>
-                    <div className={`p-6 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
-                        <div className="flex flex-col items-center text-center">
-                            <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
-                                confirmationModal.success 
-                                    ? (isDark ? 'bg-green-900/30' : 'bg-green-100')
-                                    : (isDark ? 'bg-red-900/30' : 'bg-red-100')
-                            }`}>
-                                {confirmationModal.success ? (
-                                    <CheckCircle className={`w-10 h-10 ${isDark ? 'text-green-400' : 'text-green-600'}`} />
-                                ) : (
-                                    <XCircle className={`w-10 h-10 ${isDark ? 'text-red-400' : 'text-red-600'}`} />
-                                )}
-                            </div>
-                            <h3 className={`text-xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                                {confirmationModal.success ? '¡Éxito!' : 'Error'}
-                            </h3>
-                            <p className={`mb-6 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                                {confirmationModal.message}
-                            </p>
-                            <button
-                                onClick={() => {
-                                    closeConfirmationModal();
-                                    if (confirmationModal.success && onSuccess && confirmationModal.result) {
-                                        onSuccess(confirmationModal.result);
-                                    }
-                                }}
-                                className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                                    confirmationModal.success
-                                        ? isDark 
-                                            ? 'bg-green-900 hover:bg-green-950 text-white'
-                                            : 'bg-green-600 hover:bg-green-700 text-white'
-                                        : isDark
-                                            ? 'bg-red-900 hover:bg-red-950 text-white'
-                                            : 'bg-red-600 hover:bg-red-700 text-white'
-                                }`}
-                            >
-                                Aceptar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>,
-            document.body
-        )}
         </>
     );
 }
