@@ -62,7 +62,7 @@ export default function CustomSelect({
     return (
         <div className="relative overflow-visible" ref={dropdownRef}>
             {label && (
-                <label className={`block text-sm font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>
+                <label className="block text-sm font-semibold mb-2 text-gray-900">
                     {label}
                 </label>
             )}

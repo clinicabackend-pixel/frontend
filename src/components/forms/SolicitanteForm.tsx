@@ -336,7 +336,7 @@ export default function SolicitanteForm({
 
     return (
         <>
-            <form onSubmit={handleSubmit} className={isModal ? "p-6 md:p-8" : "bg-white rounded-lg shadow-lg p-6 md:p-8 relative"}>
+            <form onSubmit={handleSubmit} className={`bg-white ${isModal ? "p-6 md:p-8" : "rounded-lg shadow-lg p-6 md:p-8 relative"}`}>
                 {/* Datos personales */}
                 <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
                     <h2 className="text-2xl font-bold text-red-900">
@@ -364,11 +364,11 @@ export default function SolicitanteForm({
                 </div>
 
                 <section className="mb-8">
-                    <h2 className="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Identificación</h2>
+                    <h2 className="text-xl font-semibold mb-4 text-gray-900 border-b pb-2 border-gray-300">Identificación</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* C.I */}
                         <div>
-                            <label className="block text-sm font-semibold mb-2">
+                            <label className="block text-sm font-semibold mb-2 text-gray-900">
                                 C.I <span className="text-red-500">*</span>
                             </label>
                             <input
@@ -381,14 +381,14 @@ export default function SolicitanteForm({
                                 pattern="\d+"
                                 title="Ingrese solo números"
                                 disabled={!isEditing || ((!!initialData?.cedula && formMode !== 'create') && !allowEditCedula)}
-                                className={`w-full px-4 h-11 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-transparent ${(!isEditing || ((!!initialData?.cedula && formMode !== 'create') && !allowEditCedula)) ? 'bg-gray-100 cursor-not-allowed opacity-70' : ''}`}
+                                className={`w-full px-4 h-11 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-transparent text-gray-900 placeholder-gray-500 ${(!isEditing || ((!!initialData?.cedula && formMode !== 'create') && !allowEditCedula)) ? 'bg-gray-100 cursor-not-allowed opacity-70' : ''}`}
                                 required
                             />
                         </div>
 
                         {/* Nombres y apellidos */}
                         <div>
-                            <label className="block text-sm font-semibold mb-2">
+                            <label className="block text-sm font-semibold mb-2 text-gray-900">
                                 Nombres y apellidos <span className="text-red-500">*</span>
                             </label>
                             <input
@@ -397,7 +397,7 @@ export default function SolicitanteForm({
                                 value={formData.nombre}
                                 onChange={handleInputChange}
                                 disabled={!isEditing}
-                                className={`w-full px-4 h-11 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-transparent ${!isEditing ? 'bg-gray-100 cursor-not-allowed opacity-70' : ''}`}
+                                className={`w-full px-4 h-11 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-transparent text-gray-900 ${!isEditing ? 'bg-gray-100 cursor-not-allowed opacity-70' : ''}`}
                                 required
                             />
                         </div>
@@ -519,7 +519,7 @@ export default function SolicitanteForm({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     {/* Datos de contacto */}
                     <section>
-                        <h2 className="text-lg font-semibold text-red-900 border-b border-red-100 pb-2 mb-4">Datos de contacto</h2>
+                        <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-300 pb-2 mb-4">Datos de contacto</h2>
                         <div className="space-y-3">
                             <div>
                                 <CustomInput
@@ -562,7 +562,7 @@ export default function SolicitanteForm({
 
                     {/* Datos de residencia */}
                     <section>
-                        <h2 className="text-lg font-semibold text-red-900 border-b border-red-100 pb-2 mb-4">Datos de residencia</h2>
+                        <h2 className="text-lg font-semibold text-gray-900 border-b border-gray-300 pb-2 mb-4">Datos de residencia</h2>
                         <div className="space-y-3">
 
                             {/* Selectores de Ubicación en Cascada */}

@@ -15,6 +15,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import catalogoService from '../services/catalogoService';
 import CustomSelect from '../components/common/CustomSelect';
+import CustomDatePicker from '../components/common/CustomDatePicker';
 import type { AmbitoLegal } from '../types/catalogo';
 
 export default function Reportes() {
@@ -314,27 +315,17 @@ export default function Reportes() {
                         <div className="space-y-3">
                             <div className="grid grid-cols-2 gap-2">
                                 <div>
-                                    <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Desde</label>
-                                    <input
-                                        type="date"
+                                    <CustomDatePicker
+                                        label="Desde"
                                         value={historialInicio}
-                                        onChange={(e) => setHistorialInicio(e.target.value)}
-                                        className={`w-full h-10 px-2 border rounded-md focus:ring-red-900 outline-none text-sm ${isDark
-                                            ? 'bg-gray-800/50 border-gray-700 text-white'
-                                            : 'border-gray-300'
-                                            }`}
+                                        onChange={(value) => setHistorialInicio(value)}
                                     />
                                 </div>
                                 <div>
-                                    <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Hasta</label>
-                                    <input
-                                        type="date"
+                                    <CustomDatePicker
+                                        label="Hasta"
                                         value={historialFin}
-                                        onChange={(e) => setHistorialFin(e.target.value)}
-                                        className={`w-full h-10 px-2 border rounded-md focus:ring-red-900 outline-none text-sm ${isDark
-                                            ? 'bg-gray-800/50 border-gray-700 text-white'
-                                            : 'border-gray-300'
-                                            }`}
+                                        onChange={(value) => setHistorialFin(value)}
                                     />
                                 </div>
                             </div>
@@ -508,27 +499,17 @@ export default function Reportes() {
                         >
                             <div className="grid grid-cols-2 gap-2">
                                 <div>
-                                    <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Desde</label>
-                                    <input
-                                        type="date"
+                                    <CustomDatePicker
+                                        label="Desde"
                                         value={auditoriaInicio}
-                                        onChange={(e) => setAuditoriaInicio(e.target.value)}
-                                        className={`w-full h-10 px-2 border rounded-md focus:ring-red-900 outline-none text-sm ${isDark
-                                            ? 'bg-gray-800/50 border-gray-700 text-white'
-                                            : 'border-gray-300'
-                                            }`}
+                                        onChange={(value) => setAuditoriaInicio(value)}
                                     />
                                 </div>
                                 <div>
-                                    <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Hasta</label>
-                                    <input
-                                        type="date"
+                                    <CustomDatePicker
+                                        label="Hasta"
                                         value={auditoriaFin}
-                                        onChange={(e) => setAuditoriaFin(e.target.value)}
-                                        className={`w-full h-10 px-2 border rounded-md focus:ring-red-900 outline-none text-sm ${isDark
-                                            ? 'bg-gray-800/50 border-gray-700 text-white'
-                                            : 'border-gray-300'
-                                            }`}
+                                        onChange={(value) => setAuditoriaFin(value)}
                                     />
                                 </div>
                             </div>

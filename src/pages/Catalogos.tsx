@@ -335,7 +335,8 @@ export function Catalogos() {
                     await catalogoService.updateTribunalStatus(item.id, newStatus);
                     break;
             }
-            // No recargamos los datos, ya actualizamos el estado local
+            // Recargar los datos para actualizar la cache y reflejar cambios inmediatamente
+            await fetchCatalogData();
         } catch (error) {
             console.error("Error updating status:", error);
             // Revertir el cambio optimista en caso de error

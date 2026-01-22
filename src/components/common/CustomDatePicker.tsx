@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 interface CustomDatePickerProps {
     label?: string | React.ReactNode;
@@ -22,6 +23,8 @@ export default function CustomDatePicker({
     required = false,
     disabled = false
 }: CustomDatePickerProps) {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const [isOpen, setIsOpen] = useState(false);
     const [placement, setPlacement] = useState<'bottom' | 'top'>('bottom');
     const [view, setView] = useState<CalendarView>('days');
@@ -316,7 +319,7 @@ export default function CustomDatePicker({
     return (
         <div className="relative" ref={datePickerRef}>
             {label && (
-                <label className="block text-sm font-semibold mb-2">
+                <label className={`block text-sm font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     {label}
                 </label>
             )}
