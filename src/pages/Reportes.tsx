@@ -43,6 +43,9 @@ export default function Reportes() {
     const [resumenSemestre, setResumenSemestre] = useState('');
     const [resumenTipo, setResumenTipo] = useState<number>(0); // 0 = Select...
 
+    const [auditoriaInicio, setAuditoriaInicio] = useState('');
+    const [auditoriaFin, setAuditoriaFin] = useState('');
+
 
     // Estados de carga
     const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
@@ -486,6 +489,49 @@ export default function Reportes() {
                             }}
                         >
                             <div className="h-4"></div>
+                        </ReportCard>
+                    )}
+
+                    {/* 7. Auditoría del Sistema (Sólo Coordinador/Admin) */}
+                    {(user?.tipoUsuario === 'COORDINADOR' || user?.tipoUsuario === 'ADMINISTRADOR') && (
+                        <ReportCard
+                            title="Auditoría del Sistema"
+                            description="Registro de eventos y cambios en el sistema (Log de Auditoría)."
+                            icon={faList}
+                            loading={loading['auditoria'] || false}
+                            onDownload={() => {
+                                if (!auditoriaInicio || !auditoriaFin) {
+                                    setNotification({ type: 'error', message: 'Debe indicar el rango de fechas' }); return;
+                                }
+                                handleDownload('auditoria', () => reporteService.downloadReporteAuditoria(auditoriaInicio, auditoriaFin));
+                            }}
+                        >
+                            <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Desde</label>
+                                    <input
+                                        type="date"
+                                        value={auditoriaInicio}
+                                        onChange={(e) => setAuditoriaInicio(e.target.value)}
+                                        className={`w-full h-10 px-2 border rounded-md focus:ring-red-900 outline-none text-sm ${isDark
+                                            ? 'bg-gray-800/50 border-gray-700 text-white'
+                                            : 'border-gray-300'
+                                            }`}
+                                    />
+                                </div>
+                                <div>
+                                    <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Hasta</label>
+                                    <input
+                                        type="date"
+                                        value={auditoriaFin}
+                                        onChange={(e) => setAuditoriaFin(e.target.value)}
+                                        className={`w-full h-10 px-2 border rounded-md focus:ring-red-900 outline-none text-sm ${isDark
+                                            ? 'bg-gray-800/50 border-gray-700 text-white'
+                                            : 'border-gray-300'
+                                            }`}
+                                    />
+                                </div>
+                            </div>
                         </ReportCard>
                     )}
 
