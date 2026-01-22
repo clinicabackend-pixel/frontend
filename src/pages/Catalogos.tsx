@@ -167,36 +167,42 @@ export function Catalogos() {
             switch (activeTab) {
                 case 'NIVEL_EDUCATIVO':
                     data = await catalogoService.getNivelesEducativos();
-                    setItems(data);
+                    setItems(data.sort((a, b) => (a.id || 0) - (b.id || 0)));
                     break;
                 case 'CONDICION_LABORAL':
                     data = await catalogoService.getCondicionesLaborales();
-                    setItems(data);
+                    setItems(data.sort((a, b) => (a.id || 0) - (b.id || 0)));
                     break;
                 case 'CONDICION_ACTIVIDAD':
                     data = await catalogoService.getCondicionesActividad();
-                    setItems(data);
+                    setItems(data.sort((a, b) => (a.id || 0) - (b.id || 0)));
                     break;
                 case 'VIVIENDA':
                     data = await catalogoService.getViviendas();
-                    setHousingData(data);
+                    // Ordenar tipos de vivienda y sus categorías por ID
+                    const sortedHousingData = data.map(type => ({
+                        ...type,
+                        categorias: type.categorias.sort((a, b) => (a.id || 0) - (b.id || 0))
+                    })).sort((a, b) => (a.id || 0) - (b.id || 0));
+                    setHousingData(sortedHousingData);
                     setItems([]); // Handled differently
                     break;
                 case 'ESTADO_CIVIL':
                     data = await catalogoService.getEstadosCiviles();
-                    setItems(data);
+                    setItems(data.sort((a, b) => (a.id || 0) - (b.id || 0)));
                     break;
                 case 'TRIBUNAL':
                     data = await catalogoService.getTribunales();
-                    setItems(data);
+                    setItems(data.sort((a, b) => (a.id || 0) - (b.id || 0)));
                     break;
                 case 'SEMESTRE':
                     data = await catalogoService.getSemestres();
-                    setItems(data);
+                    // Los semestres se ordenan por término (código)
+                    setItems(data.sort((a, b) => (a.termino || '').localeCompare(b.termino || '')));
                     break;
                 case 'CENTRO':
                     data = await catalogoService.getCentros();
-                    setItems(data);
+                    setItems(data.sort((a, b) => (a.idCentro || 0) - (b.idCentro || 0)));
                     break;
                 case 'AMBITO_LEGAL':
                     data = await catalogoService.getAmbitosLegales();
@@ -298,8 +304,8 @@ export function Catalogos() {
                         ? {
                             ...type,
                             categorias: type.categorias.map(cat =>
-                                cat.id === item.id ? { ...cat, estatus: newStatus } : cat
-                            )
+                                cat.id === item.id ? { ...cat, estatus: newStatus as 'ACTIVO' | 'INACTIVO' } : cat
+                            ).sort((a, b) => (a.id || 0) - (b.id || 0))
                         }
                         : type
                 )
@@ -308,7 +314,16 @@ export function Catalogos() {
             setItems(prevItems =>
                 prevItems.map(prevItem =>
                     prevItem.id === item.id ? { ...prevItem, estatus: newStatus } : prevItem
-                )
+                ).sort((a, b) => {
+                    // Ordenar por ID, manejando diferentes estructuras de datos
+                    if (activeTab === 'CENTRO') {
+                        return (a.idCentro || 0) - (b.idCentro || 0);
+                    } else if (activeTab === 'SEMESTRE') {
+                        return (a.termino || '').localeCompare(b.termino || '');
+                    } else {
+                        return (a.id || 0) - (b.id || 0);
+                    }
+                })
             );
         }
 
@@ -335,8 +350,7 @@ export function Catalogos() {
                     await catalogoService.updateTribunalStatus(item.id, newStatus);
                     break;
             }
-            // Recargar los datos para actualizar la cache y reflejar cambios inmediatamente
-            await fetchCatalogData();
+            // No recargamos toda la lista, la actualización optimista ya reflejó el cambio
         } catch (error) {
             console.error("Error updating status:", error);
             // Revertir el cambio optimista en caso de error
@@ -347,8 +361,8 @@ export function Catalogos() {
                             ? {
                                 ...type,
                                 categorias: type.categorias.map(cat =>
-                                    cat.id === item.id ? { ...cat, estatus: item.estatus } : cat
-                                )
+                                    cat.id === item.id ? { ...cat, estatus: item.estatus as 'ACTIVO' | 'INACTIVO' | undefined } : cat
+                                ).sort((a, b) => (a.id || 0) - (b.id || 0))
                             }
                             : type
                     )
@@ -357,7 +371,12 @@ export function Catalogos() {
                 setItems(prevItems =>
                     prevItems.map(prevItem =>
                         prevItem.id === item.id ? { ...prevItem, estatus: item.estatus } : prevItem
-                    )
+                    ).sort((a, b) => {
+                        // Ordenar por ID, manejando diferentes estructuras de datos
+                        const idA = a.id || a.idCentro || 0;
+                        const idB = b.id || b.idCentro || 0;
+                        return idA - idB;
+                    })
                 );
             }
             alert('Error al actualizar estatus');
