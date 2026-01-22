@@ -46,6 +46,13 @@ export default function UsuariosPage() {
 
     const itemsPerPage = 10;
 
+    // Verificar permisos de acceso
+    useEffect(() => {
+        if (currentUser && currentUser.tipoUsuario !== 'COORDINADOR' && currentUser.tipoUsuario !== 'ADMINISTRADOR') {
+            navigate('/home');
+        }
+    }, [currentUser, navigate]);
+
     useEffect(() => {
         fetchUsuarios();
     }, []);

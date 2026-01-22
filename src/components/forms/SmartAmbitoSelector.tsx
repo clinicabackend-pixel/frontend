@@ -142,33 +142,41 @@ export default function SmartAmbitoSelector({ data, value, onChange, disabled }:
             {/* Dropdown Results */}
             {
                 isOpen && !disabled && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto z-50 animate-fade-in divide-y divide-gray-100">
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto z-50 animate-fade-in px-1.5 py-1.5">
                         {filteredItems.length === 0 ? (
-                            <div className="p-4 text-gray-500 text-center text-sm">
+                            <div className="p-4 text-gray-500 text-center text-sm rounded-md">
                                 No se encontraron coincidencias para "{searchTerm}"
                             </div>
                         ) : (
-                            filteredItems.map(item => (
-                                <button
-                                    key={item.id}
-                                    type="button"
-                                    onClick={() => handleSelect(item)}
-                                    className={`
-                                    w-full text-left px-4 py-2 hover:bg-red-50 transition-colors flex justify-between items-start group
-                                    ${item.id === value ? 'bg-red-50' : ''}
-                                `}
-                                >
-                                    <div className="flex-1 min-w-0">
-                                        <div className={`font-medium truncate ${item.id === value ? 'text-red-900' : 'text-gray-800'}`}>
-                                            {item.label}
+                            filteredItems.map((item, index) => {
+                                const isFirst = index === 0;
+                                const isLast = index === filteredItems.length - 1;
+                                const isSelected = item.id === value;
+                                
+                                return (
+                                    <button
+                                        key={item.id}
+                                        type="button"
+                                        onClick={() => handleSelect(item)}
+                                        className={`
+                                            w-full text-left px-4 py-2 hover:bg-red-50 transition-colors flex justify-between items-start group
+                                            ${isFirst ? 'rounded-t-md' : ''}
+                                            ${isLast ? 'rounded-b-md' : ''}
+                                            ${isSelected ? 'bg-red-50' : ''}
+                                        `}
+                                    >
+                                        <div className="flex-1 min-w-0">
+                                            <div className={`font-medium truncate ${isSelected ? 'text-red-900' : 'text-gray-800'}`}>
+                                                {item.label}
+                                            </div>
+                                            <div className="text-xs text-gray-500 truncate group-hover:text-red-800">
+                                                {item.breadcrumb}
+                                            </div>
                                         </div>
-                                        <div className="text-xs text-gray-500 truncate group-hover:text-red-800">
-                                            {item.breadcrumb}
-                                        </div>
-                                    </div>
-                                    {item.id === value && <Check className="w-4 h-4 text-red-900 mt-1 ml-2 shrink-0" />}
-                                </button>
-                            ))
+                                        {isSelected && <Check className="w-4 h-4 text-red-900 mt-1 ml-2 shrink-0" />}
+                                    </button>
+                                );
+                            })
                         )}
                     </div>
                 )

@@ -35,7 +35,7 @@ const ReportCard = ({ title, description, icon, children, onDownload, loading, f
     }, [theme]);
 
     return (
-        <div className={`rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+        <div className={`rounded-xl shadow-sm border overflow-visible hover:shadow-md transition-all duration-300 flex flex-col h-full ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
             <div className={`p-6 border-b flex flex-col items-center justify-center text-center gap-3 ${isDark ? 'border-gray-700 bg-gray-800/50' : 'border-gray-100 bg-gray-50/50'}`}>
                 <div className={`p-3 rounded-full ${fileType === 'PDF' ? (isDark ? 'bg-gray-700 text-white' : 'bg-red-50 text-red-900') : (isDark ? 'bg-gray-700 text-white' : 'bg-red-50 text-red-900')}`}>
                     <FontAwesomeIcon icon={icon} className={`text-2xl ${isDark ? 'text-white' : ''}`} />
@@ -49,7 +49,7 @@ const ReportCard = ({ title, description, icon, children, onDownload, loading, f
                     </span>
                 </div>
                 <p className={`text-sm mb-6 h-10 line-clamp-2 ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>{description}</p>
-                <div className="space-y-4 flex-1 w-full">
+                <div className="space-y-4 flex-1 w-full overflow-visible">
                     {children}
                 </div>
                 <div className={`mt-6 pt-4 border-t w-full ${isDark ? 'border-gray-700' : 'border-gray-50'}`}>
