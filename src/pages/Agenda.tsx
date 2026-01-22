@@ -57,14 +57,15 @@ export default function AgendaPage() {
             const puedeVerTodosLosCasos = user?.tipoUsuario === 'COORDINADOR' || user?.tipoUsuario === 'ADMINISTRADOR' || user?.tipoUsuario === 'PROFESOR';
             const currentUsername = user?.username || username;
             
-            // Determinar el filtro según el estado del botón y los permisos del usuario
+            // Determinar el filtro según el estado del botón
             let userFilter: string | undefined;
             if (filtroCasos === 'asignados') {
-                // Si el filtro es "asignados", siempre filtrar por usuario
+                // Si el filtro es "asignados", filtrar por usuario
                 userFilter = currentUsername || undefined;
             } else {
-                // Si el filtro es "todos", solo filtrar si el usuario no puede ver todos los casos
-                userFilter = (currentUsername && !puedeVerTodosLosCasos) ? currentUsername : undefined;
+                // Si el filtro es "todos", NO filtrar por usuario (obtener todos los casos)
+                // Todos los usuarios pueden ver todos los casos cuando seleccionan "Todos"
+                userFilter = undefined;
             }
 
             if (!currentUsername && !puedeVerTodosLosCasos && filtroCasos === 'asignados') {
@@ -74,7 +75,9 @@ export default function AgendaPage() {
             }
 
             // Obtener todos los casos según el filtro
+            console.log('Fetching acciones - Filtro:', filtroCasos, 'UserFilter:', userFilter, 'Puede ver todos:', puedeVerTodosLosCasos, 'Usuario:', currentUsername, 'Tipo:', user?.tipoUsuario);
             const todosCasos = await casoService.getAll(undefined, userFilter, undefined);
+            console.log('Casos obtenidos:', todosCasos.length, 'Primeros 3 casos:', todosCasos.slice(0, 3).map(c => c.numCaso));
 
             // Obtener acciones pendientes de todos los casos
             const acciones: AccionPendiente[] = [];
@@ -117,6 +120,7 @@ export default function AgendaPage() {
                 return fechaB.getTime() - fechaA.getTime();
             });
 
+            console.log('Acciones pendientes encontradas:', acciones.length);
             setAccionesPendientes(acciones);
         } catch (error) {
             console.error('Error fetching acciones pendientes:', error);
