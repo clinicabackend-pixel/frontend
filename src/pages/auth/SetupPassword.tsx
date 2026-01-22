@@ -40,7 +40,7 @@ const SetupPassword = () => {
 
         setLoading(true);
         try {
-            await axios.post("http://localhost:8080/api/auth/setup-password", {
+            await axios.post("https://backend-8ao1.onrender.com/api/auth/setup-password", {
                 token: token,
                 contrasena: password
             });
